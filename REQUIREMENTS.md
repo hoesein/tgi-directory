@@ -97,6 +97,58 @@ Directory/
 
 ---
 
+## Home Screen Design
+
+### Layout (Top to Bottom)
+1. **Hero Card (single box)**
+   - Search bar (location/search input)
+   - Notification bell icon (right of search bar)
+   - Image Slider below: auto-scrolling carousel of famous places
+     and restaurants with dot indicators, touch to view details
+
+2. **Categories Section**
+   - "Categories" header with "View All" link
+   - Grid layout (4 columns per row, wraps to new rows)
+   - New categories automatically flow into the grid, no layout change needed
+   - Categories: Home Services, Daily Needs, Doctor, Cake Shop, etc.
+   - Each category has icon and label
+
+5. **Nearest for Your Home Section**
+   - "Nearest for your Home" header
+   - Horizontal scrollable listing cards
+   - Each card shows:
+     - Restaurant/Place image
+     - Name
+     - Address/Location
+     - Rating (star)
+     - Distance (km)
+
+6. **Bottom Tab Navigation**
+   - Home (active)
+   - Messages/Chat
+   - Notifications
+   - Profile
+
+### Components to Create
+- `ImageSlider` - Carousel for famous places/restaurants (responsive width via `useWindowDimensions`)
+- `CategoryCard` - Individual category item (grid cell)
+- `CategoriesList` - Wrapping grid of categories (4 per row)
+- `NearestCard` - Individual nearest listing card
+- `NearestListings` - Horizontal scrollable nearest listings
+- `BottomTabNavigator` - Bottom navigation tabs
+
+---
+
+## Current Development Notes
+
+### Authentication (Skipped)
+- Authentication is currently **skipped** for development
+- Pressing Login/Register directly routes to Home screen with a dummy token
+- No backend API calls for auth
+- Will be re-enabled when backend is ready
+
+---
+
 ## Development Rules
 1. Follow MVC pattern for backend
 2. Use functional components with hooks in React Native

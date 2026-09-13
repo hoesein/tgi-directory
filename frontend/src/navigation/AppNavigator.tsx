@@ -1,20 +1,24 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AuthContext } from '../context/AuthContext';
-import HomeScreen from '../screens/HomeScreen';
+import { useAuthStore } from '../store/authStore';
+import BottomTabNavigator from './BottomTabNavigator';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-import ListingsScreen from '../screens/ListingsScreen';
 import ListingDetailScreen from '../screens/ListingDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
-  const { userToken, isLoading } = useContext(AuthContext);
+  const { userToken, isLoading } = useAuthStore();
 
   if (isLoading) {
-    return null;
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#FF6B35" />
+      </View>
+    );
   }
 
   return (
@@ -27,8 +31,7 @@ const AppNavigator = () => {
           </>
         ) : (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Listings" component={ListingsScreen} />
+            <Stack.Screen name="Main" component={BottomTabNavigator} />
             <Stack.Screen name="ListingDetail" component={ListingDetailScreen} />
           </>
         )}
@@ -36,5 +39,13 @@ const AppNavigator = () => {
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default AppNavigator;

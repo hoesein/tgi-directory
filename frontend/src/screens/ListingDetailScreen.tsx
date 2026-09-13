@@ -1,29 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { Text, Button } from 'react-native-paper';
-import api from '../services/api';
+import React from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Text } from 'react-native-paper';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { useListing } from '../api/useListings';
 
-const ListingDetailScreen = ({ route, navigation }) => {
+type RootStackParamList = {
+  ListingDetail: { listingId: string };
+};
+
+type ListingDetailRouteProp = RouteProp<RootStackParamList, 'ListingDetail'>;
+
+const ListingDetailScreen = () => {
+  const route = useRoute<ListingDetailRouteProp>();
   const { listingId } = route.params;
-  const [listing, setListing] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: listing, isLoading, error } = useListing(listingId);
 
-  useEffect(() => {
-    fetchListing();
-  }, []);
-
-  const fetchListing = async () => {
-    try {
-      const response = await api.get(`/listings/${listingId}`);
-      setListing(response.data.data);
-    } catch (error) {
-      console.error('Failed to fetch listing');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={styles.center}>
         <Text>Loading...</Text>
@@ -31,7 +23,7 @@ const ListingDetailScreen = ({ route, navigation }) => {
     );
   }
 
-  if (!listing) {
+  if (error || !listing) {
     return (
       <View style={styles.center}>
         <Text>Listing not found</Text>
