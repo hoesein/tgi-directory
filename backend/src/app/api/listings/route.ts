@@ -1,6 +1,6 @@
-import { supabase, supabaseAdmin } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { createListingSchema } from '@/types';
-import { successResponse, errorResponse, getTokenFromRequest } from '@/lib/api-helpers';
+import { successResponse, errorResponse } from '@/lib/api-helpers';
 
 export async function GET() {
   try {
@@ -22,16 +22,6 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const token = getTokenFromRequest(request);
-    if (!token) {
-      return errorResponse('Not authorized to access this route', 401);
-    }
-
-    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
-    if (userError || !userData.user) {
-      return errorResponse('Not authorized to access this route', 401);
-    }
-
     const body = await request.json();
     const parsed = createListingSchema.safeParse(body);
 
@@ -39,12 +29,9 @@ export async function POST(request: Request) {
       return errorResponse(parsed.error.errors[0].message, 400);
     }
 
-    const { data: listing, error } = await supabaseAdmin
+    const { data: listing, error } = await supabase
       .from('listings')
-      .insert({
-        ...parsed.data,
-        user_id: userData.user.id,
-      })
+      .insert(parsed.data)
       .select('*, category:categories(*), user:users(id, name, email)')
       .single();
 

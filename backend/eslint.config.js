@@ -2,7 +2,7 @@ const tsPlugin = require('@typescript-eslint/eslint-plugin');
 const prettierConfig = require('eslint-config-prettier');
 
 module.exports = [
-  { ignores: ['node_modules/', '.next/', 'eslint.config.js'] },
+  { ignores: ['node_modules/', '.next/', 'eslint.config.js', 'next-env.d.ts'] },
   ...tsPlugin.configs['flat/recommended'],
   prettierConfig,
   {

@@ -1,6 +1,6 @@
-import { supabase, supabaseAdmin } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { createCategorySchema } from '@/types';
-import { successResponse, errorResponse, getTokenFromRequest } from '@/lib/api-helpers';
+import { successResponse, errorResponse } from '@/lib/api-helpers';
 
 export async function GET() {
   try {
@@ -22,27 +22,6 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const token = getTokenFromRequest(request);
-    if (!token) {
-      return errorResponse('Not authorized to access this route', 401);
-    }
-
-    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(token);
-    if (userError || !userData.user) {
-      return errorResponse('Not authorized to access this route', 401);
-    }
-
-    // Check admin role
-    const { data: profile } = await supabaseAdmin
-      .from('users')
-      .select('role')
-      .eq('id', userData.user.id)
-      .single();
-
-    if (!profile || profile.role !== 'admin') {
-      return errorResponse('Not authorized to access this route', 403);
-    }
-
     const body = await request.json();
     const parsed = createCategorySchema.safeParse(body);
 
@@ -50,7 +29,7 @@ export async function POST(request: Request) {
       return errorResponse(parsed.error.errors[0].message, 400);
     }
 
-    const { data: category, error } = await supabaseAdmin
+    const { data: category, error } = await supabase
       .from('categories')
       .insert(parsed.data)
       .select()
