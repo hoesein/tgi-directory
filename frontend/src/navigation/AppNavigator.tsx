@@ -8,6 +8,8 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ListingDetailScreen from '../screens/ListingDetailScreen';
 
+import CategoryDetailScreen from '../screens/CategoryDetailScreen';
+
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
@@ -23,18 +25,12 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {userToken == null ? (
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="Main" component={BottomTabNavigator} />
-            <Stack.Screen name="ListingDetail" component={ListingDetailScreen} />
-          </>
-        )}
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Main">
+        <Stack.Screen name="Main" component={BottomTabNavigator} />
+        <Stack.Screen name="ListingDetail" component={ListingDetailScreen} />
+        <Stack.Screen name="CategoryDetail" component={CategoryDetailScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

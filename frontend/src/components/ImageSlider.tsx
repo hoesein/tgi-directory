@@ -48,7 +48,7 @@ const SLIDER_DATA: SliderItem[] = [
 
 const ImageSlider = () => {
   const { width: screenWidth } = useWindowDimensions();
-  const slideWidth = screenWidth - HORIZONTAL_INSET * 2;
+  const slideWidth = screenWidth;
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -85,12 +85,13 @@ const ImageSlider = () => {
       >
         {SLIDER_DATA.map((item) => (
           <TouchableOpacity key={item.id} activeOpacity={0.9}>
-            <View style={[styles.slide, { backgroundColor: item.color, width: slideWidth }]}>
+            <View style={[styles.slide, { width: slideWidth }]}>
+              <Image source={{ uri: item.image }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+              <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]} />
               <View style={styles.textContainer}>
                 <Text variant="titleMedium" style={styles.title}>{item.title}</Text>
                 <Text variant="bodySmall" style={styles.subtitle}>{item.subtitle}</Text>
               </View>
-              <Image source={{ uri: item.image }} style={styles.image} resizeMode="cover" />
             </View>
           </TouchableOpacity>
         ))}
@@ -112,30 +113,30 @@ const ImageSlider = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 4,
+    marginTop: 0,
   },
   slide: {
-    height: 130,
-    borderRadius: 12,
-    flexDirection: 'row',
+    height: 200,
+    justifyContent: 'flex-end',
     overflow: 'hidden',
   },
   textContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 14,
+    padding: 16,
+    paddingBottom: 24,
   },
   title: {
     color: '#fff',
     fontWeight: 'bold',
     marginBottom: 4,
+    fontSize: 24,
   },
   subtitle: {
     color: '#fff',
     opacity: 0.9,
+    fontSize: 16,
   },
   image: {
-    width: 100,
+    width: '100%',
     height: '100%',
   },
   dotContainer: {

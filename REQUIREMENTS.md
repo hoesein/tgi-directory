@@ -1,71 +1,85 @@
 # Directory App - Requirements & Architecture
 
 ## Overview
-A full-stack Directory Application with React Native (mobile) frontend and Node.js backend.
+A full-stack Directory Application with React Native (Expo) frontend and Next.js/Supabase backend.
 
 ---
 
 ## Tech Stack
 
 ### Backend
-- **Runtime:** Node.js (v18+)
-- **Framework:** Express.js
-- **Language:** JavaScript (ES6+)
-- **Database:** MongoDB with Mongoose ODM
-- **Authentication:** JWT (JSON Web Tokens)
-- **Validation:** express-validator
-- **Environment:** dotenv
-- **Testing:** Jest + Supertest
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Database:** Supabase (PostgreSQL)
+- **Auth:** Supabase Auth (JWT)
+- **Validation:** Zod
+- **Package Manager:** Bun
 
 ### Frontend
 - **Framework:** React Native (Expo managed workflow)
-- **Language:** JavaScript
-- **Navigation:** React Navigation v6
-- **State Management:** React Context API
-- **HTTP Client:** Axios
+- **Language:** TypeScript
+- **Navigation:** React Navigation v7
+- **State Management:** Zustand + TanStack Query
+- **HTTP Client:** Custom fetch-based ApiService
 - **UI Components:** React Native Paper
-- **Storage:** AsyncStorage
+- **Storage:** react-native-mmkv (web fallback: localStorage)
 
 ---
 
 ## Architecture
 
-### Backend Architecture (MVC Pattern)
+### Backend Architecture (Next.js App Router)
 ```
 backend/
 ├── src/
-│   ├── config/         # Database, env config
-│   ├── controllers/    # Route handlers
-│   ├── middleware/      # Auth, error handling
-│   ├── models/         # Mongoose schemas
-│   ├── routes/         # API route definitions
-│   └── utils/          # Helper functions
-├── tests/              # API tests
-├── .env.example        # Environment variables template
-├── package.json
-└── server.js           # Entry point
+│   ├── app/
+│   │   ├── layout.tsx              # Root layout
+│   │   ├── page.tsx                # API docs landing page
+│   │   └── api/
+│   │       ├── health/route.ts     # GET /api/health
+│   │       ├── auth/
+│   │       │   ├── register/route.ts
+│   │       │   ├── login/route.ts
+│   │       │   └── me/route.ts
+│   │       ├── listings/
+│   │       │   ├── route.ts        # GET (list), POST (create)
+│   │       │   └── [id]/route.ts   # GET, PUT, DELETE
+│   │       └── categories/
+│   │           └── route.ts        # GET (list), POST (create)
+│   ├── lib/
+│   │   ├── supabase.ts             # Supabase client
+│   │   └── api-helpers.ts          # Response helpers
+│   └── types/
+│       └── index.ts                # TypeScript types + Zod schemas
+├── supabase/
+│   └── migrations/
+│       └── 001_initial.sql         # Database migration
+├── .env.example
+├── next.config.js
+├── tsconfig.json
+└── package.json
 ```
 
 ### Frontend Architecture
 ```
 frontend/
 ├── src/
-│   ├── assets/         # Images, fonts
-│   ├── components/     # Reusable UI components
-│   ├── context/        # React Context providers
-│   ├── hooks/          # Custom hooks
-│   ├── navigation/     # React Navigation setup
-│   ├── screens/        # Screen components
-│   ├── services/       # API service layer
-│   └── utils/          # Helper functions
-├── __tests__/          # Component tests
-├── App.js              # Root component
+│   ├── api/                        # TanStack Query hooks
+│   ├── components/                 # Reusable UI components
+│   ├── lib/                        # Utility libraries
+│   ├── navigation/                 # Navigation setup
+│   ├── screens/                    # Screen components
+│   ├── services/                   # API service layer
+│   ├── store/                      # Zustand stores
+│   └── types/                      # TypeScript types
+├── App.tsx                         # Root component
+├── index.tsx                       # Entry point
 └── package.json
 ```
 
 ---
 
-## API Endpoints (Planned)
+## API Endpoints
 
 ### Auth
 - `POST /api/auth/register` - Register user
@@ -88,11 +102,11 @@ frontend/
 ## Project Structure (Root)
 ```
 Directory/
-├── backend/            # Node.js/Express API
+├── backend/            # Next.js/Supabase API
 ├── frontend/           # React Native app
 ├── .gitignore
-├── REQUIREMENTS.md     # This file
-└── README.md
+├── AGENTS.md           # Project guide
+└── REQUIREMENTS.md     # This file
 ```
 
 ---
@@ -113,7 +127,7 @@ Directory/
    - Categories: Home Services, Daily Needs, Doctor, Cake Shop, etc.
    - Each category has icon and label
 
-5. **Nearest for Your Home Section**
+3. **Nearest for Your Home Section**
    - "Nearest for your Home" header
    - Horizontal scrollable listing cards
    - Each card shows:
@@ -123,14 +137,14 @@ Directory/
      - Rating (star)
      - Distance (km)
 
-6. **Bottom Tab Navigation**
+4. **Bottom Tab Navigation**
    - Home (active)
    - Messages/Chat
    - Notifications
    - Profile
 
-### Components to Create
-- `ImageSlider` - Carousel for famous places/restaurants (responsive width via `useWindowDimensions`)
+### Components
+- `ImageSlider` - Carousel for famous places/restaurants (responsive via `useWindowDimensions`)
 - `CategoryCard` - Individual category item (grid cell)
 - `CategoriesList` - Wrapping grid of categories (4 per row)
 - `NearestCard` - Individual nearest listing card
@@ -145,14 +159,15 @@ Directory/
 - Authentication is currently **skipped** for development
 - Pressing Login/Register directly routes to Home screen with a dummy token
 - No backend API calls for auth
-- Will be re-enabled when backend is ready
+- Will be re-enabled when Supabase is configured
 
 ---
 
 ## Development Rules
-1. Follow MVC pattern for backend
+1. Use TypeScript for all new code
 2. Use functional components with hooks in React Native
 3. Implement proper error handling on both ends
-4. Write tests for critical paths
+4. Use Zod for all input validation
 5. Use environment variables for sensitive data
 6. Follow RESTful API design principles
+7. Use Supabase Row-Level Security for access control

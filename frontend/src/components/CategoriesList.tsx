@@ -22,9 +22,10 @@ const CATEGORIES: Category[] = [
 
 interface CategoriesListProps {
   onViewAll: () => void;
+  onCategoryPress: (id: string) => void;
 }
 
-const CategoriesList = ({ onViewAll }: CategoriesListProps) => {
+const CategoriesList = ({ onViewAll, onCategoryPress }: CategoriesListProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -36,7 +37,10 @@ const CategoriesList = ({ onViewAll }: CategoriesListProps) => {
       <View style={styles.grid}>
         {CATEGORIES.map((category) => (
           <View key={category.id} style={styles.gridItem}>
-            <CategoryCard category={category} />
+            <CategoryCard 
+              category={category} 
+              onPress={() => onCategoryPress(category.id)} 
+            />
           </View>
         ))}
       </View>

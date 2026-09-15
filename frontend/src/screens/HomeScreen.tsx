@@ -16,9 +16,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
   ListingDetail: { listingId: string };
+  CategoryDetail: { categoryId: string };
 };
 
-type HomeScreenProp = NativeStackNavigationProp<RootStackParamList, 'ListingDetail'>;
+type HomeScreenProp = NativeStackNavigationProp<RootStackParamList, 'ListingDetail' | 'CategoryDetail'>;
 
 interface HomeScreenProps {
   navigation: HomeScreenProp;
@@ -28,7 +29,12 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleViewAllCategories = () => {
+    navigation.navigate('CategoryDetail', { categoryId: '1' });
     console.log('View all categories');
+  };
+
+  const handleCategoryPress = (id: string) => {
+    navigation.navigate('CategoryDetail', { categoryId: id });
   };
 
   const handleViewAllNearest = () => {
@@ -46,7 +52,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.heroCard}>
+        <View style={styles.headerContainer}>
           <View style={styles.topRow}>
             <View style={styles.searchContainer}>
               <Ionicons name="search" size={18} color="#999" />
@@ -70,9 +76,12 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
               <Ionicons name="notifications-outline" size={22} color="#333" />
             </TouchableOpacity>
           </View>
-          <ImageSlider />
         </View>
-        <CategoriesList onViewAll={handleViewAllCategories} />
+        <ImageSlider />
+        <CategoriesList 
+          onViewAll={handleViewAllCategories} 
+          onCategoryPress={handleCategoryPress} 
+        />
         <NearestListings onViewAll={handleViewAllNearest} onListingPress={handleListingPress} />
       </ScrollView>
     </SafeAreaView>
@@ -87,29 +96,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  heroCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginTop: 12,
-    padding: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 3,
-      },
-      default: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-      },
-    }),
+  headerContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
   },
   topRow: {
     flexDirection: 'row',

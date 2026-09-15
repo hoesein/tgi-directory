@@ -1,7 +1,7 @@
 # AGENTS.md - Directory App Project Guide
 
 ## Project Overview
-Full-stack Directory Application: **React Native (Expo)** frontend + **Node.js/Express** backend.
+Full-stack Directory Application: **React Native (Expo)** frontend + **Next.js/Supabase** backend.
 
 ---
 
@@ -10,14 +10,12 @@ Full-stack Directory Application: **React Native (Expo)** frontend + **Node.js/E
 ### Backend
 | Layer | Technology |
 |-------|-----------|
-| Runtime | Node.js v18+ |
-| Framework | Express.js |
-| Language | JavaScript (ES6+) |
-| Database | MongoDB + Mongoose ODM |
-| Auth | JWT (jsonwebtoken + bcryptjs) |
-| Validation | express-validator |
-| Env | dotenv |
-| Testing | Jest + Supertest |
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth (JWT) |
+| Validation | Zod |
+| Package Manager | Bun |
 
 ### Frontend
 | Layer | Technology |
@@ -26,10 +24,10 @@ Full-stack Directory Application: **React Native (Expo)** frontend + **Node.js/E
 | Language | **TypeScript** |
 | Package Manager | Bun |
 | Navigation | React Navigation v7 |
-| State | **Zustand** + React Context API |
+| State | **Zustand** |
 | Server State | **TanStack Query** (React Query) |
 | Forms | **React Hook Form + Zod** |
-| HTTP Client | Axios |
+| HTTP Client | Custom fetch-based ApiService |
 | UI Library | React Native Paper v5 |
 | Icons | @expo/vector-icons (Ionicons) |
 | Storage | **react-native-mmkv** |
@@ -51,9 +49,9 @@ Full-stack Directory Application: **React Native (Expo)** frontend + **Node.js/E
 ### P1 - Should Have (Implemented)
 | Standard | Purpose | Package |
 |----------|---------|---------|
-| ESLint + Prettier | Code quality + formatting | `eslint`, `prettier`, `eslint-config-expo` |
+| ESLint + Prettier | Code quality + formatting | `eslint`, `prettier` |
 | Sentry | Crash reporting, performance | `@sentry/react-native` |
-| react-native-mmkv | Fast key-value storage (30x faster than AsyncStorage) | `react-native-mmkv` |
+| react-native-mmkv | Fast key-value storage | `react-native-mmkv` |
 
 ### P2 - Nice to Have (Implemented)
 | Standard | Purpose | Package |
@@ -68,41 +66,49 @@ Full-stack Directory Application: **React Native (Expo)** frontend + **Node.js/E
 Directory/
 ├── backend/
 │   ├── src/
-│   │   ├── config/         # db.ts (MongoDB connection)
-│   │   ├── controllers/    # auth.ts, listings.ts, categories.ts
-│   │   ├── middleware/      # auth.ts (JWT protect/authorize)
-│   │   ├── models/         # User.ts, Listing.ts, Category.ts
-│   │   ├── routes/         # auth.ts, listings.ts, categories.ts
-│   │   └── utils/
-│   ├── tests/
+│   │   ├── app/
+│   │   │   ├── layout.tsx              # Root layout
+│   │   │   ├── page.tsx                # API docs landing page
+│   │   │   └── api/
+│   │   │       ├── health/route.ts     # GET /api/health
+│   │   │       ├── auth/
+│   │   │       │   ├── register/route.ts
+│   │   │       │   ├── login/route.ts
+│   │   │       │   └── me/route.ts
+│   │   │       ├── listings/
+│   │   │       │   ├── route.ts
+│   │   │       │   └── [id]/route.ts
+│   │   │       └── categories/
+│   │   │           └── route.ts
+│   │   ├── lib/
+│   │   │   ├── supabase.ts
+│   │   │   └── api-helpers.ts
+│   │   └── types/
+│   │       └── index.ts
+│   ├── supabase/
+│   │   └── migrations/
+│   │       └── 001_initial.sql
+│   ├── SKILL.md                       # Backend-specific skill file
 │   ├── .env.example
-│   ├── package.json
-│   └── server.js           # Entry point
+│   ├── next.config.js
+│   ├── tsconfig.json
+│   └── package.json
 ├── frontend/
 │   ├── src/
-│   │   ├── api/            # TanStack Query hooks + API functions
-│   │   ├── assets/         # Images, fonts
-│   │   ├── components/     # Reusable UI (Header, ImageSlider, etc.)
-│   │   ├── hooks/          # Custom hooks
-│   │   ├── lib/            # Utility libraries (sentry, mmkv, etc.)
-│   │   ├── navigation/     # AppNavigator.tsx, BottomTabNavigator.tsx
-│   │   ├── screens/        # Home, Login, Register, Listings, etc.
-│   │   ├── services/       # api.ts (Axios instance)
-│   │   ├── store/          # Zustand stores
-│   │   ├── types/          # TypeScript type definitions
-│   │   └── utils/          # Helper functions
-│   ├── __tests__/
-│   ├── App.tsx             # Root component (GestureHandlerRootView wrapper)
-│   ├── index.tsx           # Entry point (registerRootComponent)
-│   ├── app.json
-│   ├── babel.config.js
-│   ├── tsconfig.json
-│   ├── .eslintrc.js
-│   ├── .prettierrc.js
+│   │   ├── api/                        # TanStack Query hooks
+│   │   ├── components/                 # Reusable UI
+│   │   ├── lib/                        # Utility libraries
+│   │   ├── navigation/                 # Navigation setup
+│   │   ├── screens/                    # Screen components
+│   │   ├── services/                   # API service layer
+│   │   ├── store/                      # Zustand stores
+│   │   └── types/                      # TypeScript types
+│   ├── SKILL.md                        # Frontend-specific skill file
+│   ├── App.tsx
+│   ├── index.tsx
 │   └── package.json
 ├── .gitignore
-├── AGENTS.md               # This file
-├── skill.md                # Package knowledge & workflows
+├── AGENTS.md                           # This file
 └── REQUIREMENTS.md
 ```
 
@@ -113,24 +119,25 @@ Directory/
 ### Backend
 ```bash
 cd backend
-npm install          # Install dependencies
-cp .env.example .env # Configure env vars
-npm run dev          # Start with nodemon (dev)
-npm start            # Start with node (prod)
-npm test             # Run Jest tests
+bun install
+cp .env.example .env   # Configure Supabase keys
+bun run dev             # Start dev server (port 3000)
+bun run build           # Build for production
+bun run start           # Start production server
+bun run lint            # ESLint
+bun run typecheck       # TypeScript check
 ```
 
 ### Frontend
 ```bash
 cd frontend
-bun install          # Install dependencies
-bunx expo start --web          # Run on web
+bun install
+bunx expo start --web          # Run on web (port 8081)
 bunx expo start --web --clear  # Clear cache and run
 bunx expo start                # Run on device (QR code)
-bunx expo install --fix        # Fix version compatibility
-bun run lint        # Run ESLint
-bun run format      # Run Prettier
-bun run typecheck   # Run TypeScript check
+bun run lint                   # ESLint
+bun run format                 # Prettier
+bun run typecheck              # TypeScript check
 ```
 
 ---
@@ -157,28 +164,38 @@ bun run typecheck   # Run TypeScript check
 
 ## Conventions
 
-### Backend
-- MVC pattern: Models → Controllers → Routes
-- Error handling: `try/catch` in controllers, global error middleware
-- Auth middleware: `protect` (JWT verify), `authorize(...roles)` (role check)
-- Response format: `{ success: boolean, data: ..., count?: number }`
-- Env vars: `PORT`, `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRE`
+### Backend (Next.js + Supabase)
+- App Router with Route Handlers (`src/app/api/`)
+- Zod validation on all POST/PUT inputs
+- Supabase client: `supabase` (public/anon) and `supabaseAdmin` (service role)
+- Response format: `{ success: boolean, data: ..., count?: number, message?: string }`
+- Auth: Supabase Auth JWT verified via `supabaseAdmin.auth.getUser(token)`
+- Env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 
-### Frontend
+### Frontend (React Native/Expo)
 - **TypeScript** for all files (.ts/.tsx)
 - Functional components with hooks
 - Screen files: `src/screens/[Name]Screen.tsx`
 - Reusable components: `src/components/[Name].tsx`
 - API hooks: `src/api/use[Resource].ts` (TanStack Query)
 - Zustand stores: `src/store/[name]Store.ts`
-- Types: `src/types/[name].ts`
-- Services: `src/services/api.ts` (Axios instance with interceptor)
+- Types: `src/types/index.ts`
+- Services: `src/services/api.ts` (custom fetch-based)
 - Navigation: Stack + Bottom Tabs pattern
 - Forms: React Hook Form + Zod validation schemas
 
 ### Git
 - Initial commit on `master` branch
-- `.gitignore` excludes: `node_modules/`, `.env`, `coverage/`, `*.log`
+- `.gitignore` excludes: `node_modules/`, `.env`, `.next/`, `coverage/`, `*.log`
+
+---
+
+## Skill Files
+
+| File | Scope |
+|------|-------|
+| `backend/SKILL.md` | Next.js + Supabase backend reference |
+| `frontend/SKILL.md` | React Native (Expo) frontend reference |
 
 ---
 
@@ -186,8 +203,9 @@ bun run typecheck   # Run TypeScript check
 
 - **Auth is skipped**: Login/Register directly routes to Home with dummy token
 - **Images**: Using Unsplash URLs (no local assets yet)
-- **Backend**: Not running, frontend uses mock data
-- **Web tested**: `bunx expo start --web` on port 8081
+- **Backend**: Next.js on port 3000, Supabase for database
+- **Frontend**: Expo on port 8081, connects to backend on port 3000
+- **Database**: Requires Supabase project + migration SQL
 
 ---
 
