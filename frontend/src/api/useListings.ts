@@ -1,12 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { Listing, ApiResponse } from '../types';
 
-export function useListings() {
+export function useListings(params?: { category_id?: string; search?: string }) {
   return useQuery({
-    queryKey: ['listings'],
+    queryKey: ['listings', params],
     queryFn: async () => {
-      const data = await api.get<ApiResponse<Listing[]>>('/listings');
+      const search = new URLSearchParams();
+      if (params?.category_id) search.set('category_id', params.category_id);
+      if (params?.search) search.set('search', params.search);
+      const qs = search.toString();
+      const path = qs ? `/listings?${qs}` : '/listings';
+      const data = await api.get<ApiResponse<Listing[]>>(path);
       return data.data;
     },
   });
@@ -20,46 +25,5 @@ export function useListing(id: string) {
       return data.data;
     },
     enabled: !!id,
-  });
-}
-
-export function useCreateListing() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (newListing: Partial<Listing>) => {
-      const data = await api.post<ApiResponse<Listing>>('/listings', newListing);
-      return data.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['listings'] });
-    },
-  });
-}
-
-export function useUpdateListing() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Listing> & { id: string }) => {
-      const data = await api.put<ApiResponse<Listing>>(`/listings/${id}`, updates);
-      return data.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['listings'] });
-    },
-  });
-}
-
-export function useDeleteListing() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await api.delete(`/listings/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['listings'] });
-    },
   });
 }

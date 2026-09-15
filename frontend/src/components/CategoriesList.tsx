@@ -1,31 +1,25 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text } from 'react-native-paper';
 import CategoryCard from './CategoryCard';
-
-interface Category {
-  id: string;
-  name: string;
-  icon: string;
-}
-
-const CATEGORIES: Category[] = [
-  { id: '1', name: 'Home Services', icon: 'home-outline' },
-  { id: '2', name: 'Daily Needs', icon: 'cart-outline' },
-  { id: '3', name: 'Doctor', icon: 'medkit-outline' },
-  { id: '4', name: 'Cake Shop', icon: 'cafe-outline' },
-  { id: '5', name: 'Restaurants', icon: 'restaurant-outline' },
-  { id: '6', name: 'Hotels', icon: 'bed-outline' },
-  { id: '7', name: 'Salon & Spa', icon: 'cut-outline' },
-  { id: '8', name: 'Education', icon: 'school-outline' },
-];
+import { useMainCategories } from '../api/useCategories';
 
 interface CategoriesListProps {
   onViewAll: () => void;
   onCategoryPress: (id: string) => void;
 }
 
+const FALLBACK_CATEGORIES = [
+  { id: 'fallback-hotel', name: 'Hotel', icon: 'bed-outline', level: 0, parent_id: null, sort_order: 1 },
+  { id: 'fallback-restaurant', name: 'Restaurant', icon: 'restaurant-outline', level: 0, parent_id: null, sort_order: 2 },
+  { id: 'fallback-emergency', name: 'Emergency', icon: 'warning-outline', level: 0, parent_id: null, sort_order: 3 },
+  { id: 'fallback-hospital', name: 'Hospital/Clinic', icon: 'medkit-outline', level: 0, parent_id: null, sort_order: 4 },
+] as const;
+
 const CategoriesList = ({ onViewAll, onCategoryPress }: CategoriesListProps) => {
+  const { data, isLoading } = useMainCategories();
+  const categories = data && data.length > 0 ? data : FALLBACK_CATEGORIES;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -34,16 +28,20 @@ const CategoriesList = ({ onViewAll, onCategoryPress }: CategoriesListProps) => 
           <Text variant="bodyMedium" style={styles.viewAll}>View All</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.grid}>
-        {CATEGORIES.map((category) => (
-          <View key={category.id} style={styles.gridItem}>
-            <CategoryCard 
-              category={category} 
-              onPress={() => onCategoryPress(category.id)} 
-            />
-          </View>
-        ))}
-      </View>
+      {isLoading && !data ? (
+        <ActivityIndicator style={{ paddingVertical: 20 }} color="#FF6B35" />
+      ) : (
+        <View style={styles.grid}>
+          {categories.map((category) => (
+            <View key={category.id} style={styles.gridItem}>
+              <CategoryCard
+                category={{ id: category.id, name: category.name, icon: category.icon ?? 'apps-outline' }}
+                onPress={() => onCategoryPress(category.id)}
+              />
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 };

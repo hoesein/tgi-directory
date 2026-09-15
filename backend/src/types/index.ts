@@ -14,7 +14,13 @@ export interface Category {
   id: string;
   name: string;
   description: string | null;
+  parent_id: string | null;
+  icon: string | null;
+  level: number;
+  sort_order: number;
   created_at: string;
+  // populated
+  children?: Category[];
 }
 
 export interface Listing {
@@ -22,7 +28,7 @@ export interface Listing {
   title: string;
   description: string;
   category_id: string;
-  user_id: string;
+  user_id: string | null;
   location: string;
   phone: string | null;
   email: string | null;
@@ -31,7 +37,7 @@ export interface Listing {
   created_at: string;
   // Joined fields
   category?: Category;
-  user?: Pick<User, 'id' | 'name' | 'email'>;
+  user?: Pick<User, 'id' | 'name' | 'email'> | null;
 }
 
 // ─── API Response ────────────────────────────────────────────────────────────
@@ -71,7 +77,11 @@ export const updateListingSchema = createListingSchema.partial();
 
 export const createCategorySchema = z.object({
   name: z.string().min(1).max(50),
-  description: z.string().max(200).optional(),
+  description: z.string().max(200).optional().nullable(),
+  parent_id: z.string().uuid().nullable().optional(),
+  icon: z.string().max(50).nullable().optional(),
+  level: z.number().int().min(0).max(5).optional(),
+  sort_order: z.number().int().optional(),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

@@ -21,27 +21,34 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 export interface Listing {
-  _id: string;
+  id: string;
   title: string;
   description: string;
-  category: Category;
-  user: User;
+  category_id: string;
+  category?: Category | null;
+  user?: User | null;
   location: string;
-  phone?: string;
-  email?: string;
-  website?: string;
-  image?: string;
-  createdAt: string;
+  phone?: string | null;
+  email?: string | null;
+  website?: string | null;
+  image?: string | null;
+  created_at: string;
 }
 
 export interface Category {
-  _id: string;
+  id: string;
   name: string;
-  description?: string;
+  description?: string | null;
+  parent_id: string | null;
+  icon?: string | null;
+  level: number;
+  sort_order: number;
+  created_at: string;
+  children?: Category[];
 }
 
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role: 'user' | 'admin';
