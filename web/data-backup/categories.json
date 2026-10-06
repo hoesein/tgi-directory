@@ -1,0 +1,85 @@
+[
+    {
+        "file": "emergency.json",
+        "title": "Emergency",
+        "description": "Hospitals, charity groups, fire department and police stations",
+        "count": 20,
+        "sort_order": 7,
+        "types": [
+            "hospital",
+            "charity",
+            "fire",
+            "police"
+        ]
+    },
+    {
+        "file": "hotels.json",
+        "title": "Hotels",
+        "description": "Hotels and guest houses",
+        "count": 97,
+        "sort_order": 1,
+        "types": [
+            "guest_house",
+            "hotel"
+        ]
+    },
+    {
+        "file": "banks.json",
+        "title": "Banks & ATMs",
+        "description": "Bank branches and ATM locations",
+        "count": 54,
+        "sort_order": 4,
+        "types": [
+            "atm",
+            "branch"
+        ]
+    },
+    {
+        "file": "food_places.json",
+        "title": "Food & Drinks",
+        "description": "Restaurants, tea shops, cafes, bars, bakeries",
+        "count": 113,
+        "sort_order": 2,
+        "types": [
+            "bakery",
+            "bar",
+            "cafe",
+            "restaurant",
+            "tea_shop"
+        ]
+    },
+    {
+        "file": "healthcare.json",
+        "title": "Healthcare",
+        "description": "Clinics and pharmacies",
+        "count": 16,
+        "sort_order": 5,
+        "types": [
+            "clinic",
+            "pharmacy"
+        ]
+    },
+    {
+        "file": "shops.json",
+        "title": "Shops",
+        "description": "Mobile, gift, malls, wine shops",
+        "count": 31,
+        "sort_order": 3,
+        "types": [
+            "gift",
+            "mobile",
+            "mall",
+            "wine"
+        ]
+    },
+    {
+        "file": "travel_agencies.json",
+        "title": "Travel",
+        "description": "Travel agencies",
+        "count": 17,
+        "sort_order": 6,
+        "types": [
+            "agency"
+        ]
+    }
+]

@@ -1,0 +1,178 @@
+[
+  {
+    "name": "နိုင်းမိုရ်",
+    "phone": "20444",
+    "address": "၁၁/၉၊ လမ်းမတော်လမ်း၊ ကန်အောက်ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "စင်ထွန်းဆေးခန်း(အရေပြား)",
+    "phone": "081214411",
+    "address": "၇၃၊ ဗိုလ်ချုပ်အောင်ဆန်းလမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "ဇင်",
+    "phone": "081214442",
+    "address": "၁၁/၉၊ လမ်းမတော်လမ်း၊ ကန်အောက်ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "ဂီတာအေးသီချင်းစာပေ-ကြီး",
+    "phone": "081214447",
+    "address": "၉၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "ထွန်း",
+    "phone": "081214444, 081214444",
+    "address": "၉၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "ပတမြား",
+    "phone": "081214442",
+    "address": "၉၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "အောင်ကောင်းဆက်(ရင်ဆေး)",
+    "phone": "09-77780046, 09-77780066",
+    "address": "၈/၉၊ လမ်းမတော်လမ်း၊ ကန်အောက်ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "အောင်ရိုးရာတ်(ရင်ဆေး)",
+    "phone": "09-77780046, 09-77780066",
+    "address": "၈/၉၊ လမ်းမတော်လမ်း၊ ကန်အောက်ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "မြတ်သုခ",
+    "phone": "081207718",
+    "address": "၂၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "အမျိုးသားဓာတ်ခွဲခန်း",
+    "phone": "081214446",
+    "address": "၇၃၊ ဗိုလ်ချုပ်အောင်ဆန်းလမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "မိဘသက်မွေး",
+    "phone": "081212440",
+    "address": "၃၁/၂၊ ကန်အောက်ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "အမှတ်(၁)ဆေးခန်း",
+    "phone": "081214444",
+    "address": "၇၃၊ ဗိုလ်ချုပ်အောင်ဆန်းလမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "အမှတ်(၂)ဆေးခန်း",
+    "phone": "081214444",
+    "address": "၇၃၊ ဗိုလ်ချုပ်အောင်ဆန်းလမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "clinic",
+    "source_file": "clinics.json",
+    "description": ""
+  },
+  {
+    "name": "ရွှေတိမ်း ဆေးဆိုင်",
+    "phone": "081212142",
+    "address": "၁၂၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "pharmacy",
+    "source_file": "pharmacies.json",
+    "description": ""
+  },
+  {
+    "name": "ရွှေဆေး ဆေးဆိုင်",
+    "phone": "081212210",
+    "address": "၉၃၊ ဗိုလ်ချုပ်လမ်း၊ ကန်အောက်ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "pharmacy",
+    "source_file": "pharmacies.json",
+    "description": ""
+  },
+  {
+    "name": "ဆေးဆိုင်",
+    "phone": "081212111",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "pharmacy",
+    "source_file": "pharmacies.json",
+    "description": ""
+  }
+]

@@ -1,0 +1,189 @@
+[
+  {
+    "name": "Royal Express",
+    "phone": "20277",
+    "address": "၉၃၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "MGL",
+    "phone": "09-42127444",
+    "address": "၂၉-၃၀၊ အနောက်မြို့ပတ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "UCL",
+    "phone": "09-4210004",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "UCS",
+    "phone": "09-77787744",
+    "address": "မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "AIR KBZ",
+    "phone": "081214442, 081214446",
+    "address": "၁၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Air Than Lwin",
+    "phone": "081214442, 081214447, 081214443",
+    "address": "၁၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Golden",
+    "phone": "081213337, 09-42564607",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "KSL",
+    "phone": "09-47844000",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Myanmar Toenzar",
+    "phone": "081214442, 081214441",
+    "address": "၁၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "One Hero",
+    "phone": "081212446",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Red Eagle",
+    "phone": "081214444, 09-42564444",
+    "address": "၇/၂၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Rosetta",
+    "phone": "09-44477700, 09-77784444",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Seven Diamond",
+    "phone": "081200777, 09-42777711",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "SUN FAR",
+    "phone": "081214442, 081214443",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Sun Flower",
+    "phone": "081212447, 081212444",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Sun Shine",
+    "phone": "09-44477777, 09-42444422",
+    "address": "၇၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  },
+  {
+    "name": "Yadanarpon",
+    "phone": "081212211, 081212111",
+    "address": "၁၇၊ ဗိုလ်ချုပ်လမ်း၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "agency",
+    "source_file": "travel_agencies.json",
+    "description": ""
+  }
+]

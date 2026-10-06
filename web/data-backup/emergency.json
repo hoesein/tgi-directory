@@ -1,0 +1,222 @@
+[
+  {
+    "name": "ခိုင်မေတ္တာ",
+    "phone": "081206681",
+    "address": "၁၁/၇၊ ကမ္ဘောဇလမ်း၊ ရေအေးကွင်းရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "စဝ်စံထွန်းဆေးရုံကြီး(အရေးပေါ်ဌာန)",
+    "phone": "0812121511",
+    "address": "ဗိုလ်ချုပ်အောင်ဆန်းလမ်း။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "စိန်",
+    "phone": "081212672",
+    "address": "၃၁၀၊ အရှေ့မြို့ပတ်လမ်း၊ သစ်တောရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "ဇီဝိတဒါနသံဃာ့ဆေးရုံကြီး",
+    "phone": "081212707",
+    "address": "",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "ထွန်း",
+    "phone": "0812123255",
+    "address": "၁၇၇၊ ရေထွက်ဦးလမ်း၊ ကန်ရှေ့ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "ပတ္တမြား",
+    "phone": "0812122242",
+    "address": "ည-၃၃၆/၃၃၇/၂၅၆၊ နှင်းဆီလမ်းနှင့် ညောင်ပင်သာလမ်းထောင့်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "ဘန်ကောက်ဆေးရုံ(ရုံးခွဲ)",
+    "phone": "09-788994599",
+    "address": "၁၆/၁၁၊ ကမ္ဘောဇလမ်း၊ ရေအေးကွင်းရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "ဘမ်ရွမ်ဂရက်(ရုံးခွဲ)",
+    "phone": "09-782241686",
+    "address": "၁၀၁/၂၀၁၂၊ ဗိုလ်ချုပ်အောင်ဆန်းလမ်းနှင့် မြောက်ကျောင်းလမ်းထောင့်၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "မြတ်တော်ဝင်",
+    "phone": "081205259",
+    "address": "၂၂၊ ကြံ့ခိုင်ရေးလမ်း၊ ပြည်တော်သာရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "အမျိုးသမီးနှင့်ကလေးဆေးရုံ",
+    "phone": "0812124368",
+    "address": "သစ်တောရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "hospital",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "ဓနုစာပေနှင့်ယဥ်ကျေးမှုအသင်း",
+    "phone": "09-428328102",
+    "address": "စီ-၇၊ သံလွင်လမ်း၊ ကန်ရှေ့ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "charity",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "ရှမ်းစာပေနှင့်ယဉ်ကျေးမှုအသင်း",
+    "phone": "0812122169",
+    "address": "ဗိုလ်ချုပ်အောင်ဆန်းလမ်း။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "charity",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "သစ္စာမွန်နာမှုကူညီမှုအသင်း",
+    "phone": "081202051",
+    "address": "မြောက်ကျောင်းလမ်း၊ အလယ်ဗလီ၊ မြို့မရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "charity",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "အင်းသားလူမှုရေးအသင်း",
+    "phone": "0812125528",
+    "address": "နဂါးပွတ်ကျောင်းလမ်း၊ ချမ်းမြသာစည်ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "charity",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "နမ့်ခုံးရှမ်းများပရဟိတအသင်း",
+    "phone": "081-202041",
+    "address": "ဝေဠုဝန်ကျောင်းတိုက်၊ ဝါးပြား၊ ကျောင်းကြီးစုရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "charity",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "ပအိုဝ်းသွေးလှူရှင်အသင်း",
+    "phone": "081205370",
+    "address": "တေဇလမ်း၊ မြေဖြူဝါဆိုကျောင်းတိုက်၊ ညောင်ဖြူစခန်းရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "charity",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "မေတ္တာရှင်နာမှုကူညီရေးအသင်း",
+    "phone": "081205282",
+    "address": "နဂါးပွတ်ပရိယတ္တိစာသင်တိုက်အတွင်း၊ ချမ်းမြသာစည်ရပ်။",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "charity",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "မီးသတ်တပ်ဖွဲ့",
+    "phone": "0812121502",
+    "address": "",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "fire",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "အမှတ်(၁)ရဲစခန်း",
+    "phone": "0812121504",
+    "address": "",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "police",
+    "source_file": "emergency.json",
+    "description": ""
+  },
+  {
+    "name": "အမှတ်(၂)ရဲစခန်း",
+    "phone": "0812121555",
+    "address": "",
+    "location": "",
+    "images": "",
+    "rating": "",
+    "type": "police",
+    "source_file": "emergency.json",
+    "description": ""
+  }
+]

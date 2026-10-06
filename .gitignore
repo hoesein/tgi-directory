@@ -1,6 +1,13 @@
+/*
+!/web/
+!/web/**
+!/.gitignore
+!/.gitmodules
+
 node_modules/
 .env
 coverage/
 *.log
 .DS_Store
 Thumbs.db
+/web/dist/

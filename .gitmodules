@@ -1,0 +1,4 @@
+[submodule "web/public/data"]
+	path = web/public/data
+	url = https://github.com/hoesein/city-data.git
+	branch = main
