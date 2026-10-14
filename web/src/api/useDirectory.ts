@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   fetchDirectoryCategories,
   fetchDirectoryFile,
+  fetchTazaungdaingEvents,
   isDirectoryDataConfigured,
 } from '../services/directory';
 import type { Category } from '../types';
@@ -25,6 +26,15 @@ export function useDirectoryFile(file: string | undefined, type?: string) {
       return type ? items.filter((i) => i.type === type) : items;
     },
     enabled: isDirectoryDataConfigured() && !!file,
+    staleTime: 1000 * 60 * 60,
+  });
+}
+
+export function useTazaungdaingEvents() {
+  return useQuery({
+    queryKey: ['tazaungdaing-events'],
+    queryFn: fetchTazaungdaingEvents,
+    enabled: isDirectoryDataConfigured(),
     staleTime: 1000 * 60 * 60,
   });
 }

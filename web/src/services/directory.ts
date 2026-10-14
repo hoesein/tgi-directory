@@ -1,4 +1,4 @@
-import type { DirectoryCategoryMeta, DirectoryItem } from '../types';
+import type { DirectoryCategoryMeta, DirectoryItem, TazaungdaingEvent } from '../types';
 
 const DATA_BASE_URL = (import.meta.env.VITE_DATA_URL as string | undefined)?.replace(/\/$/, '') ?? '';
 
@@ -8,7 +8,7 @@ export function isDirectoryDataConfigured(): boolean {
 }
 
 async function fetchJson<T>(file: string): Promise<T> {
-  const base = import.meta.env.DEV ? '/data' : DATA_BASE_URL || '/data';
+  const base = import.meta.env.DEV ? '/public' : DATA_BASE_URL || '/public';
   const response = await fetch(`${base}/data/${file}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch ${file}: ${response.status}`);
@@ -31,4 +31,8 @@ export function fetchDirectoryCategories(): Promise<DirectoryCategoryMeta[]> {
 
 export function fetchDirectoryFile(file: string): Promise<DirectoryItem[]> {
   return fetchJson<DirectoryItem[]>(file);
+}
+
+export function fetchTazaungdaingEvents(): Promise<TazaungdaingEvent[]> {
+  return fetchJson<TazaungdaingEvent[]>('tazaungdaing.json');
 }

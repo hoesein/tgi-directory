@@ -2,3 +2,6 @@
 	path = web/public/data
 	url = https://github.com/hoesein/city-data.git
 	branch = main
+[submodule "web/vendor/shan-market-day"]
+	path = web/vendor/shan-market-day
+	url = https://github.com/hoesein/shan_market_day.git

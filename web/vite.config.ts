@@ -2,7 +2,22 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const marketDaySource = decodeURIComponent(
+  new URL('./vendor/shan-market-day/src/index.ts', import.meta.url).pathname.replace(
+    /^\/([A-Z]:\/)/i,
+    '$1'
+  )
+);
+
 export default defineConfig({
+  resolve: {
+    alias: {
+      'shan-market-day': marketDaySource,
+    },
+  },
+  optimizeDeps: {
+    exclude: ['shan-market-day'],
+  },
   plugins: [
     react(),
     VitePWA({
@@ -13,8 +28,8 @@ export default defineConfig({
         name: 'Directory - Taunggyi',
         short_name: 'Directory',
         description: 'Taunggyi city directory: hotels, restaurants, banks, shops and more.',
-        theme_color: '#FF6B35',
-        background_color: '#ffffff',
+        theme_color: '#14532D',
+        background_color: '#F3F7F4',
         display: 'standalone',
         scope: '/',
         start_url: '/',

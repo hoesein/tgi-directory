@@ -81,3 +81,28 @@ export interface DirectoryCategoryMeta {
   sort_order?: number;
   types: string[];
 }
+
+export interface TazaungdaingEvent {
+  event_date: string;
+  name: string;
+  participants: TazaungdaingParticipant[];
+}
+
+export interface TazaungdaingParticipant {
+  name: string;
+  type: string;
+  ward: string;
+  leader: string;
+  about: string;
+  initial_year: string;
+  milestones: {
+    year: string;
+    achieve: string;
+  }[];
+  social?: TazaungdaingParticipantSocial[] | null;
+}
+
+export interface TazaungdaingParticipantSocial {
+  platform: string;
+  url: string;
+}

@@ -128,7 +128,7 @@ export default function CategoryPage() {
           <CategoryListItem
             key={item.id}
             item={item}
-            onPress={() => navigate(`/listing/${encodeURIComponent(item.id)}`)}
+            onPress={() => navigate(`/category-detail/${encodeURIComponent(item.id)}`)}
           />
         ))}
         {displayListings.length === 0 && <p className="empty">No listings found.</p>}</div>

@@ -25,7 +25,7 @@ const PLACES = [
   },
 ];
 
-export default function NotificationsPage() {
+export default function PlaceToVisitPage() {
   return (
     <div>
       <div className="page-head">

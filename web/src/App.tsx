@@ -3,12 +3,13 @@ import BottomNav from './components/BottomNav';
 import HomePage from './pages/HomePage';
 import CategoryPage from './pages/CategoryPage';
 import CategoriesPage from './pages/CategoriesPage';
-import ListingPage from './pages/ListingPage';
+import CategoryDetailPage from './pages/CategoryDetailPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import EventsPage from './pages/EventsPage';
-import NotificationsPage from './pages/NotificationsPage';
+import TazaungdaingParticipantPage from './pages/TazaungdaingParticipantPage';
+import PlaceToVisitPage from './pages/PlaceToVisitPage';
 
 // The floating tab bar only lives on the home page — every other
 // route is a dedicated page with its own back navigation.
@@ -25,12 +26,16 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
-          <Route path="/listing/:listingId" element={<ListingPage />} />
+          <Route path="/category-detail/:listingId" element={<CategoryDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventsPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route
+            path="/events/tazaungdaing/:eventDate/:participantIndex"
+            element={<TazaungdaingParticipantPage />}
+          />
+          <Route path="/notifications" element={<PlaceToVisitPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

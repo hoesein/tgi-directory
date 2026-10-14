@@ -16,9 +16,11 @@
     "@sentry/react": "^9.0.0",
     "@tanstack/react-query": "^5.102.8",
     "lucide-react": "^1.48.0",
+    "mycal": "github:hoesein/mycal#v2.3.1-shan.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-hook-form": "^7.88.0",
+    "react-infinite-ticker": "^2.3.0",
     "react-router-dom": "^7.1.0",
     "zod": "^4.6.2",
     "zustand": "^5.0.15"

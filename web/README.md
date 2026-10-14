@@ -4,6 +4,8 @@
 
 The canonical static directory data is in [`hoesein/city-data`](https://github.com/hoesein/city-data). The repository is included as a Git submodule at `web/public/data`; its JSON files are under the submodule's `data/` directory. The previous local JSON snapshot is retained in `web/data-backup/`, outside Vite's public asset directory.
 
+The Events page calendar and the home-screen event ticker share data from [`hoesein/shan_market_day`](https://github.com/hoesein/shan_market_day), checked out as a Git submodule at `web/vendor/shan-market-day`. Market schedules and gazetted holidays are bundled with the PWA and available offline. Myanmar lunar dates provide full/new moon special-day labels. The calendar and ticker use the same shared date lookup; there are no hard-coded sample events. The home-screen ticker uses `react-infinite-ticker` for continuous scrolling.
+
 Initialize the data repository after cloning the application:
 
 ```powershell
@@ -19,6 +21,13 @@ To update the checked-out data and record the selected data revision in the appl
 ```bash
 git submodule update --remote web/public/data
 git add web/public/data
+```
+
+To update the market calendar records:
+
+```bash
+git submodule update --remote web/vendor/shan-market-day
+git add web/vendor/shan-market-day
 ```
 
 Category ordering is controlled by `sort_order` in `data/categories.json`.

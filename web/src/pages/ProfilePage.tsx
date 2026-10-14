@@ -1,30 +1,9 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  User,
-  Shield,
-  Clock,
-  Heart,
-  TrendingUp,
-  Users,
-  Link2,
-  Moon,
-  ChevronRight,
-  Info,
-  Database,
-} from 'lucide-react';
+import { ChevronRight, MessageCircle, Send, User } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import { storage } from '../lib/storage';
 
 export default function ProfilePage() {
   const { userToken, signOut } = useAuthStore();
-  const [darkMode, setDarkMode] = useState(storage.getString('darkMode') === 'true');
-
-  const toggleDarkMode = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    storage.set('darkMode', String(next));
-  };
 
   return (
     <div className="profile-page">
@@ -58,76 +37,29 @@ export default function ProfilePage() {
           </Link>
         )}
 
-        <div className="profile-menu">
-          <div className="profile-menu-item">
-            <div className="profile-menu-icon">
-              <Shield size={20} />
-            </div>
-            <span>Security</span>
+        <section className="profile-contact">
+          <div className="profile-contact-icon">
+            <MessageCircle size={22} />
+          </div>
+          <div className="profile-contact-copy">
+            <h2>Help improve the directory</h2>
+            <p>
+              Contact the developer to update category or event information, or to share
+              another suggestion.
+            </p>
+          </div>
+          <a
+            className="profile-telegram-link"
+            href="https://t.me/h3ins03"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Contact the developer on Telegram at @h3ins03"
+          >
+            <Send size={17} />
+            <span>@h3ins03</span>
             <ChevronRight size={18} />
-          </div>
-          <div className="profile-menu-item">
-            <div className="profile-menu-icon">
-              <Clock size={20} />
-            </div>
-            <span>History</span>
-            <ChevronRight size={18} />
-          </div>
-          <div className="profile-menu-item">
-            <div className="profile-menu-icon">
-              <Heart size={20} />
-            </div>
-            <span>Favorites (Saved)</span>
-            <ChevronRight size={18} />
-          </div>
-          <div className="profile-menu-item">
-            <div className="profile-menu-icon">
-              <TrendingUp size={20} />
-            </div>
-            <span>Usage Realtime Data</span>
-            <ChevronRight size={18} />
-          </div>
-          <div className="profile-menu-item">
-            <div className="profile-menu-icon">
-              <Users size={20} />
-            </div>
-            <span>Communication</span>
-            <ChevronRight size={18} />
-          </div>
-          <div className="profile-menu-item">
-            <div className="profile-menu-icon">
-              <Link2 size={20} />
-            </div>
-            <span>Website & Resources</span>
-            <ChevronRight size={18} />
-          </div>
-        </div>
-
-        <div className="profile-menu">
-          <div className="profile-menu-item" onClick={toggleDarkMode} role="switch" aria-checked={darkMode} tabIndex={0}>
-            <div className="profile-menu-icon">
-              <Moon size={20} />
-            </div>
-            <span>Dark Mode</span>
-            <div className={`toggle${darkMode ? ' on' : ''}`}>
-              <div className="toggle-knob" />
-            </div>
-          </div>
-          <div className="profile-menu-item">
-            <div className="profile-menu-icon">
-              <Info size={20} />
-            </div>
-            <span>App Version</span>
-            <span className="profile-menu-value">1.0.0</span>
-          </div>
-          <div className="profile-menu-item">
-            <div className="profile-menu-icon">
-              <Database size={20} />
-            </div>
-            <span>Data Source</span>
-            <span className="profile-menu-value">Internet</span>
-          </div>
-        </div>
+          </a>
+        </section>
 
         {userToken && (
           <button className="btn-primary profile-signout" onClick={signOut} type="button">
