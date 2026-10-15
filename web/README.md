@@ -18,7 +18,7 @@ Initialize the data repository after cloning the application:
 git submodule update --init --recursive
 ```
 
-Vite serves the submodule's `data/` files under `/data/data/` during development and includes them in the production build. Production loads the bundled JSON from the same path, and the service worker precaches the JSON files for offline use. Since `city-data` is private, a deployment checkout must have read access to the submodule before building; never expose a repository token in `VITE_DATA_URL` or other client-side variables.
+Vite serves the submodule's JSON files under `/data/` during development and includes them in the production build. For example, `categories.json` is available at `https://hoesein.github.io/tgi-directory/data/categories.json`—the `public/` directory name is not part of the URL. Production loads the bundled JSON from the same path, and the service worker precaches the JSON files for offline use. Since `city-data` is private, a deployment checkout must have read access to the submodule before building; never expose a repository token in `VITE_DATA_URL` or other client-side variables.
 
 `VITE_DATA_URL` is an optional override for a publicly accessible mirror. Set it to the base before `/data` (for example, a public raw-content repository root); leave it empty to use the bundled submodule.
 

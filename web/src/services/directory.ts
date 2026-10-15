@@ -8,9 +8,7 @@ export function isDirectoryDataConfigured(): boolean {
 }
 
 async function fetchJson<T>(file: string): Promise<T> {
-  const base = import.meta.env.DEV
-    ? `${import.meta.env.BASE_URL}public`
-    : DATA_BASE_URL || `${import.meta.env.BASE_URL}public`;
+  const base = DATA_BASE_URL || import.meta.env.BASE_URL;
   const response = await fetch(`${base}/data/${file}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch ${file}: ${response.status}`);
