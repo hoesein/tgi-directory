@@ -18,7 +18,7 @@ export default function HomePage() {
   };
 
   const handleListingPress = (id: string) => {
-    navigate(`/listing/${id}`);
+    navigate(`/category-detail/${encodeURIComponent(id)}`);
   };
 
   const handleFoodPlacesViewAll = () => {
