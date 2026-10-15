@@ -73,7 +73,7 @@ export default function NearestListings({ onViewAll, onListingPress }: NearestLi
                 id,
                 name: item.name,
                 address: item.address || item.location,
-                type: item.type,
+                type: item.type.name,
                 image: item.images || FALLBACK_IMAGE,
               }}
               onPress={() => onListingPress(id)}

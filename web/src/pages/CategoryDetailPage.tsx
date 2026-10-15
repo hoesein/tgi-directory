@@ -28,7 +28,7 @@ export default function CategoryDetailPage() {
       title: staticItem.name,
       location: staticItem.address || staticItem.location,
       image: staticItem.images || FALLBACK_IMAGE,
-      description: [staticItem.type, staticItem.phone].filter(Boolean).join(' • '),
+      description: [staticItem.type.name, staticItem.phone].filter(Boolean).join(' • '),
       phone: staticItem.phone || null,
     }
     : undefined;
@@ -118,7 +118,7 @@ export default function CategoryDetailPage() {
           {staticItem?.type && (
             <div>
               <dt>Category</dt>
-              <dd>{staticItem?.type}</dd>
+              <dd>{staticItem.type.name}</dd>
             </div>
           )}
           {address && (

@@ -6,6 +6,8 @@ The canonical static directory data is in [`hoesein/city-data`](https://github.c
 
 The Events page calendar and the home-screen event ticker share data from [`hoesein/shan_market_day`](https://github.com/hoesein/shan_market_day), checked out as a Git submodule at `web/vendor/shan-market-day`. Market schedules and gazetted holidays are bundled with the PWA and available offline. Myanmar lunar dates provide full/new moon special-day labels. The calendar and ticker use the same shared date lookup; there are no hard-coded sample events. The home-screen ticker uses `react-infinite-ticker` for continuous scrolling.
 
+The Profile page's **Add to Home Screen** action uses [`pwa-add-to-homescreen`](https://github.com/philfung/add-to-homescreen) to show browser- and device-specific install guidance. The library's required guide images are bundled under `public/add-to-homescreen/assets/img/`.
+
 Initialize the data repository after cloning the application:
 
 ```powershell

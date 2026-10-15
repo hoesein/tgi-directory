@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { ChevronRight, MessageCircle, Send, User } from 'lucide-react';
+import { ChevronRight, Download, MessageCircle, Send, User } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { showAddToHomeScreenGuide } from '../lib/addToHomeScreen';
 
 export default function ProfilePage() {
   const { userToken, signOut } = useAuthStore();
@@ -36,6 +37,16 @@ export default function ProfilePage() {
             <ChevronRight size={20} />
           </Link>
         )}
+
+        <button
+          className="profile-install-button"
+          onClick={showAddToHomeScreenGuide}
+          type="button"
+        >
+          <Download size={19} />
+          <span>Add to Home Screen</span>
+          <ChevronRight size={18} />
+        </button>
 
         <section className="profile-contact">
           <div className="profile-contact-icon">

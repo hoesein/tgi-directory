@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Bell, CalendarDays, Sparkles, Store } from 'lucide-react';
+import { CalendarDays, Sparkles, Store } from 'lucide-react';
 import { HorizontalTicker } from 'react-infinite-ticker';
 import { Link } from 'react-router-dom';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';

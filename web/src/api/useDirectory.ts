@@ -23,7 +23,7 @@ export function useDirectoryFile(file: string | undefined, type?: string) {
     queryKey: ['directory-file', file, type],
     queryFn: async () => {
       const items = await fetchDirectoryFile(file as string);
-      return type ? items.filter((i) => i.type === type) : items;
+      return type ? items.filter((item) => item.type.code === type) : items;
     },
     enabled: isDirectoryDataConfigured() && !!file,
     staleTime: 1000 * 60 * 60,

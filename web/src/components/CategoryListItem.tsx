@@ -18,7 +18,8 @@ export default function CategoryListItem({ item, onPress }: CategoryListItemProp
         <h3>{item.title}</h3>
         <p>{item.location}</p>
         <p>
-          ★ {item.rating} ({item.reviews} reviews)
+          ★ ★ ★ ★ ★
+          {/* {item.rating} ({item.reviews} reviews) */}
         </p>
       </div>
     </button>

@@ -22,7 +22,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg', 'maskable-icon.svg'],
+      includeAssets: ['apple-touch-icon.png', 'icon.svg', 'maskable-icon.svg'],
       manifest: {
         id: '/',
         name: 'Directory - Taunggyi',
@@ -51,6 +51,12 @@ export default defineConfig({
           },
         ],
         icons: [
+          {
+            src: 'apple-touch-icon.png',
+            sizes: '180x180',
+            type: 'image/png',
+            purpose: 'any',
+          },
           {
             src: 'icon.svg',
             sizes: 'any',

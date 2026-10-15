@@ -69,7 +69,10 @@ export interface DirectoryItem {
   location: string;
   images: string;
   rating: string;
-  type: string;
+  type: {
+    code: string;
+    name: string;
+  };
   source_file: string;
 }
 

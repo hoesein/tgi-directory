@@ -34,8 +34,11 @@ export default function CategoryPage() {
   );
 
   const typeOptions = useMemo(() => {
-    return (staticMeta?.types ?? []).map((t) => ({ id: t, name: t }));
-  }, [staticMeta]);
+    return (staticMeta?.types ?? []).map((code) => ({
+      id: code,
+      name: staticItems?.find((item) => item.type.code === code)?.type.name ?? code,
+    }));
+  }, [staticItems, staticMeta]);
 
   const displayListings = useMemo(() => {
     const withIndex = (staticItems ?? []).map((item, index) => ({
@@ -45,7 +48,7 @@ export default function CategoryPage() {
       rating: Number(item.rating) || 0,
       reviews: 0,
       image: item.images || FALLBACK_IMAGE,
-      rawType: item.type,
+      rawType: item.type.code,
     }));
     const byType = activeTypeId ? withIndex.filter((l) => l.rawType === activeTypeId) : withIndex;
     if (!searchQuery.trim()) return byType;
