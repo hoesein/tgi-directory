@@ -1,39 +1,95 @@
-# Web PWA
+# Taunggyi Directory
 
-## Directory data
+Taunggyi Directory is a mobile-first, installable Progressive Web App (PWA) for finding local businesses and services, with a Myanmar calendar and market-day information. The current product baseline is **MVP v1**. Its scope, implemented behavior, known limitations, and forward-looking requirements are documented in [`REQUIREMENTS.md`](REQUIREMENTS.md).
 
-The canonical static directory data is in [`hoesein/city-data`](https://github.com/hoesein/city-data). The repository is included as a Git submodule at `web/public/data`; its JSON files are under the submodule's `data/` directory. The previous local JSON snapshot is retained in `web/data-backup/`, outside Vite's public asset directory.
+## Current MVP
 
-The Events page calendar and the home-screen event ticker share data from [`hoesein/shan_market_day`](https://github.com/hoesein/shan_market_day), checked out as a Git submodule at `web/vendor/shan-market-day`. Market schedules and gazetted holidays are bundled with the PWA and available offline. Myanmar lunar dates provide full/new moon special-day labels. The calendar and ticker use the same shared date lookup; there are no hard-coded sample events. The home-screen ticker uses `react-infinite-ticker` for continuous scrolling.
+- Browse directory categories and their listings, search/filter within a category, and open listing details with phone and map actions.
+- See selected food listings on Home, an event ticker, and a Myanmar calendar with market-day, full-moon/new-moon, official holiday, and Tazaungdaing participant information.
+- Use the installable PWA, including a mobile-browser install guide, offline app shell, and cached static data.
+- Contact the developer from Profile to suggest corrections or contribute missing information.
 
-The Profile page's **Add to Home Screen** action uses [`pwa-add-to-homescreen`](https://github.com/philfung/add-to-homescreen) to show browser- and device-specific install guidance. The library's required guide images are bundled under `public/add-to-homescreen/assets/img/`.
+The Home search input is not connected to search yet; Places to Visit currently contains sample content; and authentication is not implemented. The sign-in/register card is disabled, but legacy login/register routes still exist and currently issue a dummy token if submitted. Do not treat them as real accounts. See the known gaps and planned requirements in [`REQUIREMENTS.md`](REQUIREMENTS.md).
 
-## GitHub Pages deployment
+## Requirements and product decisions
 
-The `Deploy GitHub Pages` workflow builds the PWA from the `web/` directory on pushes to `main` and deploys it to GitHub Pages. It initializes the data and market-calendar submodules before building. Since `hoesein/city-data` is private, add a repository Actions secret named `CITY_DATA_TOKEN` containing a fine-grained token with read access to that repository. Then set the repository's Pages source to **GitHub Actions** under Settings → Pages. Project-site routing, PWA paths, and submodule data URLs use the Pages base path.
+[`REQUIREMENTS.md`](REQUIREMENTS.md) is the source of truth for the MVP baseline, implemented behavior, non-goals, outstanding requirements, and data/privacy expectations. Update it when product scope or behavior changes so future contributors can distinguish working features from placeholders.
 
-Initialize the data repository after cloning the application:
+## Development
+
+Requirements: Bun and Git. Clone with submodules initialized so both the private directory data and market calendar are available:
+
+```powershell
+git clone --recurse-submodules https://github.com/hoesein/tgi-directory.git
+cd tgi-directory
+cd web
+bun install --frozen-lockfile
+bun run dev
+```
+
+For an existing clone:
 
 ```powershell
 git submodule update --init --recursive
 ```
 
-Vite serves the submodule's JSON files under `/data/` during development and includes them in the production build. For example, `categories.json` is available at `https://hoesein.github.io/tgi-directory/data/categories.json`—the `public/` directory name is not part of the URL. Production loads the bundled JSON from the same path, and the service worker precaches the JSON files for offline use. Since `city-data` is private, a deployment checkout must have read access to the submodule before building; never expose a repository token in `VITE_DATA_URL` or other client-side variables.
+Useful commands from `web/`:
 
-`VITE_DATA_URL` is an optional override for a publicly accessible mirror. Set it to the base before `/data` (for example, a public raw-content repository root); leave it empty to use the bundled submodule.
+```powershell
+bun run dev
+bun run typecheck
+bun run lint
+bun run build
+bun run preview
+```
 
-To update the checked-out data and record the selected data revision in the application repository:
+There is no automated test suite configured yet. Build runs TypeScript checking followed by Vite production bundling.
 
-```bash
+## Data sources
+
+- `web/public/data` is the `hoesein/city-data` Git submodule. It contains `categories.json`, listing JSON files, and `tazaungdaing.json`. Vite serves those JSON files at `/data/` (for example, `https://hoesein.github.io/tgi-directory/data/categories.json`); `public/` is not part of the URL.
+- `web/vendor/shan-market-day` is the `hoesein/shan_market_day` Git submodule. Calendar calculations, market schedules, and official holiday records are bundled into the app.
+- The app's source code and bundled data are publicly downloadable from GitHub Pages. Never put credentials, private personal data, or other secrets in either submodule; GitHub Actions secrets are only for build-time checkout and must not be exposed through `VITE_*` variables.
+- `VITE_DATA_URL` optionally overrides the default data base URL. It must be a public URL whose `/data/<file>` paths provide the same JSON schema. Leave it empty to use the bundled submodule data.
+
+To update a submodule to its configured branch tip and record the selected revision in this repository:
+
+```powershell
 git submodule update --remote web/public/data
 git add web/public/data
 ```
 
-To update the market calendar records:
-
-```bash
+```powershell
 git submodule update --remote web/vendor/shan-market-day
 git add web/vendor/shan-market-day
 ```
 
-Category ordering is controlled by `sort_order` in `data/categories.json`.
+The production workflow currently updates submodules to their remote branch tips during deployment. This can make a deployment use newer data than the submodule revisions recorded in the application commit; see the deployment requirement in [`REQUIREMENTS.md`](REQUIREMENTS.md).
+
+## Configuration
+
+Copy `.env.example` to `.env` when local overrides are needed. Supported variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `VITE_API_URL` | Legacy backend API base URL. The default `/api` is proxied to a local Next.js server, but the current MVP directory flows use static submodule JSON instead. |
+| `VITE_DATA_URL` | Optional public static-data mirror base URL; the app appends `/data/<file>`. |
+| `VITE_SENTRY_DSN` | Optional Sentry browser error-reporting DSN. Unset means Sentry is not initialized. |
+
+All `VITE_*` values are embedded in public client code. Never put tokens or other secrets in them.
+
+## GitHub Pages deployment
+
+The workflow at `../.github/workflows/deploy-pages.yml` builds from `web/` and deploys on pushes to `main` or manual dispatch. It creates `404.html` for SPA routes and `.nojekyll` for static assets.
+
+Repository setup:
+
+1. Set **Settings → Pages → Build and deployment → Source** to **GitHub Actions**.
+2. The workflow needs read access to the private `hoesein/city-data` submodule. Configure repository Actions secret `CITY_DATA_TOKEN` with a fine-grained personal access token scoped to that repository and **Contents: Read-only**. The workflow can fall back to `github.token` if repository permissions allow access.
+3. Keep the repository and data private-access assumptions in mind: the final deployed JSON is publicly served as part of this static site regardless of submodule privacy.
+
+The Vite base path is derived from `GITHUB_REPOSITORY` in GitHub Actions, so the project site uses `/tgi-directory/` and `*.github.io` user/organization sites use `/`. The router, icons, data requests, manifest, and service-worker fallback use that base path.
+
+## Ownership and contribution
+
+Use the Profile page's Telegram, Facebook, or phone links to suggest corrections, request data removal, or provide missing directory/event details. Before adding user-supplied or externally sourced text/images, verify accuracy, permission to publish, and appropriate attribution. The app should clearly explain that listings and images can be outdated and offer a correction/removal contact.
