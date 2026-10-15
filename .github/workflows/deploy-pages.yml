@@ -19,11 +19,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository and submodules
+      - name: Check out repository (no submodules)
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
           token: ${{ secrets.CITY_DATA_TOKEN || github.token }}
+
+      - name: Configure submodule authentication and clone submodules
+        # This uses CITY_DATA_TOKEN if set, otherwise falls back to the workflow's github.token.
+        run: |
+          set -euo pipefail
+          TOKEN="${{ secrets.CITY_DATA_TOKEN || github.token }}"
+
+          # Use token for any https://github.com/ access so submodule URLs in .gitmodules work
+          git config --global url."https://x-access-token:${TOKEN}@github.com/".insteadOf "https://github.com/"
+
+          # Sync and initialize submodules (works with either relative or absolute URLs)
+          git submodule sync --recursive || true
+          git submodule update --init --recursive --remote
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
