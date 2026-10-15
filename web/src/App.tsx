@@ -1,5 +1,11 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import BottomNav from './components/BottomNav';
+import {
+  isMobileBrowser,
+  isRunningAsInstalledApp,
+  showAddToHomeScreenGuide,
+} from './lib/addToHomeScreen';
 import HomePage from './pages/HomePage';
 import CategoryPage from './pages/CategoryPage';
 import CategoriesPage from './pages/CategoriesPage';
@@ -18,6 +24,24 @@ const SHOW_NAV_PATHS = ['/', '/events', '/notifications', '/profile'];
 export default function App() {
   const location = useLocation();
   const showNav = SHOW_NAV_PATHS.includes(location.pathname);
+
+  useEffect(() => {
+    const guideShown = 'add-to-home-screen-guide-shown';
+    if (
+      !isMobileBrowser() ||
+      isRunningAsInstalledApp() ||
+      sessionStorage.getItem(guideShown)
+    ) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      sessionStorage.setItem(guideShown, 'true');
+      showAddToHomeScreenGuide();
+    }, 1000);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   return (
     <div className="app-shell">

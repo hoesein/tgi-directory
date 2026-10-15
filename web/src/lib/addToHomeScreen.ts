@@ -24,9 +24,28 @@ declare global {
       options: AddToHomeScreenOptions
     ) => AddToHomeScreenInstance;
   }
+
+  interface Navigator {
+    standalone?: boolean;
+  }
 }
 
 let instance: AddToHomeScreenInstance | undefined;
+
+export function isMobileBrowser(): boolean {
+  const userAgent = navigator.userAgent;
+  return (
+    /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent) ||
+    (/Macintosh/i.test(userAgent) && navigator.maxTouchPoints > 1)
+  );
+}
+
+export function isRunningAsInstalledApp(): boolean {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    navigator.standalone === true
+  );
+}
 
 export function showAddToHomeScreenGuide(): void {
   if (!instance) {
@@ -39,7 +58,7 @@ export function showAddToHomeScreenGuide(): void {
       appNameDisplay: 'inline',
       appIconUrl: `${window.location.origin}${import.meta.env.BASE_URL}apple-touch-icon.png`,
       assetUrl: `${import.meta.env.BASE_URL}add-to-homescreen/assets/img/`,
-      displayOptions: { showMobile: true, showDesktop: true },
+      displayOptions: { showMobile: true, showDesktop: false },
       allowClose: true,
       showArrow: true,
     });
