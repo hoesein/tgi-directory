@@ -58,8 +58,7 @@ export default function EventsPage() {
 
   const [selectedYear, selectedMonth] = selectedDate.split('-').map(Number);
   const selectedCalendarDay = getEventsCalendarDay(selectedDate);
-  const { myanmarDate: selectedMyanmarDate, marketDay: selectedMarketDay } = selectedCalendarDay;
-  const selectedHolidays = selectedCalendarDay.holidays;
+  const { marketDay: selectedMarketDay } = selectedCalendarDay;
   const selectedMarketTown = selectedMarketDay.markets[0]?.name.my;
 
   function selectDate(dateStr: string) {

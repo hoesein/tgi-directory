@@ -1,6 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { env } from 'node:process';
+
+const repositoryName = env.GITHUB_REPOSITORY?.split('/')[1];
+const base =
+  env.GITHUB_ACTIONS === 'true' &&
+  repositoryName &&
+  !repositoryName.endsWith('.github.io')
+    ? `/${repositoryName}/`
+    : '/';
 
 const marketDaySource = decodeURIComponent(
   new URL('./vendor/shan-market-day/src/index.ts', import.meta.url).pathname.replace(
@@ -10,6 +19,7 @@ const marketDaySource = decodeURIComponent(
 );
 
 export default defineConfig({
+  base,
   resolve: {
     alias: {
       'shan-market-day': marketDaySource,
@@ -24,29 +34,29 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['apple-touch-icon.png', 'icon.svg', 'maskable-icon.svg'],
       manifest: {
-        id: '/',
+        id: base,
         name: 'Directory - Taunggyi',
         short_name: 'Directory',
         description: 'Taunggyi city directory: hotels, restaurants, banks, shops and more.',
         theme_color: '#14532D',
         background_color: '#F3F7F4',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        scope: base,
+        start_url: base,
         shortcuts: [
           {
             name: 'Home',
-            url: '/',
+            url: base,
             icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml' }],
           },
           {
             name: 'Events',
-            url: '/events',
+            url: `${base}events`,
             icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml' }],
           },
           {
             name: 'Places to Visit',
-            url: '/notifications',
+            url: `${base}notifications`,
             icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml' }],
           },
         ],
@@ -73,7 +83,7 @@ export default defineConfig({
       },
       workbox: {
         // Precache the app shell and bundled data; cache remote images at runtime.
-        navigateFallback: '/offline.html',
+        navigateFallback: `${base}offline.html`,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json}'],
         runtimeCaching: [
           {

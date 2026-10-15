@@ -8,6 +8,10 @@ The Events page calendar and the home-screen event ticker share data from [`hoes
 
 The Profile page's **Add to Home Screen** action uses [`pwa-add-to-homescreen`](https://github.com/philfung/add-to-homescreen) to show browser- and device-specific install guidance. The library's required guide images are bundled under `public/add-to-homescreen/assets/img/`.
 
+## GitHub Pages deployment
+
+The `Deploy GitHub Pages` workflow builds the PWA from the `web/` directory on pushes to `main` and deploys it to GitHub Pages. It initializes the data and market-calendar submodules before building. Since `hoesein/city-data` is private, add a repository Actions secret named `CITY_DATA_TOKEN` containing a fine-grained token with read access to that repository. Then set the repository's Pages source to **GitHub Actions** under Settings → Pages. Project-site routing, PWA paths, and submodule data URLs use the Pages base path.
+
 Initialize the data repository after cloning the application:
 
 ```powershell
