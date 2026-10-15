@@ -1487,6 +1487,11 @@ body {
   color: var(--text);
 }
 
+.profile-user-card-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .profile-avatar {
   width: 48px;
   height: 48px;
@@ -1571,11 +1576,18 @@ body {
   line-height: 1.5;
 }
 
-.profile-telegram-link {
+.profile-contact-links {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-contact-link {
   display: flex;
   width: 100%;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
   padding: 12px 14px;
   background: var(--primary);
@@ -1586,7 +1598,11 @@ body {
   text-decoration: none;
 }
 
-.profile-telegram-link:hover {
+.profile-contact-link span {
+  flex: 1;
+}
+
+.profile-contact-link:hover {
   background: #0e4224;
 }
 

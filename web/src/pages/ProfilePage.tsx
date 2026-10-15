@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom';
-import { ChevronRight, MessageCircle, Send, User } from 'lucide-react';
+import { ChevronRight, ExternalLink, MessageCircle, Phone, Send, User } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
 export default function ProfilePage() {
@@ -25,16 +24,16 @@ export default function ProfilePage() {
             <ChevronRight size={20} />
           </div>
         ) : (
-          <Link to="/login" className="profile-user-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="profile-user-card profile-user-card-disabled" aria-disabled="true">
             <div className="profile-avatar">
               <User size={28} />
             </div>
             <div className="profile-user-info">
               <div className="profile-name">Sign In (or) Register</div>
-              <div className="profile-email">Access your account</div>
+              <div className="profile-email">Coming soon</div>
             </div>
             <ChevronRight size={20} />
-          </Link>
+          </div>
         )}
 
         <section className="profile-contact">
@@ -48,17 +47,39 @@ export default function ProfilePage() {
               another suggestion.
             </p>
           </div>
-          <a
-            className="profile-telegram-link"
-            href="https://t.me/h3ins03"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Contact the developer on Telegram at @h3ins03"
-          >
-            <Send size={17} />
-            <span>@h3ins03</span>
-            <ChevronRight size={18} />
-          </a>
+          <div className="profile-contact-links">
+            <a
+              className="profile-contact-link"
+              href="https://t.me/h3ins03"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Contact the developer on Telegram at @h3ins03"
+            >
+              <Send size={17} />
+              <span>Telegram · @h3ins03</span>
+              <ChevronRight size={18} />
+            </a>
+            <a
+              className="profile-contact-link"
+              href="https://www.facebook.com/XXIXIIIMCMXCII"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Visit the developer's Facebook profile"
+            >
+              <ExternalLink size={17} />
+              <span>Facebook</span>
+              <ChevronRight size={18} />
+            </a>
+            <a
+              className="profile-contact-link"
+              href="tel:09957992668"
+              aria-label="Call the developer at 09957992668"
+            >
+              <Phone size={17} />
+              <span>09957992668</span>
+              <ChevronRight size={18} />
+            </a>
+          </div>
         </section>
 
         {userToken && (
