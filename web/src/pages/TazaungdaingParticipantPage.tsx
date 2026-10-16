@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import { useTazaungdaingEvents } from '../api/useDirectory';
+import { isTazaungdaingParticipantDetails } from '../types';
 
 export default function TazaungdaingParticipantPage() {
   const { eventDate = '', participantIndex: participantIndexParam = '' } = useParams();
@@ -32,7 +33,7 @@ export default function TazaungdaingParticipantPage() {
     );
   }
 
-  if (!event || !participant) {
+  if (!event || !participant || !isTazaungdaingParticipantDetails(participant)) {
     return (
       <div className="centered">
         <p>ပွဲအချက်အလက် မတွေ့ပါ။</p>

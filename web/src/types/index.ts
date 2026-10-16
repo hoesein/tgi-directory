@@ -88,12 +88,17 @@ export interface DirectoryCategoryMeta {
 export interface TazaungdaingEvent {
   event_date: string;
   name: string;
-  participants: TazaungdaingParticipant[];
+  participants: (TazaungdaingParticipantDetails | PagodaFestivalParticipant)[];
 }
 
 export interface TazaungdaingParticipant {
   name: string;
   type: string;
+}
+
+export type PagodaFestivalParticipant = TazaungdaingParticipant;
+
+export interface TazaungdaingParticipantDetails extends TazaungdaingParticipant {
   ward: string;
   leader: string;
   about: string;
@@ -108,4 +113,10 @@ export interface TazaungdaingParticipant {
 export interface TazaungdaingParticipantSocial {
   platform: string;
   url: string;
+}
+
+export function isTazaungdaingParticipantDetails(
+  participant: TazaungdaingParticipantDetails | PagodaFestivalParticipant,
+): participant is TazaungdaingParticipantDetails {
+  return 'milestones' in participant;
 }

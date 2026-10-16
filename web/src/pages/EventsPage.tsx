@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTazaungdaingEvents } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
+import { isTazaungdaingParticipantDetails } from '../types';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -23,6 +24,9 @@ const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
+
+const PAGODA_FESTIVAL_PREFIX = 'ဖောင်တော်ဦးဘုရားပွဲ';
+const PAGODA_FESTIVAL_TYPE_ORDER = ['ကြွချီ', 'နေ့ဆွမ်း', 'ညကျိန်း'];
 
 function getMoonMarker(phase: string): string {
   if (phase === 'Full Moon') return 'full-moon';
@@ -50,8 +54,15 @@ export default function EventsPage() {
   const [selectedDate, setSelectedDate] = useState(
     toDateStr(today.getFullYear(), today.getMonth(), today.getDate())
   );
+  const [showMarketDayChips, setShowMarketDayChips] = useState(false);
   const selectedTazaungdaingEvents =
     tazaungdaingEvents?.filter((event) => event.event_date === selectedDate) ?? [];
+  const selectedPagodaFestivalEvents = selectedTazaungdaingEvents.filter((event) =>
+    event.name.startsWith(PAGODA_FESTIVAL_PREFIX),
+  );
+  const selectedBalloonFestivalEvents = selectedTazaungdaingEvents.filter(
+    (event) => !event.name.startsWith(PAGODA_FESTIVAL_PREFIX),
+  );
 
   const cells = buildCalendarDays(viewYear, viewMonth);
   const todayStr = getLocalDateString(today);
@@ -231,15 +242,24 @@ export default function EventsPage() {
           </div> */}
           <div>
             <div className="calendar-info-label">ဈေးနေ့</div>
-            <strong>{selectedMarketTown}</strong>
-            <details className="market-list">
-              <summary>အခြားဈေးနေ့များ</summary>
-              <ul>
+            <button
+              className="market-day-main"
+              type="button"
+              aria-expanded={showMarketDayChips}
+              onClick={() => setShowMarketDayChips((isVisible) => !isVisible)}
+            >
+              <strong>{selectedMarketTown}</strong>
+              <span aria-hidden="true">{showMarketDayChips ? '−' : '+'}</span>
+            </button>
+            {showMarketDayChips && (
+              <div className="market-day-chips" aria-label="ဈေးနေ့များ">
                 {selectedMarketDay.markets.map((market) => (
-                  <li key={market.id}>{market.name.my}</li>
+                  <span className="market-day-chip" key={market.id}>
+                    {market.name.my}
+                  </span>
                 ))}
-              </ul>
-            </details>
+              </div>
+            )}
             {/* <div className="calendar-holidays">
               <div className="calendar-info-label">အစိုးရရုံးပိတ်ရက်</div>
               {selectedHolidays.length > 0 ? (
@@ -268,7 +288,7 @@ export default function EventsPage() {
             {isLoadingTazaungdaingEvents && <p>ပွဲအချက်အလက်များ ရယူနေသည်…</p>}
             {isTazaungdaingEventsError && (
               <div className="data-error" role="alert">
-                <span>တန်ဆောင်တိုင်ပွဲ အချက်အလက်များကို ရယူ၍ မရပါ။</span>
+                <span>အချက်အလက်များကို ရယူ၍ မရပါ။</span>
                 <button
                   className="link-btn"
                   onClick={() => void refetchTazaungdaingEvents()}
@@ -278,27 +298,62 @@ export default function EventsPage() {
                 </button>
               </div>
             )}
-            {selectedTazaungdaingEvents.map((event) => (
+            {selectedPagodaFestivalEvents.map((event) => (
+              <article
+                className="pagoda-festival-event"
+                key={`${event.event_date}-${event.name}`}
+              >
+                <div className="pagoda-festival-heading">
+                  <span className="pagoda-festival-symbol" aria-hidden="true">✦</span>
+                  <h3>{event.name}</h3>
+                </div>
+                <div className="pagoda-festival-schedule">
+                  {[...event.participants]
+                    .sort((a, b) => {
+                      const orderA = PAGODA_FESTIVAL_TYPE_ORDER.indexOf(a.type);
+                      const orderB = PAGODA_FESTIVAL_TYPE_ORDER.indexOf(b.type);
+                      return (
+                        (orderA < 0 ? PAGODA_FESTIVAL_TYPE_ORDER.length : orderA) -
+                        (orderB < 0 ? PAGODA_FESTIVAL_TYPE_ORDER.length : orderB)
+                      );
+                    })
+                    .map((participant, index) => (
+                      <div
+                        className="pagoda-festival-row"
+                        key={`${participant.name}-${participant.type}-${index}`}
+                      >
+                        <strong>{participant.name}</strong>
+                        <span className="pagoda-festival-type">{participant.type}</span>
+                      </div>
+                    ))}
+                </div>
+              </article>
+            ))}
+            {selectedBalloonFestivalEvents.map((event) => (
               <article className="tazaungdaing-event" key={`${event.event_date}-${event.name}`}>
                 <div className="tazaungdaing-event-heading">
                   <h3>{event.name}</h3>
                   {/* <time dateTime={event.event_date}>{event.event_date}</time> */}
                 </div>
-                {event.participants.sort((a, b) => a.type.localeCompare(b.type))
-                  .map((participant, participantIndex) => (
-                    <Link
-                      className="tazaungdaing-participant"
-                      key={`${participant.name}-${participant.type}`}
-                      to={`/events/tazaungdaing/${encodeURIComponent(event.event_date)}/${participantIndex}`}
-                    >
-                      <span className="tazaungdaing-participant-main">
-                        <strong>{participant.name}</strong>
-                        <span className="tazaungdaing-participant-type">{participant.type}</span>
-                      </span>
-                      <span className="tazaungdaing-participant-ward">{participant.ward}</span>
-                      <span className="tazaungdaing-participant-arrow" aria-hidden="true">›</span>
-                    </Link>
-                  ))}
+                {event.participants
+                  .sort((a, b) => a.type.localeCompare(b.type))
+                  .map((participant, participantIndex) => {
+                    if (!isTazaungdaingParticipantDetails(participant)) return null;
+                    return (
+                      <Link
+                        className="tazaungdaing-participant"
+                        key={`${participant.name}-${participant.type}`}
+                        to={`/events/tazaungdaing/${encodeURIComponent(event.event_date)}/${participantIndex}`}
+                      >
+                        <span className="tazaungdaing-participant-main">
+                          <strong>{participant.name}</strong>
+                          <span className="tazaungdaing-participant-type">{participant.type}</span>
+                        </span>
+                        <span className="tazaungdaing-participant-ward">{participant.ward}</span>
+                        <span className="tazaungdaing-participant-arrow" aria-hidden="true">›</span>
+                      </Link>
+                    );
+                  })}
               </article>
             ))}
           </section>

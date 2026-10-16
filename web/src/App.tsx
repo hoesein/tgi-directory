@@ -19,7 +19,7 @@ import PlaceToVisitPage from './pages/PlaceToVisitPage';
 
 // The floating tab bar only lives on the home page — every other
 // route is a dedicated page with its own back navigation.
-const SHOW_NAV_PATHS = ['/', '/events', '/notifications', '/profile'];
+const SHOW_NAV_PATHS = ['/', '/events', '/place-to-visit', '/profile'];
 
 export default function App() {
   const location = useLocation();
@@ -59,7 +59,7 @@ export default function App() {
             path="/events/tazaungdaing/:eventDate/:participantIndex"
             element={<TazaungdaingParticipantPage />}
           />
-          <Route path="/notifications" element={<PlaceToVisitPage />} />
+          <Route path="/place-to-visit" element={<PlaceToVisitPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

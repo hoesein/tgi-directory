@@ -4,7 +4,7 @@ import { Home, Calendar, MapPin, User } from 'lucide-react';
 const TABS = [
   { to: '/', label: 'Home', Icon: Home },
   { to: '/events', label: 'Events', Icon: Calendar },
-  { to: '/notifications', label: 'Places', Icon: MapPin },
+  { to: '/place-to-visit', label: 'Places', Icon: MapPin },
   { to: '/profile', label: 'Profile', Icon: User },
 ];
 

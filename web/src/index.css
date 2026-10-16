@@ -839,19 +839,41 @@ body {
   margin-bottom: 4px;
 }
 
-.market-list {
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: 6px;
-}
-
-.market-list summary {
+.market-day-main {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
   cursor: pointer;
+  font: inherit;
+  text-align: left;
 }
 
-.market-list ul {
-  margin: 6px 0 0;
-  padding-left: 20px;
+.market-day-main > span {
+  color: var(--primary);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.market-day-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.market-day-chip {
+  padding: 6px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 12px;
 }
 
 .calendar-holidays {
@@ -909,6 +931,74 @@ body {
   color: var(--muted);
   font-size: 12px;
   white-space: nowrap;
+}
+
+.pagoda-festival-event {
+  margin: 12px 0;
+  overflow: hidden;
+  border: 1px solid #e9d9ae;
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, #fffaf0, #fffefa 72%);
+  box-shadow: 0 3px 14px rgba(127, 92, 25, 0.08);
+}
+
+.pagoda-festival-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #efe4ca;
+}
+
+.pagoda-festival-symbol {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f4e8c9;
+  color: #886517;
+}
+
+.pagoda-festival-heading h3 {
+  margin: 0;
+  color: #563f15;
+  font-size: 15px;
+}
+
+.pagoda-festival-schedule {
+  padding: 4px 14px 10px;
+}
+
+.pagoda-festival-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 2px;
+  border-bottom: 1px solid #f1eadb;
+}
+
+.pagoda-festival-row:last-child {
+  border-bottom: 0;
+}
+
+.pagoda-festival-type {
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f5edda;
+  color: #775a21;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.pagoda-festival-row strong {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .tazaungdaing-participant {
