@@ -50,6 +50,8 @@ jobs:
 
       - name: Build PWA
         working-directory: web
+        env:
+          VITE_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_WEB_ANALYTICS_TOKEN }}
         run: |
           bun run build
           cp dist/index.html dist/404.html

@@ -96,10 +96,10 @@ The app is hosted on GitHub Pages, not Cloudflare Pages. Use Cloudflare's manual
 
 1. Sign in to the Cloudflare dashboard and open **Web Analytics** → **Add a site**.
 2. Add the hostname `hoesein.github.io`, select it from the offered hostname list, and finish setup. This does not require changing DNS.
-3. Open the new site's **Manage site** view and copy its generated JavaScript snippet.
-4. Paste the exact snippet Cloudflare provides into `web/index.html` before `</body>`. The snippet contains a public site token, not a secret; do not add any account API key or personal access token.
-5. Commit and push the change to `main`. The GitHub Actions workflow will build and deploy the beacon.
-6. Open the production site, navigate between routes, then check the browser Network panel for the Cloudflare beacon request. Allow a few minutes for data to appear in the Cloudflare dashboard. Review the `Path` dimension and isolate `/tgi-directory/` traffic.
+3. Open the new site's **Manage site** view and copy the token from its generated JavaScript snippet (the value of `data-cf-beacon`'s `token`).
+4. In `hoesein/tgi-directory`, open **Settings → Secrets and variables → Actions → Variables → New repository variable**. Set the name to `CLOUDFLARE_WEB_ANALYTICS_TOKEN` and paste the site token as the value. This is a public beacon identifier, not a credential; never add a Cloudflare account API token.
+5. Commit and push the integration to `main` (or rerun the deploy workflow). The workflow passes the variable to the production build; analytics remains disabled when it is unset and is not loaded in local development.
+6. Open the production site, navigate between routes, then check the browser Network panel for `static.cloudflareinsights.com/beacon.min.js` and the beacon request. Allow a few minutes for data to appear in the Cloudflare dashboard. Review the `Path` dimension and isolate `/tgi-directory/` traffic.
 7. Add a short analytics/privacy disclosure to the site's user-facing privacy information before announcing tracking to users. Recheck the dashboard after deployment and confirm the app's traffic is distinguishable from other projects.
 
 Important: GitHub Pages' default `hoesein.github.io` hostname is shared across projects. Cloudflare Web Analytics can show paths, so filter to `/tgi-directory/`, but using a custom domain dedicated to this app gives cleaner separation. The standard Web Analytics beacon is for aggregate traffic and performance metrics; it is not user-level profiling and does not answer custom product questions such as which individual listing a visitor tapped. Evaluate privacy, retention, and consent requirements for the audience and applicable jurisdictions before enabling it.
