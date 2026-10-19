@@ -48,10 +48,19 @@ jobs:
         working-directory: web
         run: bun install --frozen-lockfile
 
+      # - name: Build PWA
+      #   working-directory: web
+      #   env:
+      #     VITE_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_WEB_ANALYTICS_TOKEN }}
       - name: Build PWA
         working-directory: web
         env:
           VITE_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_WEB_ANALYTICS_TOKEN }}
+          VITE_DATA_SOURCE: ${{ vars.DATA_SOURCE }}
+          VITE_API_URL: ${{ vars.API_URL }}
+          VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          VITE_AUTH_PROVIDERS: ${{ vars.AUTH_PROVIDERS }} 
         run: |
           bun run build
           cp dist/index.html dist/404.html
