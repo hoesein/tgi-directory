@@ -1,10 +1,13 @@
+import RatingSummary from './RatingSummary';
+import type { UserRatingSummary } from '../types';
+
 interface CategoryListItemProps {
   item: {
     id: string;
     title: string;
     location: string;
-    rating: number;
-    reviews: number;
+    /** Community rating; hidden when nobody has rated. */
+    userRating: UserRatingSummary | null;
     image: string;
   };
   onPress: () => void;
@@ -17,10 +20,11 @@ export default function CategoryListItem({ item, onPress }: CategoryListItemProp
       <div>
         <h3>{item.title}</h3>
         <p>{item.location}</p>
-        <p>
-          ★ ★ ★ ★ ★
-          {/* {item.rating} ({item.reviews} reviews) */}
-        </p>
+        {item.userRating?.count ? (
+          <p>
+            <RatingSummary summary={item.userRating} />
+          </p>
+        ) : null}
       </div>
     </button>
   );

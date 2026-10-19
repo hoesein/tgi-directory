@@ -4,6 +4,18 @@ import { useAuthStore } from '../store/authStore';
 // In production set VITE_API_URL to the deployed backend URL.
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
+/** A failed API call, with the HTTP status and the backend's error code. */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code?: string,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 interface RequestOptions extends RequestInit {
   params?: Record<string, string>;
 }
@@ -47,8 +59,11 @@ class ApiService {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'Request failed' }));
-      throw new Error(error.message || 'Request failed');
+      throw new ApiError(error.message || 'Request failed', response.status, error.code);
     }
+
+    // 204 No Content (e.g. DELETE) has no body to parse.
+    if (response.status === 204) return undefined as T;
 
     return response.json();
   }

@@ -3,7 +3,10 @@ import { useParams } from 'react-router-dom';
 import { MapPin, Phone, X } from 'lucide-react';
 import BackButton from '../components/BackButton';
 import { useDirectoryPlace } from '../api/useDirectory';
+import RatingControl from '../components/RatingControl';
+import RatingSummary from '../components/RatingSummary';
 import { parseStaticListingId } from '../services/directory';
+import { canRate } from '../services/ratings';
 
 const FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop';
@@ -34,6 +37,7 @@ export default function CategoryDetailPage() {
     }
     : undefined;
 
+  const rateable = canRate(place?.entity);
   const listingImage = place?.imageUrl || FALLBACK_IMAGE;
   const address = listing?.location ?? '';
   const mapQuery =
@@ -132,9 +136,21 @@ export default function CategoryDetailPage() {
               <dd>{address}</dd>
             </div>
           )}
+          {rateable && (
+            <div>
+              <dt>Community rating</dt>
+              <dd>
+                {place?.userRating?.count ? (
+                  <RatingSummary summary={place.userRating} />
+                ) : (
+                  'No ratings yet'
+                )}
+              </dd>
+            </div>
+          )}
           {place?.rating != null && (
             <div>
-              <dt>Rating</dt>
+              <dt>{rateable ? "Editor's rating" : 'Rating'}</dt>
               <dd>{place.rating}</dd>
             </div>
           )}
@@ -146,6 +162,8 @@ export default function CategoryDetailPage() {
           )}
         </dl>
       </article>
+
+      {rateable && place && <RatingControl entity={place.entity} placeId={place.id} />}
 
       {isPhonePickerOpen && (
         <div

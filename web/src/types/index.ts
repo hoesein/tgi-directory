@@ -152,6 +152,22 @@ export interface ApiDirectoryRecord {
   image_urls?: string[];
   type: { code: string; name: string } | null;
   township: { id: string; code: string; name: string; region_code: string } | null;
+  /** Community rating; only hotels and food places have it. */
+  user_rating?: UserRatingSummary;
+}
+
+/** Community star rating. `average` is null when nobody has rated yet. */
+export interface UserRatingSummary {
+  average: number | null;
+  count: number;
+}
+
+export interface ApiMyRating {
+  entity: string;
+  record_id: string;
+  /** The signed-in user's own stars, or null when not rated. */
+  stars: number | null;
+  user_rating: UserRatingSummary;
 }
 
 export interface ApiEventDay {
@@ -204,7 +220,10 @@ export interface DirectoryPlace {
   description: string | null;
   address: string;
   phone: string | null;
+  /** Editorial rating from the data source. */
   rating: number | null;
+  /** Community rating (API mode, hotels and food places); null otherwise. */
+  userRating: UserRatingSummary | null;
   imageUrl: string | null;
   type: { code: string; name: string };
   latitude: number | null;

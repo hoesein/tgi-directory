@@ -123,8 +123,7 @@ export default function CategoryPage() {
               id: place.id,
               title: place.name,
               location: place.address,
-              rating: place.rating ?? 0,
-              reviews: 0,
+              userRating: place.userRating,
               image: place.imageUrl || FALLBACK_IMAGE,
             }}
             onPress={() => navigate(placePath(place))}
