@@ -6,6 +6,13 @@ import App from './App';
 import { initCloudflareAnalytics } from './lib/cloudflareAnalytics';
 import { initSentry } from './lib/sentry';
 import { initAuth } from './store/authStore';
+// Self-hosted fonts (bundled, so they work offline): DM Sans for text, DM Serif
+// Display for titles (a travel-guide feel), Noto Sans Myanmar for Burmese.
+import '@fontsource-variable/dm-sans';
+import '@fontsource/dm-serif-display/400.css';
+import '@fontsource/noto-sans-myanmar/myanmar-400.css';
+import '@fontsource/noto-sans-myanmar/myanmar-600.css';
+import '@fontsource/noto-sans-myanmar/myanmar-700.css';
 import './index.css';
 
 const queryClient = new QueryClient();

@@ -15,6 +15,10 @@
   --border: #dce5dc;
   --star: #b5831f;
   --radius: 12px;
+  /* Latin glyphs come from the first font; Burmese falls through to Noto Sans Myanmar. */
+  --font-body: 'DM Sans Variable', 'Noto Sans Myanmar', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-display: 'DM Serif Display', 'Noto Sans Myanmar', Georgia, 'Times New Roman', serif;
 }
 
 * {
@@ -23,9 +27,17 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   background: var(--bg);
   color: var(--text);
+}
+
+/* Form controls don't inherit the page font by default. */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
 /* Mobile-first app column, centered on desktop like the native app */
@@ -3380,4 +3392,17 @@ textarea {
 
 .tazaungdaing-events.stale {
   opacity: 0.45;
+}
+
+/* ─── Display font for titles: travel-guide serif ─── */
+.page-head h1,
+.section-head h2,
+.slide-text h2,
+.place-title h1,
+.sign-in-body h1,
+.about-app h2,
+.detail-about h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }

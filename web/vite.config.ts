@@ -95,7 +95,7 @@ export default defineConfig({
         // Every page (e.g. /profile, /auth/callback) opens the app shell; the
         // router then shows the right page, online or offline.
         navigateFallback: `${base}index.html`,
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json,woff2}'],
         runtimeCaching: [
           {
             // Backend reads (VITE_DATA_SOURCE=api). Fresh when online; the
