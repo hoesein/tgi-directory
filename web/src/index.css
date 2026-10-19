@@ -3187,90 +3187,98 @@ textarea {
 
 /* Upcoming events */
 .upcoming-events {
-  margin: 16px 0 24px;
+  margin: 10px -16px 0;
 }
 
-.upcoming-events h2 {
-  margin: 0 4px 8px;
-  font-size: 15px;
-}
-
-.upcoming-events-list {
+/* Bleeds to the screen edges so chips scroll under the gutter. */
+.upcoming-events-row {
   display: flex;
-  flex-direction: column;
   gap: 8px;
+  padding: 2px 16px 4px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 16px;
+  scrollbar-width: none;
 }
 
-.upcoming-event {
+.upcoming-events-row::-webkit-scrollbar {
+  display: none;
+}
+
+.upcoming-chip {
   display: flex;
-  width: 100%;
+  flex: 0 0 auto;
+  max-width: 78%;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 8px 14px 8px 8px;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 999px;
   background: var(--card);
   color: var(--text);
   font: inherit;
   text-align: left;
+  scroll-snap-align: start;
   cursor: pointer;
 }
 
-.upcoming-event.showing {
+.upcoming-chip.showing {
   border-color: var(--primary);
   box-shadow: inset 0 0 0 1px var(--primary);
 }
 
-.upcoming-event-mark {
+.upcoming-chip-mark {
   display: flex;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: var(--primary-light);
   color: var(--primary);
+  font-size: 14px;
 }
 
-.upcoming-event-mark.pagoda {
+.upcoming-chip-mark.pagoda {
   background: var(--butter);
   color: #7a5a12;
 }
 
-.upcoming-event-text {
+.upcoming-chip-text {
   display: flex;
-  flex: 1;
   min-width: 0;
   flex-direction: column;
-  gap: 2px;
 }
 
-.upcoming-event-text strong {
-  font-size: 15px;
+.upcoming-chip-text strong,
+.upcoming-chip-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.upcoming-event-text > span {
+.upcoming-chip-text strong {
+  font-size: 14px;
+}
+
+.upcoming-chip-text span {
   color: var(--muted);
-  font-size: 13px;
-}
-
-.upcoming-event-text > .upcoming-event-status {
-  align-self: flex-start;
-  margin-top: 4px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--mint);
-  color: var(--primary);
   font-size: 12px;
 }
 
-.upcoming-event-text > .upcoming-event-status.live {
-  background: var(--primary);
-  color: #fff;
+.upcoming-chip-text span.live {
+  color: var(--primary);
+  font-weight: 600;
 }
 
-.upcoming-event-arrow {
-  color: var(--faint);
-  font-size: 20px;
+.upcoming-chip-text span.live::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin: 0 5px 1px 0;
+  border-radius: 50%;
+  background: #1f9d55;
+  vertical-align: middle;
 }

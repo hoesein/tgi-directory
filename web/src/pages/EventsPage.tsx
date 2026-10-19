@@ -1,5 +1,5 @@
 import { useRef, useState, type TouchEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useEventDays, useEventRanges } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
 import { eventDayLabel, formatMyanmarDate, toMyanmarDigits } from '../lib/myanmar';
@@ -14,18 +14,22 @@ function daysFrom(from: string, to: string): number {
   return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
 }
 
-/** "ယနေ့ကျင်းပဆဲ · ၁၈ ရက်အနက် ၉ ရက်မြောက်နေ့", "မနက်ဖြန်", "၂၉ ရက်အကြာ" */
+/** Short chip status: "ယခုကျင်းပဆဲ · ၉/၁၈", "၁၈ နိုဝင်ဘာ · မနက်ဖြန်", "၁၈ နိုဝင်ဘာ · ၂၉ ရက်အကြာ" */
 function upcomingStatus(event: EventRangeView, today: string): { text: string; live: boolean } {
   if (event.startDate <= today) {
     const dayCount = daysFrom(event.startDate, event.endDate) + 1;
     const dayNumber = daysFrom(event.startDate, today) + 1;
     return {
-      text: dayCount > 1 ? `ယခုကျင်းပဆဲ · ${eventDayLabel(dayNumber, dayCount)}` : 'ယနေ့ကျင်းပမည်',
+      text:
+        dayCount > 1
+          ? `ယခုကျင်းပဆဲ · ${toMyanmarDigits(dayNumber)}/${toMyanmarDigits(dayCount)}`
+          : 'ယနေ့ကျင်းပမည်',
       live: true,
     };
   }
   const until = daysFrom(today, event.startDate);
-  return { text: until === 1 ? 'မနက်ဖြန်' : `${toMyanmarDigits(until)} ရက်အကြာ`, live: false };
+  const when = until === 1 ? 'မနက်ဖြန်' : `${toMyanmarDigits(until)} ရက်အကြာ`;
+  return { text: `${formatMyanmarDate(event.startDate)} · ${when}`, live: false };
 }
 
 function dateRangeLabel(event: EventRangeView): string {
@@ -68,12 +72,17 @@ function shiftDate(dateStr: string, offset: number): string {
 
 export default function EventsPage() {
   const today = new Date();
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  // ?date=YYYY-MM-DD opens a given day (shareable links, ticker taps).
+  const [searchParams] = useSearchParams();
+  const linkedDate = searchParams.get('date');
+  const initialDate =
+    linkedDate && /^\d{4}-\d{2}-\d{2}$/.test(linkedDate) && !Number.isNaN(Date.parse(linkedDate))
+      ? linkedDate
+      : toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
+  const [viewYear, setViewYear] = useState(Number(initialDate.slice(0, 4)));
+  const [viewMonth, setViewMonth] = useState(Number(initialDate.slice(5, 7)) - 1);
   const [viewMode] = useState<'month' | 'day'>('day');
-  const [selectedDate, setSelectedDate] = useState(
-    toDateStr(today.getFullYear(), today.getMonth(), today.getDate())
-  );
+  const [selectedDate, setSelectedDate] = useState(initialDate);
   const [showMarketDayChips, setShowMarketDayChips] = useState(false);
   const {
     data: selectedEventDays = [],
@@ -298,6 +307,38 @@ export default function EventsPage() {
           )}
         </div>
 
+        {/* Upcoming events: one compact scrolling row, so long schedules below never push it away. */}
+        {upcomingEvents.length > 0 && (
+          <section className="upcoming-events" aria-label="လာမည့်ပွဲများ">
+            <div className="upcoming-events-row">
+              {upcomingEvents.map((event) => {
+                const status = upcomingStatus(event, todayStr);
+                const target = event.startDate <= todayStr ? todayStr : event.startDate;
+                const showing = event.startDate <= selectedDate && selectedDate <= event.endDate;
+                const pagoda = isPagodaFestival(event.name);
+                return (
+                  <button
+                    key={event.key}
+                    type="button"
+                    className={`upcoming-chip${showing ? ' showing' : ''}`}
+                    onClick={() => moveDays(daysFrom(selectedDate, target))}
+                    aria-label={`${event.name}၊ ${dateRangeLabel(event)}၊ ${status.text}`}
+                    title={dateRangeLabel(event)}
+                  >
+                    <span className={`upcoming-chip-mark${pagoda ? ' pagoda' : ''}`} aria-hidden="true">
+                      {pagoda ? '✦' : '✺'}
+                    </span>
+                    <span className="upcoming-chip-text">
+                      <strong>{event.name}</strong>
+                      <span className={status.live ? 'live' : undefined}>{status.text}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* Market Day Info Card */}
         <section className="calendar-info" aria-live="polite">
           {/* <div>
@@ -414,37 +455,6 @@ export default function EventsPage() {
                 )}
               </article>
             ))}
-          </section>
-        )}
-
-        {upcomingEvents.length > 0 && (
-          <section className="upcoming-events" aria-labelledby="upcoming-events-title">
-            <h2 id="upcoming-events-title">လာမည့်ပွဲများ</h2>
-            <div className="upcoming-events-list">
-              {upcomingEvents.map((event) => {
-                const status = upcomingStatus(event, todayStr);
-                const target = event.startDate <= todayStr ? todayStr : event.startDate;
-                const showing = event.startDate <= selectedDate && selectedDate <= event.endDate;
-                return (
-                  <button
-                    key={event.key}
-                    type="button"
-                    className={`upcoming-event${showing ? ' showing' : ''}`}
-                    onClick={() => moveDays(daysFrom(selectedDate, target))}
-                  >
-                    <span className={`upcoming-event-mark${isPagodaFestival(event.name) ? ' pagoda' : ''}`} aria-hidden="true">
-                      {isPagodaFestival(event.name) ? '✦' : '✺'}
-                    </span>
-                    <span className="upcoming-event-text">
-                      <strong>{event.name}</strong>
-                      <span>{dateRangeLabel(event)}</span>
-                      <span className={`upcoming-event-status${status.live ? ' live' : ''}`}>{status.text}</span>
-                    </span>
-                    <span className="upcoming-event-arrow" aria-hidden="true">›</span>
-                  </button>
-                );
-              })}
-            </div>
           </section>
         )}
       </div>
