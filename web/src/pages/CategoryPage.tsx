@@ -1,36 +1,66 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { PlusCircle, Search } from 'lucide-react';
 import { canSuggest } from '../services/suggestions';
 import CategoryListItem from '../components/CategoryListItem';
 import BackButton from '../components/BackButton';
 import { useDirectoryCategories, useDirectoryPlaces } from '../api/useDirectory';
-import { toEntityCode } from '../services/directory';
+import { useTownships } from '../api/useSuggestions';
+import { DATA_SOURCE, toEntityCode, type PlaceSort } from '../services/directory';
 import { placePath } from '../lib/routes';
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=400&fit=crop';
 const SEARCH_DEBOUNCE_MS = 300;
+const SORT_OPTIONS: { value: PlaceSort; label: string }[] = [
+  { value: 'name', label: 'Name A–Z' },
+  { value: 'newest', label: 'Newest first' },
+];
+
+function isPlaceSort(value: string | null): value is PlaceSort {
+  return SORT_OPTIONS.some((option) => option.value === value);
+}
 
 export default function CategoryPage() {
   const { categoryId = '' } = useParams();
   // Old static URLs use the file name (/category/hotels.json).
   const entity = toEntityCode(categoryId);
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [activeTypeId, setActiveTypeId] = useState<string | null>(null);
+  const apiMode = DATA_SOURCE === 'api';
+
+  // Filters live in the URL so back navigation and shared links keep them.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlSearch = searchParams.get('q') ?? '';
+  const activeTypeId = searchParams.get('type');
+  const townshipId = apiMode ? searchParams.get('township') : null;
+  const sortParam = searchParams.get('sort');
+  const sort: PlaceSort = apiMode && isPlaceSort(sortParam) ? sortParam : 'name';
+
+  const [searchQuery, setSearchQuery] = useState(urlSearch);
+
+  const setParam = (key: string, value: string | null) => {
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+        if (value) next.set(key, value);
+        else next.delete(key);
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setDebouncedSearch(searchQuery.trim()), SEARCH_DEBOUNCE_MS);
+    const trimmed = searchQuery.trim();
+    if (trimmed === urlSearch) return;
+    const timeout = window.setTimeout(() => setParam('q', trimmed || null), SEARCH_DEBOUNCE_MS);
     return () => window.clearTimeout(timeout);
-  }, [searchQuery]);
+  }, [searchQuery, urlSearch]);
 
   const {
     data: categories,
     isError: categoriesError,
     refetch: retryCategories,
   } = useDirectoryCategories();
+  const { data: townships } = useTownships(apiMode);
   const {
     data,
     isLoading,
@@ -39,10 +69,11 @@ export default function CategoryPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useDirectoryPlaces(entity, { search: debouncedSearch, typeCode: activeTypeId });
+  } = useDirectoryPlaces(entity, { search: urlSearch, typeCode: activeTypeId, townshipId, sort });
 
   const category = useMemo(() => categories?.find((item) => item.id === entity), [categories, entity]);
   const places = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
+  const total = data?.pages[0]?.total;
 
   const typeOptions = useMemo(
     () =>
@@ -53,6 +84,10 @@ export default function CategoryPage() {
       })),
     [category, places],
   );
+
+  const filtered = !!(urlSearch || activeTypeId || townshipId);
+  // A single township (today: only Taunggyi) makes the filter and row label noise.
+  const showTownships = (townships?.length ?? 0) > 1;
 
   return (
     <div>
@@ -66,7 +101,7 @@ export default function CategoryPage() {
         <div className="searchbar">
           <Search size={18} color="#999" />
           <input
-            placeholder="Search..."
+            placeholder="Search by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             type="search"
@@ -80,10 +115,41 @@ export default function CategoryPage() {
         </div>
       </div>
 
+      {apiMode && (
+        <div className="filter-row">
+          {(showTownships || townshipId) && (
+            <label className="filter-select">
+              <span className="visually-hidden">Township</span>
+              <select value={townshipId ?? ''} onChange={(e) => setParam('township', e.target.value || null)}>
+                <option value="">All townships</option>
+                {(townships ?? []).map((township) => (
+                  <option key={township.id} value={township.id}>
+                    {township.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <label className="filter-select">
+            <span className="visually-hidden">Sort</span>
+            <select
+              value={sort}
+              onChange={(e) => setParam('sort', e.target.value === 'name' ? null : e.target.value)}
+            >
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+
       <div className="chip-row">
         <button
           className={`chip${activeTypeId === null ? ' selected' : ''}`}
-          onClick={() => setActiveTypeId(null)}
+          onClick={() => setParam('type', null)}
           type="button"
         >
           All
@@ -92,7 +158,7 @@ export default function CategoryPage() {
           <button
             key={t.id}
             className={`chip${activeTypeId === t.id ? ' selected' : ''}`}
-            onClick={() => setActiveTypeId(t.id)}
+            onClick={() => setParam('type', t.id)}
             type="button"
           >
             {t.name}
@@ -117,21 +183,38 @@ export default function CategoryPage() {
       )}
 
       <div className="list">
+        {total != null && !isLoading && places.length > 0 && (
+          <p className="list-count">
+            {total} {total === 1 ? 'place' : 'places'}
+            {filtered ? ' match' : ''}
+          </p>
+        )}
         {places.map((place) => (
           <CategoryListItem
             key={place.id}
-            item={{
-              id: place.id,
-              title: place.name,
-              location: place.address,
-              userRating: place.userRating,
-              image: place.imageUrl || FALLBACK_IMAGE,
-            }}
+            place={place}
+            showTownship={showTownships}
             onPress={() => navigate(placePath(place))}
           />
         ))}
         {isLoading && <p className="centered">Loading…</p>}
-        {!isLoading && !placesError && places.length === 0 && <p className="empty">No listings found.</p>}
+        {!isLoading && !placesError && places.length === 0 && (
+          <div className="empty">
+            <p>No places found.</p>
+            {filtered && (
+              <button
+                className="link-btn"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSearchParams(sort === 'name' ? {} : { sort }, { replace: true });
+                }}
+                type="button"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
         {hasNextPage && (
           <button
             className="link-btn"

@@ -4,8 +4,6 @@ import type { DirectoryPlace } from '../types';
 import NearestCard from './NearestCard';
 
 const FOOD_PLACES = 'food_places';
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=400&fit=crop';
 
 function selectRandomPlaces(items: DirectoryPlace[]): DirectoryPlace[] {
   const shuffled = [...items];
@@ -60,17 +58,7 @@ export default function NearestListings({ onViewAll, onListingPress }: NearestLi
           <p className="centered">Loading recommendations…</p>
         )}
         {selected?.map((place) => (
-          <NearestCard
-            key={place.id}
-            listing={{
-              id: place.id,
-              name: place.name,
-              address: place.address,
-              type: place.type.name,
-              image: place.imageUrl || FALLBACK_IMAGE,
-            }}
-            onPress={() => onListingPress(place)}
-          />
+          <NearestCard key={place.id} place={place} onPress={() => onListingPress(place)} />
         ))}
       </div>
     </section>

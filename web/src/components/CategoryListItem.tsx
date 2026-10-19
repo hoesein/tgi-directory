@@ -1,30 +1,31 @@
+import { MapPin } from 'lucide-react';
+import PlaceImage from './PlaceImage';
 import RatingSummary from './RatingSummary';
-import type { UserRatingSummary } from '../types';
+import type { DirectoryPlace } from '../types';
 
 interface CategoryListItemProps {
-  item: {
-    id: string;
-    title: string;
-    location: string;
-    /** Community rating; hidden when nobody has rated. */
-    userRating: UserRatingSummary | null;
-    image: string;
-  };
+  place: DirectoryPlace;
+  /** Show the township next to the type; off while every place shares one township. */
+  showTownship?: boolean;
   onPress: () => void;
 }
 
-export default function CategoryListItem({ item, onPress }: CategoryListItemProps) {
+export default function CategoryListItem({ place, showTownship = false, onPress }: CategoryListItemProps) {
+  const meta = [place.type.name, showTownship ? place.township?.name : null].filter(Boolean).join(' · ');
+
   return (
     <button className="list-item" onClick={onPress} type="button">
-      <img src={item.image} alt={item.title} loading="lazy" />
-      <div>
-        <h3>{item.title}</h3>
-        <p>{item.location}</p>
-        {item.userRating?.count ? (
-          <p>
-            <RatingSummary summary={item.userRating} />
+      <PlaceImage className="list-item-image" src={place.imageUrl} alt={place.name} entity={place.entity} />
+      <div className="list-item-body">
+        <h3>{place.name}</h3>
+        {meta && <p className="list-item-meta">{meta}</p>}
+        {place.address && (
+          <p className="list-item-address">
+            <MapPin size={13} aria-hidden="true" />
+            <span>{place.address}</span>
           </p>
-        ) : null}
+        )}
+        {place.userRating?.count ? <RatingSummary summary={place.userRating} /> : null}
       </div>
     </button>
   );

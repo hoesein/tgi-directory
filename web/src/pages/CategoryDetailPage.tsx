@@ -6,11 +6,11 @@ import BackButton from '../components/BackButton';
 import { useDirectoryPlace } from '../api/useDirectory';
 import RatingControl from '../components/RatingControl';
 import RatingSummary from '../components/RatingSummary';
+import PhotoGallery from '../components/PhotoGallery';
 import { parseStaticListingId } from '../services/directory';
 import { canRate } from '../services/ratings';
 
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop';
+const updatedFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 
 /**
  * Place detail. Routes: /place/:entity/:listingId, and the old
@@ -39,7 +39,6 @@ export default function CategoryDetailPage() {
     : undefined;
 
   const rateable = canRate(place?.entity);
-  const listingImage = place?.imageUrl || FALLBACK_IMAGE;
   const address = listing?.location ?? '';
   const mapQuery =
     place?.latitude != null && place.longitude != null
@@ -82,7 +81,7 @@ export default function CategoryDetailPage() {
   return (
     <div>
       <div className="detail-hero">
-        <img src={listingImage} alt={listing.title} />
+        <PhotoGallery images={place?.imageUrls ?? []} alt={listing.title} entity={place?.entity ?? ''} />
         <BackButton variant="fab" />
       </div>
 
@@ -131,8 +130,14 @@ export default function CategoryDetailPage() {
               <dd>{place.type.name}</dd>
             </div>
           )}
-          {address && (
+          {place?.township && (
             <div>
+              <dt>Township</dt>
+              <dd>{place.township.name}</dd>
+            </div>
+          )}
+          {address && (
+            <div className="detail-wide">
               <dt>Address</dt>
               <dd>{address}</dd>
             </div>
@@ -162,6 +167,15 @@ export default function CategoryDetailPage() {
             </div>
           )}
         </dl>
+        {place?.description && (
+          <section className="detail-about">
+            <h2>About</h2>
+            <p>{place.description}</p>
+          </section>
+        )}
+        {place?.updatedAt && (
+          <p className="detail-updated">Updated {updatedFormat.format(new Date(place.updatedAt))}</p>
+        )}
       </article>
 
       {rateable && place && <RatingControl entity={place.entity} placeId={place.id} />}

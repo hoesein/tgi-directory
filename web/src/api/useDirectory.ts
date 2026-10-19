@@ -26,7 +26,16 @@ export function useDirectoryCategories() {
 /** Places in one category, filtered; API mode pages 100 at a time. */
 export function useDirectoryPlaces(entity: string | undefined, filters: PlaceFilters = {}) {
   return useInfiniteQuery({
-    queryKey: ['directory-places', DATA_SOURCE, entity, filters.search ?? '', filters.typeCode ?? null],
+    queryKey: [
+      'directory-places',
+      DATA_SOURCE,
+      entity,
+      filters.search ?? '',
+      filters.typeCode ?? null,
+      filters.townshipId ?? null,
+      filters.sort ?? 'name',
+      filters.pageSize ?? null,
+    ],
     queryFn: ({ pageParam }) => fetchDirectoryPlaces(entity as string, filters, pageParam),
     initialPageParam: 1,
     getNextPageParam: (last) => (last.hasMore ? last.page + 1 : undefined),

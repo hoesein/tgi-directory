@@ -323,7 +323,16 @@ export default function EventsPage() {
                       <span className="tazaungdaing-participant-ward">{entry.ward}</span>
                       <span className="tazaungdaing-participant-arrow" aria-hidden="true">›</span>
                     </Link>
-                  ) : null,
+                  ) : (
+                    // No profile to open: still list the participant.
+                    <div className="tazaungdaing-participant" key={entry.key}>
+                      <span className="tazaungdaing-participant-main">
+                        <strong>{entry.name}</strong>
+                        <span className="tazaungdaing-participant-type">{entry.role}</span>
+                      </span>
+                      <span className="tazaungdaing-participant-ward">{entry.ward}</span>
+                    </div>
+                  ),
                 )}
               </article>
             ))}

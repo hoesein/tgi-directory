@@ -1,59 +1,3 @@
-import { z } from 'zod';
-
-export const loginSchema = z.object({
-  email: z.string().email('Invalid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
-
-export const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Name is required'),
-    email: z.string().email('Invalid email'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
-
-export type LoginInput = z.infer<typeof loginSchema>;
-export type RegisterInput = z.infer<typeof registerSchema>;
-
-export interface Listing {
-  id: string;
-  title: string;
-  description: string;
-  category_id: string;
-  category?: Category | null;
-  user?: User | null;
-  location: string;
-  phone?: string | null;
-  email?: string | null;
-  website?: string | null;
-  image?: string | null;
-  created_at: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  description?: string | null;
-  parent_id: string | null;
-  icon?: string | null;
-  level: number;
-  sort_order: number;
-  created_at: string;
-  children?: Category[];
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'user' | 'admin';
-}
-
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -152,6 +96,8 @@ export interface ApiDirectoryRecord {
   image_urls?: string[];
   type: { code: string; name: string } | null;
   township: { id: string; code: string; name: string; region_code: string } | null;
+  created_at?: string;
+  updated_at?: string;
   /** Community rating; only hotels and food places have it. */
   user_rating?: UserRatingSummary;
 }
@@ -266,12 +212,17 @@ export interface DirectoryPlace {
   rating: number | null;
   /** Community rating (API mode, hotels and food places); null otherwise. */
   userRating: UserRatingSummary | null;
+  /** Cover image: the first of imageUrls. */
   imageUrl: string | null;
+  /** Every photo in display order (API records can have up to 10). */
+  imageUrls: string[];
   type: { code: string; name: string };
   /** API mode only; static data has no township ids. */
   township: { id: string; name: string } | null;
   latitude: number | null;
   longitude: number | null;
+  /** Last change (API mode); null for static data. */
+  updatedAt: string | null;
 }
 
 export interface EventEntryView {

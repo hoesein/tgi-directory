@@ -97,9 +97,11 @@ export function staticItemToPlace(file: string, item: DirectoryItem, index: numb
     rating: Number(item.rating) || null,
     userRating: null,
     imageUrl: item.images || null,
+    imageUrls: item.images ? [item.images] : [],
     type: item.type,
     township: null,
     ...parseLocation(item.location),
+    updatedAt: null,
   };
 }
 
@@ -165,10 +167,12 @@ function apiRecordToPlace(entity: string, record: ApiDirectoryRecord): Directory
     rating: record.rating === null ? null : Number(record.rating),
     userRating: record.user_rating ?? null,
     imageUrl: record.image_urls?.[0] ?? null,
+    imageUrls: record.image_urls ?? [],
     type: record.type ?? { code: '', name: '' },
     township: record.township ? { id: record.township.id, name: record.township.name } : null,
     latitude: record.latitude === null ? null : Number(record.latitude),
     longitude: record.longitude === null ? null : Number(record.longitude),
+    updatedAt: record.updated_at ?? null,
   };
 }
 
@@ -215,10 +219,22 @@ export async function fetchDirectoryCategories(): Promise<DirectoryCategoryView[
     .map(({ category }) => category);
 }
 
+export type PlaceSort = 'name' | 'newest';
+
 export interface PlaceFilters {
   search?: string;
   typeCode?: string | null;
+  /** API mode only: static data has no township ids. */
+  townshipId?: string | null;
+  /** API mode only; static data keeps file order. */
+  sort?: PlaceSort;
+  pageSize?: number;
 }
+
+const SORT_PARAMS: Record<PlaceSort, { sort: string; direction: string }> = {
+  name: { sort: 'name', direction: 'asc' },
+  newest: { sort: 'created_at', direction: 'desc' },
+};
 
 export interface PlacePage {
   items: DirectoryPlace[];
@@ -234,14 +250,15 @@ export async function fetchDirectoryPlaces(
 ): Promise<PlacePage> {
   const search = filters.search?.trim() ?? '';
   if (DATA_SOURCE === 'api') {
+    const pageSize = filters.pageSize ?? API_PAGE_SIZE;
     const params: Record<string, string> = {
       page: String(page),
-      page_size: String(API_PAGE_SIZE),
-      sort: 'name',
-      direction: 'asc',
+      page_size: String(pageSize),
+      ...SORT_PARAMS[filters.sort ?? 'name'],
     };
     if (search) params.search = search;
     if (filters.typeCode) params.type_code = filters.typeCode;
+    if (filters.townshipId) params.township_id = filters.townshipId;
     const response = await api.get<ApiResponse<Paged<ApiDirectoryRecord>>>(
       `/v1/directory/${encodeURIComponent(entity)}`,
       params,
@@ -250,7 +267,7 @@ export async function fetchDirectoryPlaces(
     return {
       items: items.map((record) => apiRecordToPlace(entity, record)),
       page,
-      hasMore: page * API_PAGE_SIZE < total,
+      hasMore: page * pageSize < total,
       total,
     };
   }
