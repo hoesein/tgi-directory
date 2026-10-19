@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   DATA_SOURCE,
   fetchDirectoryCategories,
@@ -59,7 +59,10 @@ export function useDirectoryPlace(entity: string | undefined, id: string | undef
 export function useEventDays(date: string) {
   return useQuery({
     queryKey: ['event-days', DATA_SOURCE, date],
-    queryFn: () => fetchEventDays(date),
+    // The signal cancels the request when the user has already moved to another day.
+    queryFn: ({ signal }) => fetchEventDays(date, signal),
+    // Keep showing the last day while the next one loads, instead of an empty page.
+    placeholderData: keepPreviousData,
     staleTime: STALE_TIME,
   });
 }

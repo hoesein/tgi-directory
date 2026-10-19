@@ -3364,3 +3364,20 @@ textarea {
   flex-shrink: 0;
   color: var(--faint);
 }
+
+/* Role on the right when there is no ward to show under the name. */
+.event-row-role {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Previous day's schedule, shown faded while the chosen day loads. */
+.tazaungdaing-events {
+  transition: opacity 0.15s;
+}
+
+.tazaungdaing-events.stale {
+  opacity: 0.45;
+}

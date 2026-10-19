@@ -68,8 +68,9 @@ class ApiService {
     return response.json();
   }
 
-  async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET', params });
+  /** `signal` lets callers (e.g. TanStack Query) cancel a request that is no longer needed. */
+  async get<T>(endpoint: string, params?: Record<string, string>, signal?: AbortSignal): Promise<T> {
+    return this.request<T>(endpoint, { method: 'GET', params, signal });
   }
 
   async post<T>(endpoint: string, body?: unknown): Promise<T> {

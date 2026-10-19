@@ -3,12 +3,15 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useEventDays, useEventRanges } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
+import { useDebouncedValue } from '../lib/useDebouncedValue';
 import { eventDayLabel, formatMyanmarDate } from '../lib/myanmar';
 import { isPagodaFestival } from '../services/directory';
 import type { EventRangeView } from '../types';
 
 /** A horizontal move this long (px) on the day strip changes the day. */
 const SWIPE_DISTANCE = 40;
+/** Wait this long after the last day change before loading that day's schedule. */
+const SCHEDULE_DEBOUNCE_MS = 250;
 
 function daysFrom(from: string, to: string): number {
   return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
@@ -98,12 +101,17 @@ export default function EventsPage() {
   const [viewMode] = useState<'month' | 'day'>('day');
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [showMarketDayChips, setShowMarketDayChips] = useState(false);
+  // Rapid taps on the strip only load the day the user stops on.
+  const scheduleDate = useDebouncedValue(selectedDate, SCHEDULE_DEBOUNCE_MS);
   const {
     data: selectedEventDays = [],
     isLoading: isLoadingEventDays,
     isError: isEventDaysError,
+    isPlaceholderData,
     refetch: refetchEventDays,
-  } = useEventDays(selectedDate);
+  } = useEventDays(scheduleDate);
+  // The cards still show an earlier day until the chosen day's schedule arrives.
+  const scheduleIsStale = isPlaceholderData || scheduleDate !== selectedDate;
   const selectedPagodaFestivalEvents = selectedEventDays.filter((day) =>
     isPagodaFestival(day.eventName),
   );
@@ -392,7 +400,11 @@ export default function EventsPage() {
 
         {/* Festival days on the selected date */}
         {(isLoadingEventDays || isEventDaysError || selectedEventDays.length > 0) && (
-          <section className="tazaungdaing-events" aria-live="polite">
+          <section
+            className={`tazaungdaing-events${scheduleIsStale ? ' stale' : ''}`}
+            aria-live="polite"
+            aria-busy={scheduleIsStale}
+          >
             {isLoadingEventDays && <p>ပွဲအချက်အလက်များ ရယူနေသည်…</p>}
             {isEventDaysError && (
               <div className="data-error" role="alert">
@@ -417,12 +429,14 @@ export default function EventsPage() {
                 </header>
                 <ul className="event-card-list">
                   {day.entries.map((entry) => {
+                    // With a ward: "role · ward" under the name. Without: the role sits on the right.
                     const body = (
                       <>
                         <span className="event-row-text">
                           <strong>{entry.name}</strong>
-                          <span>{[entry.role, entry.ward].filter(Boolean).join(' · ')}</span>
+                          {entry.ward && <span>{[entry.role, entry.ward].filter(Boolean).join(' · ')}</span>}
                         </span>
+                        {!entry.ward && entry.role && <span className="event-row-role">{entry.role}</span>}
                         {entry.href && <ChevronRight size={16} className="event-row-arrow" aria-hidden="true" />}
                       </>
                     );

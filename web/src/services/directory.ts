@@ -322,9 +322,9 @@ export async function fetchDirectoryPlace(entity: string, id: string): Promise<D
   }
 }
 
-export async function fetchEventDays(date: string): Promise<EventDayView[]> {
+export async function fetchEventDays(date: string, signal?: AbortSignal): Promise<EventDayView[]> {
   if (DATA_SOURCE === 'api') {
-    const response = await api.get<ApiResponse<ApiEventDay[]>>('/v1/event-days', { date });
+    const response = await api.get<ApiResponse<ApiEventDay[]>>('/v1/event-days', { date }, signal);
     return response.data.map(apiDayToView);
   }
   return staticEventsToDays(await fetchTazaungdaingEvents(), date);
