@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchMyRating, removeRating, saveRating } from '../services/ratings';
+import { fetchMyRating, fetchMyRatings, removeRating, saveRating } from '../services/ratings';
 import { useAuthStore } from '../store/authStore';
 import type { ApiMyRating } from '../types';
 
@@ -13,6 +13,17 @@ export function useMyRating(entity: string, id: string, enabled: boolean) {
   return useQuery({
     queryKey: myRatingKey(userId, entity, id),
     queryFn: () => fetchMyRating(entity, id),
+    enabled: enabled && !!userId,
+    staleTime: 1000 * 60,
+  });
+}
+
+/** Every place the signed-in user rated (Profile → Places I rated). */
+export function useMyRatings(enabled = true) {
+  const userId = useAuthStore((state) => state.user?.id);
+  return useQuery({
+    queryKey: ['my-ratings', userId ?? null],
+    queryFn: fetchMyRatings,
     enabled: enabled && !!userId,
     staleTime: 1000 * 60,
   });
@@ -50,6 +61,7 @@ export function useRatePlace(entity: string, id: string) {
     onSettled: () => {
       // Fresh average and count on this page and on the category lists.
       void queryClient.invalidateQueries({ queryKey: key });
+      void queryClient.invalidateQueries({ queryKey: ['my-ratings'] });
       void queryClient.invalidateQueries({
         predicate: (query) =>
           (query.queryKey[0] === 'directory-place' && query.queryKey[3] === id) ||

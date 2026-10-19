@@ -22,6 +22,8 @@ import AddPlacePage from './pages/AddPlacePage';
 import MySuggestionsPage from './pages/MySuggestionsPage';
 import SearchPage from './pages/SearchPage';
 import PlaceMapPage from './pages/PlaceMapPage';
+import MyRatingsPage from './pages/MyRatingsPage';
+import AboutPage from './pages/AboutPage';
 
 // The floating tab bar only lives on the home page — every other
 // route is a dedicated page with its own back navigation.
@@ -73,6 +75,8 @@ export default function App() {
           <Route path="/register" element={<Navigate to="/sign-in" replace />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/suggestions" element={<MySuggestionsPage />} />
+          <Route path="/profile/ratings" element={<MyRatingsPage />} />
+          <Route path="/profile/about" element={<AboutPage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/events/participants/:participantId" element={<EventParticipantPage />} />
           <Route

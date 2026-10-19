@@ -1,4 +1,4 @@
-import type { ApiMyRating, ApiResponse } from '../types';
+import type { ApiMyRating, ApiMyRatingItem, ApiResponse } from '../types';
 import { api } from './api';
 import { DATA_SOURCE } from './directory';
 
@@ -26,4 +26,10 @@ export async function saveRating(entity: string, id: string, stars: number): Pro
 
 export async function removeRating(entity: string, id: string): Promise<void> {
   await api.delete<void>(ratingPath(entity, id));
+}
+
+/** The signed-in user's ratings, newest first. */
+export async function fetchMyRatings(): Promise<{ items: ApiMyRatingItem[]; count: number }> {
+  const response = await api.get<ApiResponse<ApiMyRatingItem[]>>('/v1/ratings/mine', { page_size: '100' });
+  return { items: response.data, count: response.count ?? response.data.length };
 }

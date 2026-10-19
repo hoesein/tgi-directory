@@ -116,6 +116,20 @@ export interface ApiMyRating {
   user_rating: UserRatingSummary;
 }
 
+/** One row of GET /v1/ratings/mine. `place` is null when the record no longer exists. */
+export interface ApiMyRatingItem {
+  entity: string;
+  record_id: string;
+  stars: number;
+  updated_at: string;
+  place: {
+    name: string;
+    is_active: boolean;
+    type: { code: string; name: string } | null;
+    image_url: string | null;
+  } | null;
+}
+
 export interface ApiTownship {
   id: string;
   code: string;

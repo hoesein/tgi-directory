@@ -2,6 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { env } from 'node:process';
+import { readFileSync } from 'node:fs';
+
+/** Shown on Profile → About. */
+const appVersion = (
+  JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string }
+).version;
 
 const repositoryName = env.GITHUB_REPOSITORY?.split('/')[1];
 const base =
@@ -20,6 +26,9 @@ const marketDaySource = decodeURIComponent(
 
 export default defineConfig({
   base,
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion),
+  },
   resolve: {
     alias: {
       'shan-market-day': marketDaySource,
@@ -56,7 +65,7 @@ export default defineConfig({
           },
           {
             name: 'Places to Visit',
-            url: `${base}notifications`,
+            url: `${base}place-to-visit`,
             icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml' }],
           },
         ],

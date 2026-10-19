@@ -22,12 +22,12 @@ function mySuggestionsKey(userId: string | undefined) {
   return ['my-suggestions', userId ?? null] as const;
 }
 
-export function useMySuggestions() {
+export function useMySuggestions(enabled = true) {
   const userId = useAuthStore((state) => state.user?.id);
   return useQuery({
     queryKey: mySuggestionsKey(userId),
     queryFn: fetchMySuggestions,
-    enabled: !!userId,
+    enabled: enabled && !!userId,
   });
 }
 
