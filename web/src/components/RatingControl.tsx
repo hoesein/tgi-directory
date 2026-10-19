@@ -41,7 +41,18 @@ export default function RatingControl({ entity, placeId }: { entity: string; pla
 
   return (
     <section className="rating-control" aria-labelledby="rating-control-title">
-      <h2 id="rating-control-title">{ownStars ? 'Your rating' : 'Rate this place'}</h2>
+      <div className="rating-control-text">
+        <h2 id="rating-control-title">{ownStars ? 'Your rating' : 'Rate this place'}</h2>
+        {!user ? (
+          <span className="rating-hint">Sign in to rate</span>
+        ) : ownStars !== null ? (
+          <button type="button" className="rating-remove" onClick={() => choose(null)}>
+            Remove
+          </button>
+        ) : (
+          <span className="rating-hint">Tap a star</span>
+        )}
+      </div>
       <div className="rating-stars" role="group" aria-label="Your rating">
         {STARS.map((value) => {
           const filled = ownStars !== null && value <= ownStars;
@@ -55,17 +66,11 @@ export default function RatingControl({ entity, placeId }: { entity: string; pla
               aria-label={`${value} star${value === 1 ? '' : 's'}`}
               aria-pressed={ownStars === value}
             >
-              <Star size={30} fill={filled ? 'currentColor' : 'none'} />
+              <Star size={24} strokeWidth={1.75} fill={filled ? 'currentColor' : 'none'} />
             </button>
           );
         })}
       </div>
-      {!user && <p className="rating-hint">Sign in to rate.</p>}
-      {ownStars !== null && (
-        <button type="button" className="link-btn rating-remove" onClick={() => choose(null)}>
-          Remove my rating
-        </button>
-      )}
       {toast && (
         <div className="rating-toast" role="status">
           {toast}

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import BackButton from '../components/BackButton';
 import PlaceFormFields, {
+  FormSection,
   LocationField,
   placeFormSchema,
   type PlaceFormValues,
@@ -105,7 +106,6 @@ export default function AddPlacePage() {
           errors={errors}
           typeOptions={typeOptions}
           townshipOptions={townshipOptions}
-          showDescription
         />
         <LocationField
           latitude={latitude}
@@ -116,11 +116,15 @@ export default function AddPlacePage() {
           }}
         />
 
-        <div className="field">
-          <label htmlFor="add-note">Note for the admin (optional)</label>
-          <textarea id="add-note" rows={3} {...register('note')} />
-        </div>
-        {errors.note && <p className="field-error">{errors.note.message}</p>}
+        <FormSection title="Note for the admin">
+          <div className="field">
+            <label htmlFor="add-note" className="visually-hidden">
+              Note (optional)
+            </label>
+            <textarea id="add-note" rows={3} placeholder="Optional" {...register('note')} />
+            {errors.note && <p className="field-error">{errors.note.message}</p>}
+          </div>
+        </FormSection>
 
         {formError && (
           <p className="form-error" role="alert">
@@ -128,9 +132,11 @@ export default function AddPlacePage() {
           </p>
         )}
 
-        <button className="btn-primary" type="submit" disabled={submit.isPending}>
-          {submit.isPending ? 'Sending…' : 'Send suggestion'}
-        </button>
+        <div className="form-submit-bar">
+          <button className="btn-primary" type="submit" disabled={submit.isPending}>
+            {submit.isPending ? 'Sending…' : 'Send suggestion'}
+          </button>
+        </div>
       </form>
     </div>
   );

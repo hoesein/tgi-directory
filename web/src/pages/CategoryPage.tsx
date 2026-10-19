@@ -86,7 +86,7 @@ export default function CategoryPage() {
   );
 
   const filtered = !!(urlSearch || activeTypeId || townshipId);
-  // A single township (today: only Taunggyi) makes the filter and row label noise.
+  // With a single township (today: only Taunggyi) the row label is noise; the filter stays for new townships.
   const showTownships = (townships?.length ?? 0) > 1;
 
   return (
@@ -117,19 +117,17 @@ export default function CategoryPage() {
 
       {apiMode && (
         <div className="filter-row">
-          {(showTownships || townshipId) && (
-            <label className="filter-select">
-              <span className="visually-hidden">Township</span>
-              <select value={townshipId ?? ''} onChange={(e) => setParam('township', e.target.value || null)}>
-                <option value="">All townships</option>
-                {(townships ?? []).map((township) => (
-                  <option key={township.id} value={township.id}>
-                    {township.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          <label className="filter-select">
+            <span className="visually-hidden">Township</span>
+            <select value={townshipId ?? ''} onChange={(e) => setParam('township', e.target.value || null)}>
+              <option value="">All townships</option>
+              {(townships ?? []).map((township) => (
+                <option key={township.id} value={township.id}>
+                  {township.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="filter-select">
             <span className="visually-hidden">Sort</span>
             <select

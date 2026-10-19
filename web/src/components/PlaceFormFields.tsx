@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
-import { LocateFixed, X } from 'lucide-react';
+import { LocateFixed, MapPin, X } from 'lucide-react';
 import { z } from 'zod';
+import LazyOsmMap from './map/LazyOsmMap';
+import { round6 } from '../lib/maps';
 
 /** Form values shared by "Suggest an edit" and "Add a missing place". Limits match the backend. */
 export const placeFormSchema = z.object({
@@ -28,75 +30,96 @@ interface PlaceFormFieldsProps {
   errors: FieldErrors<PlaceFormValues>;
   typeOptions: Option[];
   townshipOptions: Option[];
-  showDescription?: boolean;
+}
+
+/** A titled card that groups related fields. */
+export function FormSection({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+  return (
+    <section className="form-section">
+      <h2>{title}</h2>
+      {hint && <p className="form-section-hint">{hint}</p>}
+      {children}
+    </section>
+  );
 }
 
 function FieldError({ message }: { message?: string }) {
-  return message ? <p className="field-error">{message}</p> : null;
+  return message ? (
+    <p className="field-error" role="alert">
+      {message}
+    </p>
+  ) : null;
 }
 
-export default function PlaceFormFields({
-  register,
-  errors,
-  typeOptions,
-  townshipOptions,
-  showDescription = false,
-}: PlaceFormFieldsProps) {
+export default function PlaceFormFields({ register, errors, typeOptions, townshipOptions }: PlaceFormFieldsProps) {
   return (
     <>
-      <div className="field">
-        <label htmlFor="place-name">Name</label>
-        <input id="place-name" {...register('name')} autoComplete="off" />
-      </div>
-      <FieldError message={errors.name?.message} />
+      <FormSection title="Place">
+        <div className="field">
+          <label htmlFor="place-name">Name</label>
+          <input id="place-name" {...register('name')} autoComplete="off" aria-invalid={!!errors.name} />
+          <FieldError message={errors.name?.message} />
+        </div>
 
-      <div className="field">
-        <label htmlFor="place-type">Type</label>
-        <select id="place-type" {...register('typeCode')}>
-          <option value="">Choose a type</option>
-          {typeOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <FieldError message={errors.typeCode?.message} />
-
-      <div className="field">
-        <label htmlFor="place-township">Township</label>
-        <select id="place-township" {...register('townshipId')}>
-          <option value="">Choose a township</option>
-          {townshipOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-      <FieldError message={errors.townshipId?.message} />
-
-      <div className="field">
-        <label htmlFor="place-phone">Phone (optional)</label>
-        <input id="place-phone" type="tel" {...register('phone')} />
-      </div>
-      <FieldError message={errors.phone?.message} />
-
-      <div className="field">
-        <label htmlFor="place-address">Address (optional)</label>
-        <input id="place-address" {...register('address')} />
-      </div>
-      <FieldError message={errors.address?.message} />
-
-      {showDescription && (
-        <>
+        <div className="field-row">
           <div className="field">
-            <label htmlFor="place-description">Description (optional)</label>
-            <textarea id="place-description" rows={3} {...register('description')} />
+            <label htmlFor="place-type">Type</label>
+            <select id="place-type" {...register('typeCode')} aria-invalid={!!errors.typeCode}>
+              <option value="">Choose</option>
+              {typeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <FieldError message={errors.typeCode?.message} />
           </div>
+
+          <div className="field">
+            <label htmlFor="place-township">Township</label>
+            <select id="place-township" {...register('townshipId')} aria-invalid={!!errors.townshipId}>
+              <option value="">Choose</option>
+              {townshipOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <FieldError message={errors.townshipId?.message} />
+          </div>
+        </div>
+      </FormSection>
+
+      <FormSection title="Contact and details">
+        <div className="field">
+          <label htmlFor="place-phone">Phone</label>
+          <input
+            id="place-phone"
+            type="tel"
+            inputMode="tel"
+            placeholder="e.g. 081 21 22 97"
+            {...register('phone')}
+          />
+          <FieldError message={errors.phone?.message} />
+        </div>
+
+        <div className="field">
+          <label htmlFor="place-address">Address</label>
+          <textarea id="place-address" rows={2} {...register('address')} />
+          <FieldError message={errors.address?.message} />
+        </div>
+
+        <div className="field">
+          <label htmlFor="place-description">Description</label>
+          <textarea
+            id="place-description"
+            rows={4}
+            placeholder="What should visitors know?"
+            {...register('description')}
+          />
           <FieldError message={errors.description?.message} />
-        </>
-      )}
+        </div>
+      </FormSection>
     </>
   );
 }
@@ -107,10 +130,10 @@ interface LocationFieldProps {
   onChange: (latitude: number | null, longitude: number | null) => void;
 }
 
-/** Location from the phone's GPS (no map in the PWA yet). Both coordinates or none. */
+/** Map picker (OpenStreetMap): tap the map, drag the pin, or use the phone's GPS. Both coordinates or none. */
 export function LocationField({ latitude, longitude, onChange }: LocationFieldProps) {
   const [status, setStatus] = useState<string | null>(null);
-  const hasLocation = latitude !== null && longitude !== null;
+  const point = latitude !== null && longitude !== null ? { lat: latitude, lng: longitude } : null;
 
   const useCurrentLocation = () => {
     if (!('geolocation' in navigator)) {
@@ -120,10 +143,7 @@ export function LocationField({ latitude, longitude, onChange }: LocationFieldPr
     setStatus('Finding your location…');
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        onChange(
-          Number(position.coords.latitude.toFixed(6)),
-          Number(position.coords.longitude.toFixed(6)),
-        );
+        onChange(round6(position.coords.latitude), round6(position.coords.longitude));
         setStatus(null);
       },
       () => setStatus("Couldn't get your location. Check the location permission."),
@@ -132,35 +152,35 @@ export function LocationField({ latitude, longitude, onChange }: LocationFieldPr
   };
 
   return (
-    <div className="field location-field">
-      <span className="location-label">Location (optional)</span>
-      <p className="location-value">
-        {hasLocation ? (
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {latitude}, {longitude}
-          </a>
-        ) : (
-          'No location set'
-        )}
-      </p>
-      <div className="location-actions">
-        <button type="button" className="chip-btn" onClick={useCurrentLocation}>
-          <LocateFixed size={16} />
-          <span>Use my current location</span>
-        </button>
-        {hasLocation && (
-          <button type="button" className="chip-btn" onClick={() => onChange(null, null)}>
-            <X size={16} />
-            <span>Clear</span>
+    <FormSection title="Location" hint="Tap the map or drag the pin to the entrance.">
+      <LazyOsmMap
+        className="location-picker-map"
+        point={point}
+        onPick={(picked) => onChange(picked.lat, picked.lng)}
+        label="Choose the place's location"
+      />
+      <div className="location-bar">
+        <span className="location-value">
+          <MapPin size={15} aria-hidden="true" />
+          {point ? `${point.lat}, ${point.lng}` : 'No pin yet'}
+        </span>
+        <div className="location-actions">
+          <button type="button" className="chip-btn" onClick={useCurrentLocation}>
+            <LocateFixed size={16} />
+            <span>My location</span>
           </button>
-        )}
+          {point && (
+            <button type="button" className="chip-btn" onClick={() => onChange(null, null)} aria-label="Clear location">
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </div>
-      <p className="location-help">Stand at the place before using your location.</p>
-      {status && <p className="location-status">{status}</p>}
-    </div>
+      {status && (
+        <p className="location-status" role="status">
+          {status}
+        </p>
+      )}
+    </FormSection>
   );
 }

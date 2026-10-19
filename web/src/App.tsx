@@ -21,6 +21,7 @@ import SuggestEditPage from './pages/SuggestEditPage';
 import AddPlacePage from './pages/AddPlacePage';
 import MySuggestionsPage from './pages/MySuggestionsPage';
 import SearchPage from './pages/SearchPage';
+import PlaceMapPage from './pages/PlaceMapPage';
 
 // The floating tab bar only lives on the home page — every other
 // route is a dedicated page with its own back navigation.
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="/category/:categoryId/add" element={<AddPlacePage />} />
           <Route path="/place/:entity/:listingId" element={<CategoryDetailPage />} />
           <Route path="/place/:entity/:listingId/suggest" element={<SuggestEditPage />} />
+          <Route path="/place/:entity/:listingId/map" element={<PlaceMapPage />} />
           {/* Old static detail links (dir--<file>--<index>) */}
           <Route path="/category-detail/:listingId" element={<CategoryDetailPage />} />
           <Route path="/sign-in" element={<SignInPage />} />

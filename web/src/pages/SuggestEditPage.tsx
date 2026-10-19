@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import BackButton from '../components/BackButton';
 import PlaceFormFields, {
+  FormSection,
   LocationField,
   placeFormSchema,
   type PlaceFormValues,
@@ -35,6 +36,7 @@ function valuesFromPlace(place: DirectoryPlace): PlaceFormValues {
     townshipId: place.township?.id ?? '',
     phone: place.phone ?? '',
     address: place.address,
+    description: place.description ?? '',
     latitude: place.latitude,
     longitude: place.longitude,
   };
@@ -50,6 +52,7 @@ function changedFields(initial: PlaceFormValues, values: PlaceFormValues): Sugge
   if (values.townshipId !== initial.townshipId) changes.township_id = values.townshipId;
   if (text(values.phone) !== text(initial.phone)) changes.phone = nullable(values.phone);
   if (text(values.address) !== text(initial.address)) changes.address = nullable(values.address);
+  if (text(values.description) !== text(initial.description)) changes.description = nullable(values.description);
   if (values.latitude !== initial.latitude || values.longitude !== initial.longitude) {
     changes.latitude = values.latitude;
     changes.longitude = values.longitude;
@@ -131,9 +134,17 @@ export default function SuggestEditPage() {
           appears.
         </p>
 
-        <label className="checkbox-row">
-          <input type="checkbox" checked={closed} onChange={(event) => setClosed(event.target.checked)} />
-          <span>This place is closed</span>
+        <label className="switch-row">
+          <span>
+            <strong>This place is closed</strong>
+            <small>Report it instead of editing details</small>
+          </span>
+          <input
+            type="checkbox"
+            role="switch"
+            checked={closed}
+            onChange={(event) => setClosed(event.target.checked)}
+          />
         </label>
 
         {!closed && (
@@ -155,11 +166,20 @@ export default function SuggestEditPage() {
           </>
         )}
 
-        <div className="field">
-          <label htmlFor="suggest-note">{closed ? 'How do you know? (optional)' : 'Note for the admin (optional)'}</label>
-          <textarea id="suggest-note" rows={3} {...register('note')} />
-        </div>
-        {errors.note && <p className="field-error">{errors.note.message}</p>}
+        <FormSection title={closed ? 'How do you know?' : 'Note for the admin'}>
+          <div className="field">
+            <label htmlFor="suggest-note" className="visually-hidden">
+              Note (optional)
+            </label>
+            <textarea
+              id="suggest-note"
+              rows={3}
+              placeholder={closed ? 'e.g. The shop has been empty since June' : 'Optional'}
+              {...register('note')}
+            />
+            {errors.note && <p className="field-error">{errors.note.message}</p>}
+          </div>
+        </FormSection>
 
         {formError && (
           <p className="form-error" role="alert">
@@ -167,10 +187,16 @@ export default function SuggestEditPage() {
           </p>
         )}
 
-        <button className="btn-primary" type="submit" disabled={(!closed && !hasChanges) || submit.isPending}>
-          {submit.isPending ? 'Sending…' : 'Send suggestion'}
-        </button>
-        {!closed && !hasChanges && <p className="suggest-hint">Change at least one detail to send.</p>}
+        <div className="form-submit-bar">
+          {!closed && (
+            <p className="suggest-hint" aria-live="polite">
+              {hasChanges ? 'Only the details you changed are sent.' : 'Change at least one detail to send.'}
+            </p>
+          )}
+          <button className="btn-primary" type="submit" disabled={(!closed && !hasChanges) || submit.isPending}>
+            {submit.isPending ? 'Sending…' : closed ? 'Report as closed' : 'Send suggestion'}
+          </button>
+        </div>
       </form>
     </div>
   );
