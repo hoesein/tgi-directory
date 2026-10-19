@@ -184,7 +184,7 @@ function apiRecordToPlace(entity: string, record: ApiDirectoryRecord): Directory
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Whole days from one YYYY-MM-DD date to another (UTC, so DST can't shift it). */
-function daysBetween(from: string, to: string): number {
+export function daysBetween(from: string, to: string): number {
   return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / DAY_MS);
 }
 

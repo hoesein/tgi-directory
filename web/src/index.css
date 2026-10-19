@@ -3406,3 +3406,9 @@ textarea {
   font-weight: 400;
   letter-spacing: 0.01em;
 }
+
+/* Event running today stands out in the home ticker. */
+.event-ticker-item.accent {
+  color: var(--primary);
+  font-weight: 600;
+}
