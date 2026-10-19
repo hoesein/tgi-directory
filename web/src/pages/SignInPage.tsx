@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import ProviderIcon from '../components/ProviderIcon';
 import {
@@ -47,19 +47,18 @@ export default function SignInPage() {
     }
   };
 
+  const leave = () => navigate(next, { replace: true });
+
   return (
     <div className="sign-in-page">
-      <div className="page-head">
-        <BackButton onBack={() => navigate(next, { replace: true })} />
-        <span style={{ width: 24 }} />
+      <div className="sign-in-top">
+        <BackButton onBack={leave} />
       </div>
 
       <div className="sign-in-body">
         <img className="sign-in-logo" src={`${import.meta.env.BASE_URL}icon.svg`} alt="" />
         <h1>Sign in</h1>
-        <p className="sign-in-lead">
-          Sign in to rate places and suggest updates. You can keep browsing without an account.
-        </p>
+        <p className="sign-in-lead">Rate places and suggest updates.</p>
 
         {error ? (
           <p className="sign-in-error" role="alert">
@@ -80,17 +79,27 @@ export default function SignInPage() {
                 disabled={pending !== null}
                 aria-busy={pending === provider.id}
               >
-                {pending === provider.id ? (
-                  <span className="sign-in-spinner" aria-hidden="true" />
-                ) : (
-                  <ProviderIcon provider={provider.id} />
-                )}
-                <span>{provider.label}</span>
+                <span className="sign-in-button-icon">
+                  {pending === provider.id ? (
+                    <span className="sign-in-spinner" aria-hidden="true" />
+                  ) : (
+                    <ProviderIcon provider={provider.id} />
+                  )}
+                </span>
+                <span className="sign-in-button-label">{provider.label}</span>
               </button>
             ))}
           </div>
         )}
+
+        <button className="sign-in-skip" type="button" onClick={leave}>
+          Not now
+        </button>
       </div>
+
+      <p className="sign-in-footer">
+        Browsing never needs an account. <Link to="/profile/about">Privacy &amp; data</Link>
+      </p>
     </div>
   );
 }

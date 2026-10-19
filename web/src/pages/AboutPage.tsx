@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 import BackButton from '../components/BackButton';
 
 /** Profile → About: version, data credits and a privacy note (TGI-55). */
@@ -23,21 +24,36 @@ export default function AboutPage() {
         <section className="about-section">
           <h3>What it is</h3>
           <p>
-            A city guide for Taunggyi: hotels, food places, banks, shops, events and places to visit. Listings
-            are kept up to date by the developer and by suggestions from people who use the app.
+            A city guide for Taunggyi: hotels, food places, banks, shops, events and places to visit.
           </p>
         </section>
 
+        <section className="about-section about-disclaimer">
+          <h3>
+            <AlertTriangle size={16} aria-hidden="true" />
+            Data disclaimer
+          </h3>
+          <p>
+            Listings are collected from public information on the internet and social media, such as Facebook
+            pages, and from suggestions by people who use the app. They are not official.
+          </p>
+          <p>
+            Names, phone numbers, addresses, hours and photos may be incomplete, out of date or wrong. Please check
+            with the place before you rely on them. This app is not affiliated with the places listed, and their
+            names, logos and photos belong to their owners.
+          </p>
+          <p>Own a listed place? Contact the developer from the Profile page to correct or remove it.</p>
+        </section>
+
         <section className="about-section">
-          <h3>Data and maps</h3>
+          <h3>Maps</h3>
           <p>
             Map tiles and map data ©{' '}
             <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
               OpenStreetMap contributors
             </a>
-            . Directions open in Apple Maps or Google Maps.
+            . Directions open in Apple Maps or Google Maps. Map pins are approximate.
           </p>
-          <p>Place details can change. Call ahead before you visit.</p>
         </section>
 
         <section className="about-section">
