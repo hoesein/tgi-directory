@@ -170,6 +170,48 @@ export interface ApiMyRating {
   user_rating: UserRatingSummary;
 }
 
+export interface ApiTownship {
+  id: string;
+  code: string;
+  name: string;
+  region_code: string;
+}
+
+export type SuggestionKind = 'correction' | 'new_place' | 'closed';
+export type SuggestionState = 'pending' | 'approved' | 'rejected' | 'withdrawn';
+
+/** Fields a suggestion can set (backend names). */
+export interface SuggestionChanges {
+  name?: string;
+  description?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  township_id?: string;
+  type_code?: string;
+}
+
+export type SuggestionInput =
+  | { kind: 'correction'; entity: string; record_id: string; changes: SuggestionChanges; note?: string }
+  | { kind: 'closed'; entity: string; record_id: string; note?: string }
+  | { kind: 'new_place'; entity: string; changes: SuggestionChanges; note?: string };
+
+export interface ApiSuggestion {
+  id: string;
+  kind: SuggestionKind;
+  entity: string;
+  record_id: string | null;
+  place_name: string;
+  changes: SuggestionChanges;
+  note: string | null;
+  state: SuggestionState;
+  reason: string | null;
+  applied_record_id: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+}
+
 export interface ApiEventDay {
   id: string;
   event_date: string;
@@ -226,6 +268,8 @@ export interface DirectoryPlace {
   userRating: UserRatingSummary | null;
   imageUrl: string | null;
   type: { code: string; name: string };
+  /** API mode only; static data has no township ids. */
+  township: { id: string; name: string } | null;
   latitude: number | null;
   longitude: number | null;
 }

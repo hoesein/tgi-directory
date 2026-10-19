@@ -1,4 +1,5 @@
-import { ChevronRight, ExternalLink, MessageCircle, Phone, Send, User } from 'lucide-react';
+import { ChevronRight, ClipboardList, ExternalLink, MessageCircle, Phone, Send, User } from 'lucide-react';
+import { canSuggest } from '../services/suggestions';
 import { Link } from 'react-router-dom';
 import { userAvatarUrl, userDisplayName, userProviderName } from '../lib/auth';
 import { supabase } from '../lib/supabase';
@@ -53,6 +54,19 @@ export default function ProfilePage() {
             <div className="profile-user-info">
               <div className="profile-name">Sign in</div>
               <div className="profile-email">Google, Facebook or Telegram</div>
+            </div>
+            <ChevronRight size={20} />
+          </Link>
+        )}
+
+        {user && canSuggest() && (
+          <Link className="profile-user-card" to="/profile/suggestions">
+            <div className="profile-avatar">
+              <ClipboardList size={24} />
+            </div>
+            <div className="profile-user-info">
+              <div className="profile-name">My suggestions</div>
+              <div className="profile-email">Edits and new places you sent</div>
             </div>
             <ChevronRight size={20} />
           </Link>

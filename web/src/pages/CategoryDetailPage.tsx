@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { MapPin, Phone, X } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import { MapPin, PencilLine, Phone, X } from 'lucide-react';
+import { canSuggest } from '../services/suggestions';
 import BackButton from '../components/BackButton';
 import { useDirectoryPlace } from '../api/useDirectory';
 import RatingControl from '../components/RatingControl';
@@ -164,6 +165,13 @@ export default function CategoryDetailPage() {
       </article>
 
       {rateable && place && <RatingControl entity={place.entity} placeId={place.id} />}
+
+      {canSuggest() && place && !parseStaticListingId(place.id) && (
+        <Link className="suggest-entry" to={`/place/${place.entity}/${place.id}/suggest`}>
+          <PencilLine size={18} />
+          <span>Something wrong? Suggest an edit</span>
+        </Link>
+      )}
 
       {isPhonePickerOpen && (
         <div

@@ -98,6 +98,7 @@ export function staticItemToPlace(file: string, item: DirectoryItem, index: numb
     userRating: null,
     imageUrl: item.images || null,
     type: item.type,
+    township: null,
     ...parseLocation(item.location),
   };
 }
@@ -165,6 +166,7 @@ function apiRecordToPlace(entity: string, record: ApiDirectoryRecord): Directory
     userRating: record.user_rating ?? null,
     imageUrl: record.image_urls?.[0] ?? null,
     type: record.type ?? { code: '', name: '' },
+    township: record.township ? { id: record.township.id, name: record.township.name } : null,
     latitude: record.latitude === null ? null : Number(record.latitude),
     longitude: record.longitude === null ? null : Number(record.longitude),
   };

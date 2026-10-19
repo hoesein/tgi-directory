@@ -697,6 +697,187 @@ body {
   cursor: pointer;
 }
 
+/* ─── Suggestions (TGI-24) ─── */
+.suggest-entry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 16px 24px;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.suggest-page {
+  min-height: 100dvh;
+}
+
+.suggest-form {
+  padding: 8px 16px 32px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.suggest-intro {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.suggest-form select,
+.suggest-form textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text);
+}
+
+.suggest-form textarea {
+  resize: vertical;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  font-weight: 600;
+}
+
+.checkbox-row input {
+  width: 20px;
+  height: 20px;
+}
+
+.location-label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.location-value {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.location-help,
+.location-status,
+.suggest-hint {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.suggest-hint {
+  text-align: center;
+}
+
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 16px 32px;
+}
+
+.suggestion-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.suggestion-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.suggestion-card h2 {
+  margin: 0;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.suggestion-card h2 a {
+  color: inherit;
+}
+
+.suggestion-meta {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.suggestion-reason {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+
+.suggestion-card .link-btn {
+  margin-top: 8px;
+  padding-left: 0;
+}
+
+.state-badge {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #eef1ee;
+  color: var(--muted);
+}
+
+.state-pending {
+  background: #fff4dc;
+  color: #8a5a00;
+}
+
+.state-approved {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.state-rejected {
+  background: #fdecea;
+  color: #8a1c13;
+}
+
 /* ─── Community ratings (TGI-23) ─── */
 .rating-summary {
   display: inline-flex;

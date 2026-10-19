@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { PlusCircle, Search } from 'lucide-react';
+import { canSuggest } from '../services/suggestions';
 import CategoryListItem from '../components/CategoryListItem';
 import BackButton from '../components/BackButton';
 import { useDirectoryCategories, useDirectoryPlaces } from '../api/useDirectory';
@@ -141,6 +142,12 @@ export default function CategoryPage() {
           >
             {isFetchingNextPage ? 'Loading…' : 'Load more'}
           </button>
+        )}
+        {canSuggest() && !isLoading && (
+          <Link className="suggest-entry" to={`/category/${categoryId}/add`}>
+            <PlusCircle size={18} />
+            <span>Can&apos;t find a place? Add it</span>
+          </Link>
         )}
       </div>
     </div>
