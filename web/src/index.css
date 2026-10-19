@@ -2412,9 +2412,6 @@ textarea {
   right: 16px;
 }
 
-.place-page .category-detail-actions {
-  margin: 0 0 14px;
-}
 
 .place-body {
   position: relative;
@@ -2881,4 +2878,27 @@ textarea {
 /* Keep the photo dots above the rounded content card that overlaps the hero. */
 .place-page .gallery-dots {
   bottom: 30px;
+}
+
+/* Call/Map straddle the photo's bottom edge (as before); the body starts below them. */
+.place-page .category-detail-actions {
+  margin: -26px 16px 0;
+}
+
+.place-page .place-body {
+  margin-top: 0;
+  padding-top: 16px;
+  border-radius: 0;
+}
+
+/* Photo count bottom-left, clear of the edit icon and the Call/Map buttons. */
+.place-page .gallery-counter {
+  top: auto;
+  right: auto;
+  left: 16px;
+  bottom: 36px;
+}
+
+.place-page .gallery-dots {
+  bottom: 40px;
 }

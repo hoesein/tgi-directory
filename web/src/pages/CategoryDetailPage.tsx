@@ -103,6 +103,37 @@ export default function CategoryDetailPage() {
         )}
       </div>
 
+      {/* Call and Map straddle the bottom edge of the photo, above the title. */}
+      <div className="category-detail-actions">
+        {phoneNumbers.length === 1 ? (
+          <a className="category-detail-action" href={`tel:${phoneNumbers[0].replace(/\s+/g, '')}`}>
+            <Phone size={19} />
+            <span>Call</span>
+          </a>
+        ) : (
+          <button
+            className="category-detail-action"
+            disabled={phoneNumbers.length === 0}
+            onClick={() => setIsPhonePickerOpen(true)}
+            type="button"
+          >
+            <Phone size={19} />
+            <span>Call</span>
+          </button>
+        )}
+        {hasMapTarget ? (
+          <Link className="category-detail-action" to={`${placePath(place)}/map`}>
+            <MapIcon size={19} />
+            <span>Map</span>
+          </Link>
+        ) : (
+          <span className="category-detail-action disabled" aria-disabled="true">
+            <MapIcon size={19} />
+            <span>Map</span>
+          </span>
+        )}
+      </div>
+
       <div className="place-body">
         <header className="place-title">
           <h1>{place.name}</h1>
@@ -113,36 +144,6 @@ export default function CategoryDetailPage() {
             </div>
           ) : null}
         </header>
-
-        <div className="category-detail-actions">
-          {phoneNumbers.length === 1 ? (
-            <a className="category-detail-action" href={`tel:${phoneNumbers[0].replace(/\s+/g, '')}`}>
-              <Phone size={19} />
-              <span>Call</span>
-            </a>
-          ) : (
-            <button
-              className="category-detail-action"
-              disabled={phoneNumbers.length === 0}
-              onClick={() => setIsPhonePickerOpen(true)}
-              type="button"
-            >
-              <Phone size={19} />
-              <span>Call</span>
-            </button>
-          )}
-          {hasMapTarget ? (
-            <Link className="category-detail-action" to={`${placePath(place)}/map`}>
-              <MapIcon size={19} />
-              <span>Map</span>
-            </Link>
-          ) : (
-            <span className="category-detail-action disabled" aria-disabled="true">
-              <MapIcon size={19} />
-              <span>Map</span>
-            </span>
-          )}
-        </div>
 
         <dl className="info-grid">
           {place.type.name && (
