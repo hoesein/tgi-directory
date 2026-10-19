@@ -83,10 +83,9 @@ export default defineConfig({
       },
       workbox: {
         // Precache the app shell and bundled data; cache remote images at runtime.
-        navigateFallback: `${base}offline.html`,
-        // The sign-in return page must load the app from the network, or the
-        // provider's one-time code is lost on the offline page.
-        navigateFallbackDenylist: [/\/auth\/callback/],
+        // Every page (e.g. /profile, /auth/callback) opens the app shell; the
+        // router then shows the right page, online or offline.
+        navigateFallback: `${base}index.html`,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json}'],
         runtimeCaching: [
           {
