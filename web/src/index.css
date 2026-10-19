@@ -1741,10 +1741,6 @@ a.profile-user-card {
   box-shadow: inset 0 0 0 1px var(--primary);
 }
 
-.calendar-strip-day.today:not(.focused) {
-  color: var(--primary);
-}
-
 .calendar-strip-weekday,
 .calendar-strip-myanmar {
   color: var(--faint);
@@ -3228,5 +3224,143 @@ textarea {
 .event-status-chip.no-event {
   border: 1px dashed var(--border);
   background: transparent;
+  color: var(--faint);
+}
+
+/* Market day: one slim row (TGI-56) */
+.market-day {
+  margin-bottom: 12px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.market-day-row {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.market-day-label {
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.market-day-row strong {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.market-day-toggle {
+  flex-shrink: 0;
+  color: var(--faint);
+  transition: transform 0.15s;
+}
+
+.market-day-toggle.open {
+  transform: rotate(180deg);
+}
+
+.market-day .market-day-chips {
+  margin-top: 0;
+  padding: 2px 0 12px;
+  gap: 6px;
+}
+
+.market-day .market-day-chip {
+  padding: 3px 9px;
+  border-color: var(--border);
+  background: transparent;
+  color: var(--muted);
+}
+
+/* Festival day card: flat, one divider per row (TGI-56) */
+.event-card {
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.event-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.event-card-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.event-card.pagoda .event-card-dot {
+  background: var(--sand);
+}
+
+.event-card-head h3 {
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+}
+
+.event-card-list {
+  margin: 0;
+  padding: 0 14px;
+  list-style: none;
+}
+
+.event-card-list li + li {
+  border-top: 1px solid var(--border);
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.event-row-text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.event-row-text strong {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.event-row-text span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.event-row-arrow {
+  flex-shrink: 0;
   color: var(--faint);
 }

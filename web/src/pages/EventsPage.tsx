@@ -1,5 +1,6 @@
 import { useRef, useState, type TouchEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useEventDays, useEventRanges } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
 import { eventDayLabel, formatMyanmarDate } from '../lib/myanmar';
@@ -335,7 +336,7 @@ export default function EventsPage() {
         </ul>
 
         {/* Market Day Info Card */}
-        <section className="calendar-info" aria-live="polite">
+        <section className="market-day" aria-live="polite">
           {/* <div>
             <div className="calendar-info-label">မြန်မာပြက္ခဒိန်</div>
             <strong>
@@ -344,15 +345,20 @@ export default function EventsPage() {
             </strong>
           </div> */}
           <div>
-            <div className="calendar-info-label">ဈေးနေ့</div>
+            {/* One slim row: label, today's market, and a chevron for the full list. */}
             <button
-              className="market-day-main"
+              className="market-day-row"
               type="button"
               aria-expanded={showMarketDayChips}
               onClick={() => setShowMarketDayChips((isVisible) => !isVisible)}
             >
+              <span className="market-day-label">ဈေးနေ့</span>
               <strong>{selectedMarketTown}</strong>
-              <span aria-hidden="true">{showMarketDayChips ? '−' : '+'}</span>
+              <ChevronDown
+                size={16}
+                className={`market-day-toggle${showMarketDayChips ? ' open' : ''}`}
+                aria-hidden="true"
+              />
             </button>
             {showMarketDayChips && (
               <div className="market-day-chips" aria-label="ဈေးနေ့များ">
@@ -400,54 +406,40 @@ export default function EventsPage() {
                 </button>
               </div>
             )}
-            {selectedPagodaFestivalEvents.map((day) => (
-              <article className="pagoda-festival-event" key={day.key}>
-                <div className="pagoda-festival-heading">
-                  <span className="pagoda-festival-symbol" aria-hidden="true">✦</span>
+            {[...selectedPagodaFestivalEvents, ...selectedBalloonFestivalEvents].map((day) => (
+              <article className={`event-card${isPagodaFestival(day.eventName) ? ' pagoda' : ''}`} key={day.key}>
+                <header className="event-card-head">
+                  <span className="event-card-dot" aria-hidden="true" />
                   <h3>{day.title}</h3>
                   {day.dayNumber && day.dayCount && (
                     <span className="event-day-count">{eventDayLabel(day.dayNumber, day.dayCount)}</span>
                   )}
-                </div>
-                <div className="pagoda-festival-schedule">
-                  {day.entries.map((entry) => (
-                    <div className="pagoda-festival-row" key={entry.key}>
-                      <strong>{entry.name}</strong>
-                      <span className="pagoda-festival-type">{entry.role}</span>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-            {selectedBalloonFestivalEvents.map((day) => (
-              <article className="tazaungdaing-event" key={day.key}>
-                <div className="tazaungdaing-event-heading">
-                  <h3>{day.title}</h3>
-                  {day.dayNumber && day.dayCount && (
-                    <span className="event-day-count">{eventDayLabel(day.dayNumber, day.dayCount)}</span>
-                  )}
-                </div>
-                {day.entries.map((entry) =>
-                  entry.href ? (
-                    <Link className="tazaungdaing-participant" key={entry.key} to={entry.href}>
-                      <span className="tazaungdaing-participant-main">
-                        <strong>{entry.name}</strong>
-                        <span className="tazaungdaing-participant-type">{entry.role}</span>
-                      </span>
-                      <span className="tazaungdaing-participant-ward">{entry.ward}</span>
-                      <span className="tazaungdaing-participant-arrow" aria-hidden="true">›</span>
-                    </Link>
-                  ) : (
-                    // No profile to open: still list the participant.
-                    <div className="tazaungdaing-participant" key={entry.key}>
-                      <span className="tazaungdaing-participant-main">
-                        <strong>{entry.name}</strong>
-                        <span className="tazaungdaing-participant-type">{entry.role}</span>
-                      </span>
-                      <span className="tazaungdaing-participant-ward">{entry.ward}</span>
-                    </div>
-                  ),
-                )}
+                </header>
+                <ul className="event-card-list">
+                  {day.entries.map((entry) => {
+                    const body = (
+                      <>
+                        <span className="event-row-text">
+                          <strong>{entry.name}</strong>
+                          <span>{[entry.role, entry.ward].filter(Boolean).join(' · ')}</span>
+                        </span>
+                        {entry.href && <ChevronRight size={16} className="event-row-arrow" aria-hidden="true" />}
+                      </>
+                    );
+                    return (
+                      <li key={entry.key}>
+                        {entry.href ? (
+                          <Link className="event-row" to={entry.href}>
+                            {body}
+                          </Link>
+                        ) : (
+                          // No profile to open: still list the participant.
+                          <div className="event-row">{body}</div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
               </article>
             ))}
           </section>
