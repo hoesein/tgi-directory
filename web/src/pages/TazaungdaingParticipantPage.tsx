@@ -29,6 +29,7 @@ export default function TazaungdaingParticipantPage() {
         milestones: participant.milestones,
         about: participant.about,
         social: participant.social ?? [],
+        appearances: [],
       }}
     />
   );

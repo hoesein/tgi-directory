@@ -2307,3 +2307,52 @@ img.nearest-card-image {
   font-size: 13px;
   font-weight: 500;
 }
+
+/* ─── Event history (TGI-50) ─── */
+.event-day-count {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.appearance-year h3 {
+  margin: 12px 0 6px;
+  color: var(--faint);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tazaungdaing-participant-page .appearance-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.appearance-list li {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--primary-light);
+  font-size: 13px;
+}
+
+.appearance-list time {
+  color: var(--muted);
+}
+
+.appearance-event {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.appearance-role {
+  color: var(--primary);
+  font-weight: 600;
+}

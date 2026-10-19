@@ -137,6 +137,9 @@ function staticEventsToDays(events: TazaungdaingEvent[], date: string): EventDay
         date: event.event_date,
         eventName: event.name,
         title: event.name,
+        // The static file has no event date range.
+        dayNumber: null,
+        dayCount: null,
         entries: withIndex.map(({ participant, index }) => {
           const details = isTazaungdaingParticipantDetails(participant);
           return {
@@ -176,13 +179,25 @@ function apiRecordToPlace(entity: string, record: ApiDirectoryRecord): Directory
   };
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Whole days from one YYYY-MM-DD date to another (UTC, so DST can't shift it). */
+function daysBetween(from: string, to: string): number {
+  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / DAY_MS);
+}
+
 function apiDayToView(day: ApiEventDay): EventDayView {
   const pagoda = isPagodaFestival(day.event.name);
+  const dayCount = daysBetween(day.event.start_date, day.event.end_date) + 1;
+  const dayNumber = daysBetween(day.event.start_date, day.event_date) + 1;
+  const multiDay = dayCount > 1 && dayNumber >= 1 && dayNumber <= dayCount;
   return {
     key: day.id,
     date: day.event_date,
     eventName: day.event.name,
     title: day.title ?? day.event.name,
+    dayNumber: multiDay ? dayNumber : null,
+    dayCount: multiDay ? dayCount : null,
     entries: day.schedule
       .filter((row) => row.participant !== null)
       .map((row) => ({
@@ -343,5 +358,14 @@ export async function fetchEventParticipant(
     })),
     about: participant.about,
     social: participant.social,
+    appearances: [...participant.appearances]
+      .sort((a, b) => b.event_date.localeCompare(a.event_date))
+      .map((item) => ({
+        key: item.id,
+        date: item.event_date,
+        eventName: item.event?.name ?? '',
+        dayTitle: item.day?.title ?? null,
+        role: item.role?.name ?? null,
+      })),
   };
 }

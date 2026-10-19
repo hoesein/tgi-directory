@@ -183,6 +183,7 @@ export interface ApiEventParticipant {
   appearances: {
     id: string;
     event_date: string;
+    day: { id: string; title: string | null } | null;
     event: { id: string; name: string } | null;
     role: { id: string; name: string } | null;
   }[];
@@ -239,7 +240,18 @@ export interface EventDayView {
   date: string;
   eventName: string;
   title: string;
+  /** Position within a multi-day event (API mode); null when unknown or single-day. */
+  dayNumber: number | null;
+  dayCount: number | null;
   entries: EventEntryView[];
+}
+
+export interface ParticipantAppearanceView {
+  key: string;
+  date: string;
+  eventName: string;
+  dayTitle: string | null;
+  role: string | null;
 }
 
 export interface ParticipantProfileView {
@@ -251,4 +263,6 @@ export interface ParticipantProfileView {
   milestones: { year: string; achieve: string }[];
   about: string | null;
   social: { platform: string; url: string }[];
+  /** Every scheduled appearance, newest first (API mode; empty for static data). */
+  appearances: ParticipantAppearanceView[];
 }

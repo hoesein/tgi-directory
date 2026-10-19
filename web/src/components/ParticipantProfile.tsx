@@ -1,7 +1,18 @@
 import BackButton from './BackButton';
-import type { ParticipantProfileView } from '../types';
+import { formatMyanmarDate, toMyanmarDigits } from '../lib/myanmar';
+import type { ParticipantAppearanceView, ParticipantProfileView } from '../types';
 
 const BACK_LABEL = 'ပွဲစာရင်းသို့ ပြန်သွားရန်';
+
+/** Appearances (already newest first) grouped by year, newest year first. */
+function groupByYear(appearances: ParticipantAppearanceView[]): [string, ParticipantAppearanceView[]][] {
+  const groups = new Map<string, ParticipantAppearanceView[]>();
+  for (const item of appearances) {
+    const year = item.date.slice(0, 4);
+    groups.set(year, [...(groups.get(year) ?? []), item]);
+  }
+  return [...groups.entries()];
+}
 
 /** Event participant profile; same layout for static and API data. */
 export default function ParticipantProfile({ participant }: { participant: ParticipantProfileView }) {
@@ -56,6 +67,31 @@ export default function ParticipantProfile({ participant }: { participant: Parti
           <section style={{ marginTop: '0px' }}>
             <h2>သမိုင်းကြောင်း</h2>
             <p>{participant.about}</p>
+          </section>
+        </article>
+      )}
+
+      {participant.appearances.length > 0 && (
+        <article className="tazaungdaing-participant-page">
+          <section style={{ marginTop: '0' }}>
+            <h2>ပွဲဝင်မှတ်တမ်း</h2>
+            {groupByYear(participant.appearances).map(([year, items]) => (
+              <div className="appearance-year" key={year}>
+                <h3>{toMyanmarDigits(year)}</h3>
+                <ul className="appearance-list">
+                  {items.map((item) => (
+                    <li key={item.key}>
+                      <time dateTime={item.date}>{formatMyanmarDate(item.date)}</time>
+                      <span className="appearance-event">
+                        {item.dayTitle ?? item.eventName}
+                        {item.dayTitle && item.eventName ? ` · ${item.eventName}` : ''}
+                      </span>
+                      {item.role && <span className="appearance-role">{item.role}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </section>
         </article>
       )}

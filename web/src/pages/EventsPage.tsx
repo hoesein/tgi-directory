@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEventDays } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
+import { eventDayLabel } from '../lib/myanmar';
 import { isPagodaFestival } from '../services/directory';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -297,6 +298,9 @@ export default function EventsPage() {
                 <div className="pagoda-festival-heading">
                   <span className="pagoda-festival-symbol" aria-hidden="true">✦</span>
                   <h3>{day.title}</h3>
+                  {day.dayNumber && day.dayCount && (
+                    <span className="event-day-count">{eventDayLabel(day.dayNumber, day.dayCount)}</span>
+                  )}
                 </div>
                 <div className="pagoda-festival-schedule">
                   {day.entries.map((entry) => (
@@ -312,6 +316,9 @@ export default function EventsPage() {
               <article className="tazaungdaing-event" key={day.key}>
                 <div className="tazaungdaing-event-heading">
                   <h3>{day.title}</h3>
+                  {day.dayNumber && day.dayCount && (
+                    <span className="event-day-count">{eventDayLabel(day.dayNumber, day.dayCount)}</span>
+                  )}
                 </div>
                 {day.entries.map((entry) =>
                   entry.href ? (
