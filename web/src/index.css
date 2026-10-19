@@ -3110,3 +3110,167 @@ textarea {
   gap: 6px;
   color: #7a5a12;
 }
+
+/* ─── Events page enhancements (TGI-56) ─── */
+/* Today: solid green so it stands out from the selected day's light tint. */
+.calendar-strip-day.today {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.calendar-strip-day.today .calendar-strip-weekday,
+.calendar-strip-day.today .calendar-strip-myanmar {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.calendar-strip-day.today.focused {
+  box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--primary);
+}
+
+.calendar-strip-day.today strong.new-moon {
+  border-color: #fff;
+}
+
+/* Event dot along the bottom edge of a day. */
+.calendar-strip-dot {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.calendar-strip-dot.pagoda {
+  background: var(--sand);
+}
+
+.calendar-strip-day.today .calendar-strip-dot {
+  background: #fff;
+}
+
+.calendar-day-strip {
+  touch-action: pan-y;
+}
+
+.calendar-day-strip.slide-next {
+  animation: strip-slide-next 0.22s ease-out;
+}
+
+.calendar-day-strip.slide-prev {
+  animation: strip-slide-prev 0.22s ease-out;
+}
+
+@keyframes strip-slide-next {
+  from {
+    transform: translateX(24px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes strip-slide-prev {
+  from {
+    transform: translateX(-24px);
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-day-strip.slide-next,
+  .calendar-day-strip.slide-prev {
+    animation: none;
+  }
+}
+
+/* Upcoming events */
+.upcoming-events {
+  margin: 16px 0 24px;
+}
+
+.upcoming-events h2 {
+  margin: 0 4px 8px;
+  font-size: 15px;
+}
+
+.upcoming-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upcoming-event {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.upcoming-event.showing {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.upcoming-event-mark {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.upcoming-event-mark.pagoda {
+  background: var(--butter);
+  color: #7a5a12;
+}
+
+.upcoming-event-text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.upcoming-event-text strong {
+  font-size: 15px;
+}
+
+.upcoming-event-text > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.upcoming-event-text > .upcoming-event-status {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: var(--primary);
+  font-size: 12px;
+}
+
+.upcoming-event-text > .upcoming-event-status.live {
+  background: var(--primary);
+  color: #fff;
+}
+
+.upcoming-event-arrow {
+  color: var(--faint);
+  font-size: 20px;
+}

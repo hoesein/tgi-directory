@@ -1,9 +1,37 @@
-import { useState } from 'react';
+import { useRef, useState, type TouchEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { useEventDays } from '../api/useDirectory';
+import { useEventDays, useEventRanges } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
-import { eventDayLabel } from '../lib/myanmar';
+import { eventDayLabel, formatMyanmarDate, toMyanmarDigits } from '../lib/myanmar';
 import { isPagodaFestival } from '../services/directory';
+import type { EventRangeView } from '../types';
+
+/** A horizontal move this long (px) on the day strip changes the day. */
+const SWIPE_DISTANCE = 40;
+const UPCOMING_LIMIT = 3;
+
+function daysFrom(from: string, to: string): number {
+  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
+}
+
+/** "ယနေ့ကျင်းပဆဲ · ၁၈ ရက်အနက် ၉ ရက်မြောက်နေ့", "မနက်ဖြန်", "၂၉ ရက်အကြာ" */
+function upcomingStatus(event: EventRangeView, today: string): { text: string; live: boolean } {
+  if (event.startDate <= today) {
+    const dayCount = daysFrom(event.startDate, event.endDate) + 1;
+    const dayNumber = daysFrom(event.startDate, today) + 1;
+    return {
+      text: dayCount > 1 ? `ယခုကျင်းပဆဲ · ${eventDayLabel(dayNumber, dayCount)}` : 'ယနေ့ကျင်းပမည်',
+      live: true,
+    };
+  }
+  const until = daysFrom(today, event.startDate);
+  return { text: until === 1 ? 'မနက်ဖြန်' : `${toMyanmarDigits(until)} ရက်အကြာ`, live: false };
+}
+
+function dateRangeLabel(event: EventRangeView): string {
+  if (event.startDate === event.endDate) return formatMyanmarDate(event.startDate);
+  return `${formatMyanmarDate(event.startDate)} – ${formatMyanmarDate(event.endDate)}`;
+}
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -60,8 +88,15 @@ export default function EventsPage() {
     (day) => !isPagodaFestival(day.eventName),
   );
 
+  const { data: eventRanges = [] } = useEventRanges();
+  const [slide, setSlide] = useState<'next' | 'prev' | null>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
   const cells = buildCalendarDays(viewYear, viewMonth);
   const todayStr = getLocalDateString(today);
+  const eventsOn = (dateStr: string) =>
+    eventRanges.filter((event) => event.startDate <= dateStr && dateStr <= event.endDate);
+  const upcomingEvents = eventRanges.filter((event) => event.endDate >= todayStr).slice(0, UPCOMING_LIMIT);
 
   const [selectedYear, selectedMonth] = selectedDate.split('-').map(Number);
   const selectedCalendarDay = getEventsCalendarDay(selectedDate);
@@ -73,6 +108,30 @@ export default function EventsPage() {
     const date = new Date(`${dateStr}T12:00:00Z`);
     setViewYear(date.getUTCFullYear());
     setViewMonth(date.getUTCMonth());
+  }
+
+  /** Move the strip by whole days; the slide direction drives a short animation. */
+  function moveDays(offset: number) {
+    if (offset === 0) return;
+    setSlide(offset > 0 ? 'next' : 'prev');
+    selectDate(shiftDate(selectedDate, offset));
+  }
+
+  function onStripTouchStart(event: TouchEvent) {
+    const touch = event.touches[0];
+    touchStart.current = { x: touch.clientX, y: touch.clientY };
+  }
+
+  function onStripTouchEnd(event: TouchEvent) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    // Mostly-vertical moves are page scrolls, not swipes.
+    if (Math.abs(dx) < SWIPE_DISTANCE || Math.abs(dx) < Math.abs(dy)) return;
+    moveDays(dx < 0 ? 1 : -1);
   }
 
   function prevMonth() {
@@ -91,13 +150,12 @@ export default function EventsPage() {
         <h1>Events</h1>
         <button
           className="calendar-today-button"
-          onClick={() => selectDate(todayStr)}
+          onClick={() => moveDays(daysFrom(selectedDate, todayStr))}
           aria-current={selectedDate === todayStr ? 'date' : undefined}
           type="button"
         >
           Today
         </button>
-
       </div>
 
       <div style={{ padding: '12px 16px 0' }}>
@@ -164,7 +222,7 @@ export default function EventsPage() {
             <>
               <div className="calendar-nav">
                 <button
-                  onClick={() => selectDate(shiftDate(selectedDate, -1))}
+                  onClick={() => moveDays(-1)}
                   aria-label="Previous day"
                   disabled={selectedDate === '0001-01-01'}
                   type="button"
@@ -185,7 +243,7 @@ export default function EventsPage() {
                   </button> */}
                 </div>
                 <button
-                  onClick={() => selectDate(shiftDate(selectedDate, 1))}
+                  onClick={() => moveDays(1)}
                   aria-label="Next day"
                   disabled={selectedDate === '9999-12-31'}
                   type="button"
@@ -193,23 +251,36 @@ export default function EventsPage() {
                   ›
                 </button>
               </div>
-              <div className="calendar-day-strip">
+              <div
+                key={selectedDate}
+                className={`calendar-day-strip${slide ? ` slide-${slide}` : ''}`}
+                onTouchStart={onStripTouchStart}
+                onTouchEnd={onStripTouchEnd}
+              >
                 {[-2, -1, 0, 1, 2].map((offset) => {
                   const dateStr = shiftDate(selectedDate, offset);
                   const date = new Date(`${dateStr}T12:00:00Z`);
                   const { myanmarDate, marketDay } = getEventsCalendarDay(dateStr);
                   const isToday = dateStr === todayStr;
                   const moonMarker = getMoonMarker(myanmarDate.day.mp.en);
+                  const dayEvents = eventsOn(dateStr);
+                  const hasPagodaFestival = dayEvents.some((event) => isPagodaFestival(event.name));
 
                   return (
                     <button
                       key={dateStr}
                       type="button"
                       aria-pressed={offset === 0}
-                      aria-label={`${dateStr}: ${marketDay.markets[0]?.town.my} ဈေးနေ့၊ ${myanmarDate.month.my} ${myanmarDate.day.mp.my} ${myanmarDate.day.fd.my} ရက်${moonMarker ? `၊ ${moonMarker === 'full-moon' ? 'လပြည့်နေ့' : 'လကွယ်နေ့'}` : ''}`}
+                      aria-label={`${isToday ? 'Today, ' : ''}${dateStr}: ${marketDay.markets[0]?.town.my} ဈေးနေ့၊ ${myanmarDate.month.my} ${myanmarDate.day.mp.my} ${myanmarDate.day.fd.my} ရက်${moonMarker ? `၊ ${moonMarker === 'full-moon' ? 'လပြည့်နေ့' : 'လကွယ်နေ့'}` : ''}${dayEvents.length ? `၊ ${dayEvents.map((event) => event.name).join('၊ ')}` : ''}`}
                       className={`calendar-strip-day${offset === 0 ? ' focused' : ''}${isToday ? ' today' : ''}`}
-                      onClick={() => selectDate(dateStr)}
+                      onClick={() => moveDays(offset)}
                     >
+                      {dayEvents.length > 0 && (
+                        <span
+                          className={`calendar-strip-dot${hasPagodaFestival ? ' pagoda' : ''}`}
+                          aria-hidden="true"
+                        />
+                      )}
                       <span className="calendar-strip-weekday">
                         {DAY_LABELS[date.getUTCDay()]}
                       </span>
@@ -343,6 +414,37 @@ export default function EventsPage() {
                 )}
               </article>
             ))}
+          </section>
+        )}
+
+        {upcomingEvents.length > 0 && (
+          <section className="upcoming-events" aria-labelledby="upcoming-events-title">
+            <h2 id="upcoming-events-title">လာမည့်ပွဲများ</h2>
+            <div className="upcoming-events-list">
+              {upcomingEvents.map((event) => {
+                const status = upcomingStatus(event, todayStr);
+                const target = event.startDate <= todayStr ? todayStr : event.startDate;
+                const showing = event.startDate <= selectedDate && selectedDate <= event.endDate;
+                return (
+                  <button
+                    key={event.key}
+                    type="button"
+                    className={`upcoming-event${showing ? ' showing' : ''}`}
+                    onClick={() => moveDays(daysFrom(selectedDate, target))}
+                  >
+                    <span className={`upcoming-event-mark${isPagodaFestival(event.name) ? ' pagoda' : ''}`} aria-hidden="true">
+                      {isPagodaFestival(event.name) ? '✦' : '✺'}
+                    </span>
+                    <span className="upcoming-event-text">
+                      <strong>{event.name}</strong>
+                      <span>{dateRangeLabel(event)}</span>
+                      <span className={`upcoming-event-status${status.live ? ' live' : ''}`}>{status.text}</span>
+                    </span>
+                    <span className="upcoming-event-arrow" aria-hidden="true">›</span>
+                  </button>
+                );
+              })}
+            </div>
           </section>
         )}
       </div>

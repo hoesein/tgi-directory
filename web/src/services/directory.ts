@@ -3,6 +3,7 @@ import {
   isTazaungdaingParticipantDetails,
   type ApiDirectoryCategory,
   type ApiDirectoryRecord,
+  type ApiEvent,
   type ApiEventDay,
   type ApiEventParticipant,
   type ApiResponse,
@@ -11,6 +12,7 @@ import {
   type DirectoryItem,
   type DirectoryPlace,
   type EventDayView,
+  type EventRangeView,
   type Paged,
   type ParticipantProfileView,
   type TazaungdaingEvent,
@@ -368,4 +370,40 @@ export async function fetchEventParticipant(
         role: item.role?.name ?? null,
       })),
   };
+}
+
+/**
+ * The static file has one entry per day, and a festival's name can change on
+ * its last day. Consecutive days of the same festival become one range.
+ */
+function staticEventRanges(events: TazaungdaingEvent[]): EventRangeView[] {
+  const ranges: EventRangeView[] = [];
+  const sorted = [...events].sort((a, b) => a.event_date.localeCompare(b.event_date));
+  for (const event of sorted) {
+    const pagoda = isPagodaFestival(event.name);
+    const last = ranges[ranges.length - 1];
+    if (last && isPagodaFestival(last.name) === pagoda && daysBetween(last.endDate, event.event_date) === 1) {
+      last.endDate = event.event_date;
+      if (!pagoda) last.name = event.name;
+      continue;
+    }
+    ranges.push({
+      key: `${event.event_date}-${event.name}`,
+      name: pagoda ? PAGODA_FESTIVAL_PREFIX : event.name,
+      startDate: event.event_date,
+      endDate: event.event_date,
+    });
+  }
+  return ranges;
+}
+
+/** Every active event with its date range, sorted by start date. */
+export async function fetchEventRanges(): Promise<EventRangeView[]> {
+  if (DATA_SOURCE === 'api') {
+    const response = await api.get<ApiResponse<ApiEvent[]>>('/v1/events', { page_size: '100' });
+    return response.data
+      .map((event) => ({ key: event.id, name: event.name, startDate: event.start_date, endDate: event.end_date }))
+      .sort((a, b) => a.startDate.localeCompare(b.startDate));
+  }
+  return staticEventRanges(await fetchTazaungdaingEvents());
 }

@@ -249,6 +249,22 @@ export interface EventEntryView {
   href: string | null;
 }
 
+/** GET /v1/events row (fields the app uses). */
+export interface ApiEvent {
+  id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+}
+
+/** One event and the dates it runs, for calendar dots and the upcoming list. */
+export interface EventRangeView {
+  key: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
+
 export interface EventDayView {
   key: string;
   date: string;

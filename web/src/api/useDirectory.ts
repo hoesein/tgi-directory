@@ -6,6 +6,7 @@ import {
   fetchDirectoryPlaces,
   fetchEventDays,
   fetchEventParticipant,
+  fetchEventRanges,
   fetchTazaungdaingEvents,
   type PlaceFilters,
 } from '../services/directory';
@@ -59,6 +60,15 @@ export function useEventDays(date: string) {
   return useQuery({
     queryKey: ['event-days', DATA_SOURCE, date],
     queryFn: () => fetchEventDays(date),
+    staleTime: STALE_TIME,
+  });
+}
+
+/** All events with their date ranges (calendar dots, upcoming list). */
+export function useEventRanges() {
+  return useQuery({
+    queryKey: ['event-ranges', DATA_SOURCE],
+    queryFn: fetchEventRanges,
     staleTime: STALE_TIME,
   });
 }
