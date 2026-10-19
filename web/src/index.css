@@ -3185,100 +3185,53 @@ textarea {
   }
 }
 
-/* Upcoming events */
-.upcoming-events {
-  margin: 10px -16px 0;
-}
-
-/* Bleeds to the screen edges so chips scroll under the gutter. */
-.upcoming-events-row {
+/* Previous / current / upcoming event chips: names only, colour shows the state. */
+.event-status-chips {
   display: flex;
-  gap: 8px;
-  padding: 2px 16px 4px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding: 0 16px;
-  scrollbar-width: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 12px;
+  padding: 0;
+  list-style: none;
 }
 
-.upcoming-events-row::-webkit-scrollbar {
-  display: none;
-}
-
-.upcoming-chip {
-  display: flex;
-  flex: 0 0 auto;
-  max-width: 78%;
+.event-status-chip {
+  display: inline-flex;
+  max-width: 100%;
   align-items: center;
-  gap: 10px;
-  padding: 8px 14px 8px 8px;
-  border: 1px solid var(--border);
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: var(--card);
-  color: var(--text);
-  font: inherit;
-  text-align: left;
-  scroll-snap-align: start;
-  cursor: pointer;
-}
-
-.upcoming-chip.showing {
-  border-color: var(--primary);
-  box-shadow: inset 0 0 0 1px var(--primary);
-}
-
-.upcoming-chip-mark {
-  display: flex;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--primary-light);
-  color: var(--primary);
-  font-size: 14px;
-}
-
-.upcoming-chip-mark.pagoda {
-  background: var(--butter);
-  color: #7a5a12;
-}
-
-.upcoming-chip-text {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-}
-
-.upcoming-chip-text strong,
-.upcoming-chip-text span {
+  font-size: 12px;
+  line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.upcoming-chip-text strong {
-  font-size: 14px;
-}
-
-.upcoming-chip-text span {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.upcoming-chip-text span.live {
-  color: var(--primary);
-  font-weight: 600;
-}
-
-.upcoming-chip-text span.live::before {
+.event-status-chip::before {
   content: '';
-  display: inline-block;
   width: 6px;
   height: 6px;
-  margin: 0 5px 1px 0;
+  flex-shrink: 0;
   border-radius: 50%;
-  background: #1f9d55;
-  vertical-align: middle;
+  background: currentColor;
+}
+
+.event-status-chip.previous {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--faint);
+}
+
+.event-status-chip.current {
+  background: var(--primary);
+  color: #fff;
+}
+
+.event-status-chip.upcoming {
+  border-color: #efdca6;
+  background: #fdf7e6;
+  color: #7a5a12;
 }

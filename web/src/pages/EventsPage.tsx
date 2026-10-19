@@ -2,34 +2,42 @@ import { useRef, useState, type TouchEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEventDays, useEventRanges } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
-import { eventDayLabel, formatMyanmarDate, toMyanmarDigits } from '../lib/myanmar';
+import { eventDayLabel, formatMyanmarDate } from '../lib/myanmar';
 import { isPagodaFestival } from '../services/directory';
 import type { EventRangeView } from '../types';
 
 /** A horizontal move this long (px) on the day strip changes the day. */
 const SWIPE_DISTANCE = 40;
-const UPCOMING_LIMIT = 3;
 
 function daysFrom(from: string, to: string): number {
   return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
 }
 
-/** Short chip status: "ယခုကျင်းပဆဲ · ၉/၁၈", "၁၈ နိုဝင်ဘာ · မနက်ဖြန်", "၁၈ နိုဝင်ဘာ · ၂၉ ရက်အကြာ" */
-function upcomingStatus(event: EventRangeView, today: string): { text: string; live: boolean } {
-  if (event.startDate <= today) {
-    const dayCount = daysFrom(event.startDate, event.endDate) + 1;
-    const dayNumber = daysFrom(event.startDate, today) + 1;
-    return {
-      text:
-        dayCount > 1
-          ? `ယခုကျင်းပဆဲ · ${toMyanmarDigits(dayNumber)}/${toMyanmarDigits(dayCount)}`
-          : 'ယနေ့ကျင်းပမည်',
-      live: true,
-    };
-  }
-  const until = daysFrom(today, event.startDate);
-  const when = until === 1 ? 'မနက်ဖြန်' : `${toMyanmarDigits(until)} ရက်အကြာ`;
-  return { text: `${formatMyanmarDate(event.startDate)} · ${when}`, live: false };
+type EventStatus = 'previous' | 'current' | 'upcoming';
+
+/** Spoken by screen readers; sighted users read the state from the chip colour. */
+const STATUS_LABELS: Record<EventStatus, string> = {
+  previous: 'ပြီးခဲ့သောပွဲ',
+  current: 'ယခုကျင်းပဆဲပွဲ',
+  upcoming: 'လာမည့်ပွဲ',
+};
+
+/** The last event that ended, the one running today, and the next one to start. */
+function eventStatusChips(events: EventRangeView[], today: string) {
+  const previous = events
+    .filter((event) => event.endDate < today)
+    .sort((a, b) => b.endDate.localeCompare(a.endDate))[0];
+  const current = events.find((event) => event.startDate <= today && today <= event.endDate);
+  const upcoming = events
+    .filter((event) => event.startDate > today)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
+  return (
+    [
+      ['previous', previous],
+      ['current', current],
+      ['upcoming', upcoming],
+    ] as const
+  ).filter((chip): chip is readonly [EventStatus, EventRangeView] => !!chip[1]);
 }
 
 function dateRangeLabel(event: EventRangeView): string {
@@ -105,7 +113,7 @@ export default function EventsPage() {
   const todayStr = getLocalDateString(today);
   const eventsOn = (dateStr: string) =>
     eventRanges.filter((event) => event.startDate <= dateStr && dateStr <= event.endDate);
-  const upcomingEvents = eventRanges.filter((event) => event.endDate >= todayStr).slice(0, UPCOMING_LIMIT);
+  const statusChips = eventStatusChips(eventRanges, todayStr);
 
   const [selectedYear, selectedMonth] = selectedDate.split('-').map(Number);
   const selectedCalendarDay = getEventsCalendarDay(selectedDate);
@@ -307,36 +315,20 @@ export default function EventsPage() {
           )}
         </div>
 
-        {/* Upcoming events: one compact scrolling row, so long schedules below never push it away. */}
-        {upcomingEvents.length > 0 && (
-          <section className="upcoming-events" aria-label="လာမည့်ပွဲများ">
-            <div className="upcoming-events-row">
-              {upcomingEvents.map((event) => {
-                const status = upcomingStatus(event, todayStr);
-                const target = event.startDate <= todayStr ? todayStr : event.startDate;
-                const showing = event.startDate <= selectedDate && selectedDate <= event.endDate;
-                const pagoda = isPagodaFestival(event.name);
-                return (
-                  <button
-                    key={event.key}
-                    type="button"
-                    className={`upcoming-chip${showing ? ' showing' : ''}`}
-                    onClick={() => moveDays(daysFrom(selectedDate, target))}
-                    aria-label={`${event.name}၊ ${dateRangeLabel(event)}၊ ${status.text}`}
-                    title={dateRangeLabel(event)}
-                  >
-                    <span className={`upcoming-chip-mark${pagoda ? ' pagoda' : ''}`} aria-hidden="true">
-                      {pagoda ? '✦' : '✺'}
-                    </span>
-                    <span className="upcoming-chip-text">
-                      <strong>{event.name}</strong>
-                      <span className={status.live ? 'live' : undefined}>{status.text}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+        {/* Previous, current and upcoming event: names only, colour shows which is which. */}
+        {statusChips.length > 0 && (
+          <ul className="event-status-chips" aria-label="ပွဲများ">
+            {statusChips.map(([status, event]) => (
+              <li
+                key={status}
+                className={`event-status-chip ${status}`}
+                title={`${STATUS_LABELS[status]} · ${dateRangeLabel(event)}`}
+              >
+                <span className="visually-hidden">{STATUS_LABELS[status]}: </span>
+                {event.name}
+              </li>
+            ))}
+          </ul>
         )}
 
         {/* Market Day Info Card */}
