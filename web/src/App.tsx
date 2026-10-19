@@ -10,8 +10,8 @@ import HomePage from './pages/HomePage';
 import CategoryPage from './pages/CategoryPage';
 import CategoriesPage from './pages/CategoriesPage';
 import CategoryDetailPage from './pages/CategoryDetailPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
+import SignInPage from './pages/SignInPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 import ProfilePage from './pages/ProfilePage';
 import EventsPage from './pages/EventsPage';
 import TazaungdaingParticipantPage from './pages/TazaungdaingParticipantPage';
@@ -54,8 +54,11 @@ export default function App() {
           <Route path="/place/:entity/:listingId" element={<CategoryDetailPage />} />
           {/* Old static detail links (dir--<file>--<index>) */}
           <Route path="/category-detail/:listingId" element={<CategoryDetailPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          {/* Old email login links */}
+          <Route path="/login" element={<Navigate to="/sign-in" replace />} />
+          <Route path="/register" element={<Navigate to="/sign-in" replace />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventsPage />} />
           <Route path="/events/participants/:participantId" element={<EventParticipantPage />} />

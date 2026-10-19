@@ -1,8 +1,13 @@
 import { ChevronRight, ExternalLink, MessageCircle, Phone, Send, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { userAvatarUrl, userDisplayName, userProviderName } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 
 export default function ProfilePage() {
-  const { userToken, signOut } = useAuthStore();
+  const { user, signOut } = useAuthStore();
+  const avatarUrl = user ? userAvatarUrl(user) : null;
+  const providerName = user ? userProviderName(user) : null;
 
   return (
     <div className="profile-page">
@@ -12,28 +17,45 @@ export default function ProfilePage() {
       </div>
 
       <div className="profile-content">
-        {userToken ? (
+        {user ? (
           <div className="profile-user-card">
             <div className="profile-avatar">
-              <User size={28} />
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" referrerPolicy="no-referrer" />
+              ) : (
+                <User size={28} />
+              )}
             </div>
             <div className="profile-user-info">
-              <div className="profile-name">Guest User</div>
-              <div className="profile-email">guest@directory.app</div>
+              <div className="profile-name">{userDisplayName(user)}</div>
+              {/* Telegram users have no email; show how they signed in instead. */}
+              <div className="profile-email">
+                {user.email || (providerName ? `Signed in with ${providerName}` : '')}
+              </div>
             </div>
-            <ChevronRight size={20} />
           </div>
-        ) : (
+        ) : !supabase ? (
           <div className="profile-user-card profile-user-card-disabled" aria-disabled="true">
             <div className="profile-avatar">
               <User size={28} />
             </div>
             <div className="profile-user-info">
-              <div className="profile-name">Sign In (or) Register</div>
+              <div className="profile-name">Sign in</div>
               <div className="profile-email">Coming soon</div>
             </div>
             <ChevronRight size={20} />
           </div>
+        ) : (
+          <Link className="profile-user-card" to="/sign-in?next=/profile">
+            <div className="profile-avatar">
+              <User size={28} />
+            </div>
+            <div className="profile-user-info">
+              <div className="profile-name">Sign in</div>
+              <div className="profile-email">Google, Facebook or Telegram</div>
+            </div>
+            <ChevronRight size={20} />
+          </Link>
         )}
 
         <section className="profile-contact">
@@ -82,8 +104,8 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        {userToken && (
-          <button className="btn-primary profile-signout" onClick={signOut} type="button">
+        {user && (
+          <button className="btn-primary profile-signout" onClick={() => void signOut()} type="button">
             Sign Out
           </button>
         )}

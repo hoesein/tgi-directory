@@ -1,4 +1,4 @@
-import { storage } from '../lib/storage';
+import { useAuthStore } from '../store/authStore';
 
 // Vite dev proxies "/api" to the Next.js backend (see vite.config.ts).
 // In production set VITE_API_URL to the deployed backend URL.
@@ -20,7 +20,7 @@ class ApiService {
       'Content-Type': 'application/json',
     };
 
-    const token = storage.getString('userToken');
+    const token = useAuthStore.getState().userToken;
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
