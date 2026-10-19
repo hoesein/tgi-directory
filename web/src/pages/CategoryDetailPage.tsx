@@ -178,7 +178,7 @@ export default function CategoryDetailPage() {
         </dl>
 
         {description && (
-          <section className="place-card detail-about">
+          <section className="place-section detail-about">
             <h2>About</h2>
             <p>{shownDescription}</p>
             {longDescription && (

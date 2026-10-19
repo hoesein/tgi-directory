@@ -5,7 +5,7 @@ import ImageSlider from '../components/ImageSlider';
 import EventTicker from '../components/EventTicker';
 import CategoriesList from '../components/CategoriesList';
 import NearestListings from '../components/NearestListings';
-import { placePath } from '../lib/routes';
+import { categoryPath, placePath } from '../lib/routes';
 import type { DirectoryPlace } from '../types';
 
 export default function HomePage() {
@@ -16,7 +16,7 @@ export default function HomePage() {
   };
 
   const handleCategoryPress = (id: string) => {
-    navigate(`/category/${id}`);
+    navigate(categoryPath(id));
   };
 
   const handleListingPress = (place: DirectoryPlace) => {

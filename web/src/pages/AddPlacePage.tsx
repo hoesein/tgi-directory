@@ -14,6 +14,7 @@ import { useSubmitSuggestion, useTownships } from '../api/useSuggestions';
 import { canSuggest, suggestionErrorMessage } from '../services/suggestions';
 import { useAuthStore } from '../store/authStore';
 import { toEntityCode } from '../services/directory';
+import { categoryPath } from '../lib/routes';
 import type { SuggestionChanges } from '../types';
 
 const EMPTY: PlaceFormValues = {
@@ -55,7 +56,7 @@ export default function AddPlacePage() {
   const typeOptions = (category?.types ?? []).map((type) => ({ value: type.code, label: type.name }));
   const townshipOptions = (townships ?? []).map((township) => ({ value: township.id, label: township.name }));
 
-  if (!canSuggest()) return <Navigate to={`/category/${categoryId}`} replace />;
+  if (!canSuggest()) return <Navigate to={categoryPath(categoryId)} replace />;
   if (ready && !user) {
     return <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname)}`} replace />;
   }
@@ -90,7 +91,7 @@ export default function AddPlacePage() {
   return (
     <div className="suggest-page">
       <div className="page-head">
-        <BackButton onBack={() => navigate(`/category/${categoryId}`, { replace: true })} />
+        <BackButton onBack={() => navigate(categoryPath(categoryId), { replace: true })} />
         <h1>Add a missing place</h1>
         <span style={{ width: 24 }} />
       </div>

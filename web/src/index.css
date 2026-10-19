@@ -2494,7 +2494,7 @@ textarea {
   font-weight: 500;
 }
 
-.place-card {
+.place-section {
   margin-top: 12px;
   padding: 14px;
   border: 1px solid var(--border);
@@ -2502,11 +2502,11 @@ textarea {
   background: var(--card);
 }
 
-.place-card.detail-about p {
+.place-section.detail-about p {
   font-size: 14px;
 }
 
-.place-card .link-btn {
+.place-section .link-btn {
   margin-top: 6px;
   padding: 0;
 }
@@ -2901,4 +2901,22 @@ textarea {
 
 .place-page .gallery-dots {
   bottom: 40px;
+}
+
+/* Places tab cards that open a place (TGI-47) */
+.place-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.place-card .place-card-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: flex;
+}
+
+.places-grid-empty {
+  grid-column: 1 / -1;
 }

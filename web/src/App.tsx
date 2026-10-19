@@ -56,6 +56,9 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/search" element={<SearchPage />} />
+          {/* The Places to Visit category is the Places tab. */}
+          <Route path="/category/places_to_visit" element={<Navigate to="/place-to-visit" replace />} />
+          <Route path="/category/places_to_visit.json" element={<Navigate to="/place-to-visit" replace />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
           <Route path="/category/:categoryId/add" element={<AddPlacePage />} />
           <Route path="/place/:entity/:listingId" element={<CategoryDetailPage />} />
