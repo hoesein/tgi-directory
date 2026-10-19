@@ -87,6 +87,19 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json}'],
         runtimeCaching: [
           {
+            // Backend reads (VITE_DATA_SOURCE=api). Fresh when online; the
+            // last response keeps viewed pages working offline.
+            urlPattern: ({ url, request }) =>
+              request.method === 'GET' && url.pathname.includes('/api/v1/'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'directory-api',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 100, maxAgeSeconds: 7 * 24 * 60 * 60 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+          {
             urlPattern: /^https:\/\/raw\.githubusercontent\.com\/.*/i,
             handler: 'StaleWhileRevalidate',
             options: {

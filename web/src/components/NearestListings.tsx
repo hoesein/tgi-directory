@@ -1,44 +1,39 @@
 import { useEffect, useRef, useState } from 'react';
-import { toStaticListingId, useDirectoryFile } from '../api/useDirectory';
-import type { DirectoryItem } from '../types';
+import { useDirectoryPlaces } from '../api/useDirectory';
+import type { DirectoryPlace } from '../types';
 import NearestCard from './NearestCard';
 
-interface SelectedListing {
-  item: DirectoryItem;
-  index: number;
-}
-
-const FOOD_PLACES_FILE = 'food_places.json';
+const FOOD_PLACES = 'food_places';
 const FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=400&fit=crop';
 
-function selectRandomListings(items: DirectoryItem[]): SelectedListing[] {
-  const shuffled = items.map((item, index) => ({ item, index }));
-
+function selectRandomPlaces(items: DirectoryPlace[]): DirectoryPlace[] {
+  const shuffled = [...items];
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
     const randomIndex = Math.floor(Math.random() * (index + 1));
     [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
   }
-
   return shuffled.slice(0, 3);
 }
 
 interface NearestListingsProps {
   onViewAll: () => void;
-  onListingPress: (id: string) => void;
+  onListingPress: (place: DirectoryPlace) => void;
 }
 
 export default function NearestListings({ onViewAll, onListingPress }: NearestListingsProps) {
-  const { data: listings, isLoading, isError, refetch } = useDirectoryFile(FOOD_PLACES_FILE);
-  const [selectedListings, setSelectedListings] = useState<SelectedListing[] | null>(null);
-  const hasSelectedListings = useRef(false);
+  // First page only: up to 100 food places in API mode, the whole file in static mode.
+  const { data, isLoading, isError, refetch } = useDirectoryPlaces(FOOD_PLACES);
+  const places = data?.pages[0]?.items;
+  const [selected, setSelected] = useState<DirectoryPlace[] | null>(null);
+  const hasSelected = useRef(false);
 
   useEffect(() => {
-    if (listings && !hasSelectedListings.current) {
-      hasSelectedListings.current = true;
-      setSelectedListings(selectRandomListings(listings));
+    if (places && !hasSelected.current) {
+      hasSelected.current = true;
+      setSelected(selectRandomPlaces(places));
     }
-  }, [listings]);
+  }, [places]);
 
   return (
     <section className="section">
@@ -58,28 +53,25 @@ export default function NearestListings({ onViewAll, onListingPress }: NearestLi
             </button>
           </div>
         )}
-        {!isLoading && !isError && listings?.length === 0 && (
+        {!isLoading && !isError && places?.length === 0 && (
           <p className="empty">No food listings found.</p>
         )}
-        {listings && listings.length > 0 && selectedListings === null && (
+        {places && places.length > 0 && selected === null && (
           <p className="centered">Loading recommendations…</p>
         )}
-        {selectedListings?.map(({ item, index }) => {
-          const id = toStaticListingId(FOOD_PLACES_FILE, index);
-          return (
-            <NearestCard
-              key={id}
-              listing={{
-                id,
-                name: item.name,
-                address: item.address || item.location,
-                type: item.type.name,
-                image: item.images || FALLBACK_IMAGE,
-              }}
-              onPress={() => onListingPress(id)}
-            />
-          );
-        })}
+        {selected?.map((place) => (
+          <NearestCard
+            key={place.id}
+            listing={{
+              id: place.id,
+              name: place.name,
+              address: place.address,
+              type: place.type.name,
+              image: place.imageUrl || FALLBACK_IMAGE,
+            }}
+            onPress={() => onListingPress(place)}
+          />
+        ))}
       </div>
     </section>
   );

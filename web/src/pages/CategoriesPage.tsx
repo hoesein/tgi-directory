@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import BackButton from '../components/BackButton';
 import CategoryIcon from '../components/CategoryIcon';
 import { useDirectoryCategories } from '../api/useDirectory';
+import { categoryPath } from '../lib/routes';
 
 export default function CategoriesPage() {
   const navigate = useNavigate();
@@ -27,15 +28,15 @@ export default function CategoriesPage() {
         )}
         {categories?.map((category) => (
           <button
-            key={category.file}
+            key={category.id}
             className="directory-category"
-            onClick={() => navigate(`/category/${encodeURIComponent(category.file)}`)}
+            onClick={() => navigate(categoryPath(category.id))}
             type="button"
           >
             <span className="cat-icon" aria-hidden>
               <CategoryIcon
-                id={category.file}
-                icon={category.types[0]}
+                id={category.id}
+                icon={category.types[0]?.code}
                 name={category.title}
               />
             </span>

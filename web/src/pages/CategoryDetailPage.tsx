@@ -2,41 +2,44 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { MapPin, Phone, X } from 'lucide-react';
 import BackButton from '../components/BackButton';
-import { parseStaticListingId, useDirectoryFile } from '../api/useDirectory';
+import { useDirectoryPlace } from '../api/useDirectory';
+import { parseStaticListingId } from '../services/directory';
 
 const FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop';
 
+/**
+ * Place detail. Routes: /place/:entity/:listingId, and the old
+ * /category-detail/dir--<file>--<index> (entity comes from the id).
+ */
 export default function CategoryDetailPage() {
-  const { listingId = '' } = useParams();
+  const params = useParams();
+  const listingId = decodeURIComponent(params.listingId ?? '');
+  const entity = params.entity ?? parseStaticListingId(listingId)?.file.replace(/\.json$/, '');
   const [isPhonePickerOpen, setIsPhonePickerOpen] = useState(false);
 
-  const staticRef = parseStaticListingId(decodeURIComponent(listingId));
   const {
-    data: staticItems,
+    data: place,
+    isLoading,
     isError: dataError,
     refetch: retryData,
-  } = useDirectoryFile(staticRef?.file);
-  const staticItem =
-    staticRef && staticItems && staticItems[staticRef.index]
-      ? staticItems[staticRef.index]
-      : undefined;
+  } = useDirectoryPlace(entity, listingId);
 
-  const listing = staticItem
+  const listing = place
     ? {
-      id: listingId,
-      title: staticItem.name,
-      location: staticItem.address || staticItem.location,
-      image: staticItem.images || FALLBACK_IMAGE,
-      description: [staticItem.type.name, staticItem.phone].filter(Boolean).join(' • '),
-      phone: staticItem.phone || null,
+      id: place.id,
+      title: place.name,
+      location: place.address,
+      phone: place.phone,
     }
     : undefined;
 
-  const listingImage =
-    listing?.image ||
-    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop';
+  const listingImage = place?.imageUrl || FALLBACK_IMAGE;
   const address = listing?.location ?? '';
+  const mapQuery =
+    place?.latitude != null && place.longitude != null
+      ? `${place.latitude},${place.longitude}`
+      : address;
 
   const phoneNumbers = listing?.phone
     ? listing.phone.split(/[,;\s]+/).filter(Boolean)
@@ -55,7 +58,9 @@ export default function CategoryDetailPage() {
   if (!listing) {
     return (
       <div className="centered">
-        {dataError ? (
+        {isLoading ? (
+          <p>Loading…</p>
+        ) : dataError ? (
           <>
             <p role="alert">Couldn’t load this listing’s directory data.</p>
             <button className="link-btn" onClick={() => void retryData()} type="button">
@@ -94,17 +99,17 @@ export default function CategoryDetailPage() {
           </button>
         )}
         <a
-          className={`category-detail-action${address ? '' : ' disabled'}`}
+          className={`category-detail-action${mapQuery ? '' : ' disabled'}`}
           href={
-            address
-              ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+            mapQuery
+              ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
               : undefined
           }
           target="_blank"
           rel="noreferrer"
-          aria-disabled={!address}
+          aria-disabled={!mapQuery}
           onClick={(event) => {
-            if (!address) event.preventDefault();
+            if (!mapQuery) event.preventDefault();
           }}
         >
           <MapPin size={19} />
@@ -115,10 +120,10 @@ export default function CategoryDetailPage() {
       <article className="tazaungdaing-participant-info category-detail-info">
         <h1>{listing.title}</h1>
         <dl>
-          {staticItem?.type && (
+          {place?.type.name && (
             <div>
               <dt>Category</dt>
-              <dd>{staticItem.type.name}</dd>
+              <dd>{place.type.name}</dd>
             </div>
           )}
           {address && (
@@ -127,10 +132,10 @@ export default function CategoryDetailPage() {
               <dd>{address}</dd>
             </div>
           )}
-          {staticItem?.rating && (
+          {place?.rating != null && (
             <div>
               <dt>Rating</dt>
-              <dd>{staticItem.rating}</dd>
+              <dd>{place.rating}</dd>
             </div>
           )}
           {phoneNumbers.length > 0 && (

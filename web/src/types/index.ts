@@ -120,3 +120,121 @@ export function isTazaungdaingParticipantDetails(
 ): participant is TazaungdaingParticipantDetails {
   return 'milestones' in participant;
 }
+
+// ─── Backend /api/v1 responses (TGI-18) ─────────────────────────────────────
+
+export interface Paged<T> {
+  items: T[];
+  page: number;
+  page_size: number;
+  total: number;
+}
+
+export interface ApiDirectoryCategory {
+  code: string;
+  title: string;
+  description: string | null;
+  sort_order: number;
+  count: number;
+  types: { code: string; name: string }[];
+}
+
+export interface ApiDirectoryRecord {
+  id: string;
+  name: string;
+  description: string | null;
+  phone: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  rating: number | null;
+  images: string[];
+  image_urls?: string[];
+  type: { code: string; name: string } | null;
+  township: { id: string; code: string; name: string; region_code: string } | null;
+}
+
+export interface ApiEventDay {
+  id: string;
+  event_date: string;
+  title: string | null;
+  event: { id: string; name: string; start_date: string; end_date: string };
+  schedule: {
+    id: string;
+    sort_order: number;
+    participant: { id: string; name: string; ward: string | null } | null;
+    role: { id: string; name: string } | null;
+  }[];
+}
+
+export interface ApiEventParticipant {
+  id: string;
+  name: string;
+  ward: string | null;
+  leader: string | null;
+  about: string | null;
+  initial_year: number | null;
+  milestones: { year: string | number; achieve: string }[];
+  social: { platform: string; url: string }[];
+  appearances: {
+    id: string;
+    event_date: string;
+    event: { id: string; name: string } | null;
+    role: { id: string; name: string } | null;
+  }[];
+}
+
+// ─── View models shared by the static and API data sources ─────────────────
+
+export interface DirectoryCategoryView {
+  /** Entity code, e.g. "hotels". Also the /category/:code route param. */
+  id: string;
+  title: string;
+  description: string;
+  count: number;
+  sortOrder: number;
+  types: { code: string; name: string }[];
+}
+
+export interface DirectoryPlace {
+  /** Record UUID (api) or dir--<file>--<index> (static). */
+  id: string;
+  entity: string;
+  name: string;
+  description: string | null;
+  address: string;
+  phone: string | null;
+  rating: number | null;
+  imageUrl: string | null;
+  type: { code: string; name: string };
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface EventEntryView {
+  key: string;
+  name: string;
+  role: string;
+  ward: string | null;
+  /** Participant profile link, or null when there is no profile to show. */
+  href: string | null;
+}
+
+export interface EventDayView {
+  key: string;
+  date: string;
+  eventName: string;
+  title: string;
+  entries: EventEntryView[];
+}
+
+export interface ParticipantProfileView {
+  name: string;
+  role: string | null;
+  ward: string | null;
+  leader: string | null;
+  initialYear: string | null;
+  milestones: { year: string; achieve: string }[];
+  about: string | null;
+  social: { platform: string; url: string }[];
+}

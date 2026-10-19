@@ -15,6 +15,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import EventsPage from './pages/EventsPage';
 import TazaungdaingParticipantPage from './pages/TazaungdaingParticipantPage';
+import EventParticipantPage from './pages/EventParticipantPage';
 import PlaceToVisitPage from './pages/PlaceToVisitPage';
 
 // The floating tab bar only lives on the home page — every other
@@ -50,11 +51,14 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
+          <Route path="/place/:entity/:listingId" element={<CategoryDetailPage />} />
+          {/* Old static detail links (dir--<file>--<index>) */}
           <Route path="/category-detail/:listingId" element={<CategoryDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/events/participants/:participantId" element={<EventParticipantPage />} />
           <Route
             path="/events/tazaungdaing/:eventDate/:participantIndex"
             element={<TazaungdaingParticipantPage />}

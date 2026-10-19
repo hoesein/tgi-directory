@@ -1,84 +1,74 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
+  DATA_SOURCE,
   fetchDirectoryCategories,
-  fetchDirectoryFile,
+  fetchDirectoryPlace,
+  fetchDirectoryPlaces,
+  fetchEventDays,
+  fetchEventParticipant,
   fetchTazaungdaingEvents,
-  isDirectoryDataConfigured,
+  type PlaceFilters,
 } from '../services/directory';
-import type { Category } from '../types';
 
-/** Static manifest from aggregated_data/categories.json on GitHub. */
+const HOUR = 1000 * 60 * 60;
+// Static files change only on deploy; API data changes with admin edits.
+const STALE_TIME = DATA_SOURCE === 'api' ? 1000 * 60 * 5 : HOUR;
+
+/** Category summary (title, description, count, types). */
 export function useDirectoryCategories() {
   return useQuery({
-    queryKey: ['directory-categories'],
+    queryKey: ['directory-categories', DATA_SOURCE],
     queryFn: fetchDirectoryCategories,
-    enabled: isDirectoryDataConfigured(),
-    staleTime: 1000 * 60 * 60,
+    staleTime: STALE_TIME,
   });
 }
 
-/** One consolidated static file, e.g. "hotels.json". */
-export function useDirectoryFile(file: string | undefined, type?: string) {
+/** Places in one category, filtered; API mode pages 100 at a time. */
+export function useDirectoryPlaces(entity: string | undefined, filters: PlaceFilters = {}) {
+  return useInfiniteQuery({
+    queryKey: ['directory-places', DATA_SOURCE, entity, filters.search ?? '', filters.typeCode ?? null],
+    queryFn: ({ pageParam }) => fetchDirectoryPlaces(entity as string, filters, pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (last) => (last.hasMore ? last.page + 1 : undefined),
+    enabled: !!entity,
+    staleTime: STALE_TIME,
+  });
+}
+
+/** One place by entity and route id (UUID, or an old dir--… static id). */
+export function useDirectoryPlace(entity: string | undefined, id: string | undefined) {
   return useQuery({
-    queryKey: ['directory-file', file, type],
-    queryFn: async () => {
-      const items = await fetchDirectoryFile(file as string);
-      return type ? items.filter((item) => item.type.code === type) : items;
-    },
-    enabled: isDirectoryDataConfigured() && !!file,
-    staleTime: 1000 * 60 * 60,
+    queryKey: ['directory-place', DATA_SOURCE, entity, id],
+    queryFn: () => fetchDirectoryPlace(entity as string, id as string),
+    enabled: !!entity && !!id,
+    staleTime: STALE_TIME,
   });
 }
 
+/** Event days on one date with their ordered schedules. */
+export function useEventDays(date: string) {
+  return useQuery({
+    queryKey: ['event-days', DATA_SOURCE, date],
+    queryFn: () => fetchEventDays(date),
+    staleTime: STALE_TIME,
+  });
+}
+
+/** Participant profile (API mode). */
+export function useEventParticipant(id: string | undefined, date: string | null) {
+  return useQuery({
+    queryKey: ['event-participant', id, date],
+    queryFn: () => fetchEventParticipant(id as string, date),
+    enabled: !!id,
+    staleTime: STALE_TIME,
+  });
+}
+
+/** Bundled tazaungdaing.json, for old /events/tazaungdaing/:date/:index links. */
 export function useTazaungdaingEvents() {
   return useQuery({
     queryKey: ['tazaungdaing-events'],
     queryFn: fetchTazaungdaingEvents,
-    enabled: isDirectoryDataConfigured(),
-    staleTime: 1000 * 60 * 60,
+    staleTime: HOUR,
   });
-}
-
-/**
- * Static manifest adapted to the backend Category shape so category UI
- * works without any backend call. Static ids are the filenames
- * (e.g. "hotels.json").
- */
-export function useDirectoryAsCategories() {
-  return useQuery({
-    queryKey: ['directory-as-categories'],
-    queryFn: async () => {
-      const manifest = await fetchDirectoryCategories();
-      return manifest.map(
-        (m, i): Category => ({
-          id: m.file,
-          name: m.title,
-          description: m.description,
-          parent_id: null,
-          icon: m.types[0] ?? null,
-          level: 0,
-          sort_order: i,
-          created_at: new Date(0).toISOString(),
-          children: [],
-        }),
-      );
-    },
-    enabled: isDirectoryDataConfigured(),
-    staleTime: 1000 * 60 * 60,
-  });
-}
-
-/** Detail-page id for a static item: dir--<file>--<index> (deep-linkable). */
-export function parseStaticListingId(id: string): { file: string; index: number } | null {
-  if (!id.startsWith('dir--')) return null;
-  const rest = id.slice('dir--'.length);
-  const sep = rest.lastIndexOf('--');
-  if (sep < 0) return null;
-  const index = Number(rest.slice(sep + 2));
-  if (!Number.isInteger(index) || index < 0) return null;
-  return { file: rest.slice(0, sep), index };
-}
-
-export function toStaticListingId(file: string, index: number): string {
-  return `dir--${file}--${index}`;
 }

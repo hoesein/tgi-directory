@@ -5,6 +5,8 @@ import ImageSlider from '../components/ImageSlider';
 import EventTicker from '../components/EventTicker';
 import CategoriesList from '../components/CategoriesList';
 import NearestListings from '../components/NearestListings';
+import { placePath } from '../lib/routes';
+import type { DirectoryPlace } from '../types';
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,12 +19,12 @@ export default function HomePage() {
     navigate(`/category/${id}`);
   };
 
-  const handleListingPress = (id: string) => {
-    navigate(`/category-detail/${encodeURIComponent(id)}`);
+  const handleListingPress = (place: DirectoryPlace) => {
+    navigate(placePath(place));
   };
 
   const handleFoodPlacesViewAll = () => {
-    navigate('/category/food_places.json');
+    navigate('/category/food_places');
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {

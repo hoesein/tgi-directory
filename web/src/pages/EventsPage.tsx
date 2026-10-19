@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useTazaungdaingEvents } from '../api/useDirectory';
+import { useEventDays } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
-import { isTazaungdaingParticipantDetails } from '../types';
+import { isPagodaFestival } from '../services/directory';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -25,9 +25,6 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-const PAGODA_FESTIVAL_PREFIX = 'ဖောင်တော်ဦးဘုရားပွဲ';
-const PAGODA_FESTIVAL_TYPE_ORDER = ['ကြွချီ', 'နေ့ဆွမ်း', 'ညကျိန်း'];
-
 function getMoonMarker(phase: string): string {
   if (phase === 'Full Moon') return 'full-moon';
   if (phase === 'New Moon') return 'new-moon';
@@ -41,12 +38,6 @@ function shiftDate(dateStr: string, offset: number): string {
 }
 
 export default function EventsPage() {
-  const {
-    data: tazaungdaingEvents,
-    isLoading: isLoadingTazaungdaingEvents,
-    isError: isTazaungdaingEventsError,
-    refetch: refetchTazaungdaingEvents,
-  } = useTazaungdaingEvents();
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -55,13 +46,17 @@ export default function EventsPage() {
     toDateStr(today.getFullYear(), today.getMonth(), today.getDate())
   );
   const [showMarketDayChips, setShowMarketDayChips] = useState(false);
-  const selectedTazaungdaingEvents =
-    tazaungdaingEvents?.filter((event) => event.event_date === selectedDate) ?? [];
-  const selectedPagodaFestivalEvents = selectedTazaungdaingEvents.filter((event) =>
-    event.name.startsWith(PAGODA_FESTIVAL_PREFIX),
+  const {
+    data: selectedEventDays = [],
+    isLoading: isLoadingEventDays,
+    isError: isEventDaysError,
+    refetch: refetchEventDays,
+  } = useEventDays(selectedDate);
+  const selectedPagodaFestivalEvents = selectedEventDays.filter((day) =>
+    isPagodaFestival(day.eventName),
   );
-  const selectedBalloonFestivalEvents = selectedTazaungdaingEvents.filter(
-    (event) => !event.name.startsWith(PAGODA_FESTIVAL_PREFIX),
+  const selectedBalloonFestivalEvents = selectedEventDays.filter(
+    (day) => !isPagodaFestival(day.eventName),
   );
 
   const cells = buildCalendarDays(viewYear, viewMonth);
@@ -281,79 +276,55 @@ export default function EventsPage() {
           </div>
         </section>
 
-        {/* Tazaungdaing Events Section */}
-        {(isLoadingTazaungdaingEvents || isTazaungdaingEventsError || selectedTazaungdaingEvents.length > 0) && (
+        {/* Festival days on the selected date */}
+        {(isLoadingEventDays || isEventDaysError || selectedEventDays.length > 0) && (
           <section className="tazaungdaing-events" aria-live="polite">
-            {/* <h2>တန်ဆောင်တိုင်ပွဲများ</h2> */}
-            {isLoadingTazaungdaingEvents && <p>ပွဲအချက်အလက်များ ရယူနေသည်…</p>}
-            {isTazaungdaingEventsError && (
+            {isLoadingEventDays && <p>ပွဲအချက်အလက်များ ရယူနေသည်…</p>}
+            {isEventDaysError && (
               <div className="data-error" role="alert">
                 <span>အချက်အလက်များကို ရယူ၍ မရပါ။</span>
                 <button
                   className="link-btn"
-                  onClick={() => void refetchTazaungdaingEvents()}
+                  onClick={() => void refetchEventDays()}
                   type="button"
                 >
                   ပြန်ကြိုးစားရန်
                 </button>
               </div>
             )}
-            {selectedPagodaFestivalEvents.map((event) => (
-              <article
-                className="pagoda-festival-event"
-                key={`${event.event_date}-${event.name}`}
-              >
+            {selectedPagodaFestivalEvents.map((day) => (
+              <article className="pagoda-festival-event" key={day.key}>
                 <div className="pagoda-festival-heading">
                   <span className="pagoda-festival-symbol" aria-hidden="true">✦</span>
-                  <h3>{event.name}</h3>
+                  <h3>{day.title}</h3>
                 </div>
                 <div className="pagoda-festival-schedule">
-                  {[...event.participants]
-                    .sort((a, b) => {
-                      const orderA = PAGODA_FESTIVAL_TYPE_ORDER.indexOf(a.type);
-                      const orderB = PAGODA_FESTIVAL_TYPE_ORDER.indexOf(b.type);
-                      return (
-                        (orderA < 0 ? PAGODA_FESTIVAL_TYPE_ORDER.length : orderA) -
-                        (orderB < 0 ? PAGODA_FESTIVAL_TYPE_ORDER.length : orderB)
-                      );
-                    })
-                    .map((participant, index) => (
-                      <div
-                        className="pagoda-festival-row"
-                        key={`${participant.name}-${participant.type}-${index}`}
-                      >
-                        <strong>{participant.name}</strong>
-                        <span className="pagoda-festival-type">{participant.type}</span>
-                      </div>
-                    ))}
+                  {day.entries.map((entry) => (
+                    <div className="pagoda-festival-row" key={entry.key}>
+                      <strong>{entry.name}</strong>
+                      <span className="pagoda-festival-type">{entry.role}</span>
+                    </div>
+                  ))}
                 </div>
               </article>
             ))}
-            {selectedBalloonFestivalEvents.map((event) => (
-              <article className="tazaungdaing-event" key={`${event.event_date}-${event.name}`}>
+            {selectedBalloonFestivalEvents.map((day) => (
+              <article className="tazaungdaing-event" key={day.key}>
                 <div className="tazaungdaing-event-heading">
-                  <h3>{event.name}</h3>
-                  {/* <time dateTime={event.event_date}>{event.event_date}</time> */}
+                  <h3>{day.title}</h3>
                 </div>
-                {event.participants
-                  .sort((a, b) => a.type.localeCompare(b.type))
-                  .map((participant, participantIndex) => {
-                    if (!isTazaungdaingParticipantDetails(participant)) return null;
-                    return (
-                      <Link
-                        className="tazaungdaing-participant"
-                        key={`${participant.name}-${participant.type}`}
-                        to={`/events/tazaungdaing/${encodeURIComponent(event.event_date)}/${participantIndex}`}
-                      >
-                        <span className="tazaungdaing-participant-main">
-                          <strong>{participant.name}</strong>
-                          <span className="tazaungdaing-participant-type">{participant.type}</span>
-                        </span>
-                        <span className="tazaungdaing-participant-ward">{participant.ward}</span>
-                        <span className="tazaungdaing-participant-arrow" aria-hidden="true">›</span>
-                      </Link>
-                    );
-                  })}
+                {day.entries.map((entry) =>
+                  entry.href ? (
+                    <Link className="tazaungdaing-participant" key={entry.key} to={entry.href}>
+                      <span className="tazaungdaing-participant-main">
+                        <strong>{entry.name}</strong>
+                        <span className="tazaungdaing-participant-type">{entry.role}</span>
+                      </span>
+                      <span className="tazaungdaing-participant-ward">{entry.ward}</span>
+                      <span className="tazaungdaing-participant-arrow" aria-hidden="true">›</span>
+                    </Link>
+                  ) : null,
+                )}
               </article>
             ))}
           </section>
