@@ -3185,10 +3185,10 @@ textarea {
   }
 }
 
-/* Previous / current / upcoming event chips: names only, colour shows the state. */
+/* Previous | current | upcoming event chips: text only, colour shows the state. */
 .event-status-chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
   margin: 4px 0 12px;
   padding: 0;
@@ -3196,33 +3196,21 @@ textarea {
 }
 
 .event-status-chip {
-  display: inline-flex;
-  max-width: 100%;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  padding: 4px 8px;
   border: 1px solid transparent;
   border-radius: 999px;
   font-size: 12px;
   line-height: 1.5;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.event-status-chip::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: currentColor;
-}
-
 .event-status-chip.previous {
   border-color: var(--border);
   background: transparent;
-  color: var(--faint);
+  color: var(--muted);
 }
 
 .event-status-chip.current {
@@ -3234,4 +3222,11 @@ textarea {
   border-color: #efdca6;
   background: #fdf7e6;
   color: #7a5a12;
+}
+
+/* No event in this slot: same place, faded and dashed. */
+.event-status-chip.no-event {
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--faint);
 }

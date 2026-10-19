@@ -22,22 +22,27 @@ const STATUS_LABELS: Record<EventStatus, string> = {
   upcoming: 'လာမည့်ပွဲ',
 };
 
-/** The last event that ended, the one running today, and the next one to start. */
-function eventStatusChips(events: EventRangeView[], today: string) {
+/** Previous and upcoming chips only count events within this many days of today. */
+const CHIP_WINDOW_DAYS = 30;
+const NO_EVENT = 'ပွဲမရှိ';
+
+/**
+ * Always three slots, left to right: the last event that ended, the one
+ * running today, and the next one to start. A slot is null when there is none.
+ */
+function eventStatusChips(events: EventRangeView[], today: string): [EventStatus, EventRangeView | null][] {
   const previous = events
-    .filter((event) => event.endDate < today)
+    .filter((event) => event.endDate < today && daysFrom(event.endDate, today) <= CHIP_WINDOW_DAYS)
     .sort((a, b) => b.endDate.localeCompare(a.endDate))[0];
   const current = events.find((event) => event.startDate <= today && today <= event.endDate);
   const upcoming = events
-    .filter((event) => event.startDate > today)
+    .filter((event) => event.startDate > today && daysFrom(today, event.startDate) <= CHIP_WINDOW_DAYS)
     .sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
-  return (
-    [
-      ['previous', previous],
-      ['current', current],
-      ['upcoming', upcoming],
-    ] as const
-  ).filter((chip): chip is readonly [EventStatus, EventRangeView] => !!chip[1]);
+  return [
+    ['previous', previous ?? null],
+    ['current', current ?? null],
+    ['upcoming', upcoming ?? null],
+  ];
 }
 
 function dateRangeLabel(event: EventRangeView): string {
@@ -315,21 +320,19 @@ export default function EventsPage() {
           )}
         </div>
 
-        {/* Previous, current and upcoming event: names only, colour shows which is which. */}
-        {statusChips.length > 0 && (
-          <ul className="event-status-chips" aria-label="ပွဲများ">
-            {statusChips.map(([status, event]) => (
-              <li
-                key={status}
-                className={`event-status-chip ${status}`}
-                title={`${STATUS_LABELS[status]} · ${dateRangeLabel(event)}`}
-              >
-                <span className="visually-hidden">{STATUS_LABELS[status]}: </span>
-                {event.name}
-              </li>
-            ))}
-          </ul>
-        )}
+        {/* Previous | current | upcoming event: names only, colour shows which is which. */}
+        <ul className="event-status-chips" aria-label="ပွဲများ">
+          {statusChips.map(([status, event]) => (
+            <li
+              key={status}
+              className={`event-status-chip ${status}${event ? '' : ' no-event'}`}
+              title={event ? `${STATUS_LABELS[status]} · ${dateRangeLabel(event)}` : STATUS_LABELS[status]}
+            >
+              <span className="visually-hidden">{STATUS_LABELS[status]}: </span>
+              {event?.name ?? NO_EVENT}
+            </li>
+          ))}
+        </ul>
 
         {/* Market Day Info Card */}
         <section className="calendar-info" aria-live="polite">
