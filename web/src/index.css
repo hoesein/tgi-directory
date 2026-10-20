@@ -3813,3 +3813,36 @@ button.hero-fab {
   color: var(--faint);
   font-weight: 400;
 }
+
+/* Long names and addresses: clamp to two lines so every card keeps the same
+   shape, with the type and rating pinned to the bottom. */
+.nearest-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.nearest-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nearest-body h3,
+.nearest-body p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.nearest-body p {
+  line-height: 1.5;
+}
+
+.nearest-meta {
+  margin-top: auto;
+  min-width: 0;
+}
