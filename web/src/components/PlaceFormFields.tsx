@@ -33,9 +33,9 @@ interface PlaceFormFieldsProps {
 }
 
 /** A titled card that groups related fields. */
-export function FormSection({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+export function FormSection({ id, title, hint, children }: { id?: string; title: string; hint?: string; children: ReactNode }) {
   return (
-    <section className="form-section">
+    <section className="form-section" id={id}>
       <h2>{title}</h2>
       {hint && <p className="form-section-hint">{hint}</p>}
       {children}
@@ -152,7 +152,7 @@ export function LocationField({ latitude, longitude, onChange }: LocationFieldPr
   };
 
   return (
-    <FormSection title="Location" hint="Tap the map or drag the pin to the entrance.">
+    <FormSection id="location" title="Location" hint="Tap the map or drag the pin to the entrance.">
       <LazyOsmMap
         className="location-picker-map"
         point={point}

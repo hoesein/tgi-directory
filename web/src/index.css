@@ -3851,3 +3851,45 @@ button.hero-fab {
 html {
   touch-action: manipulation;
 }
+
+/* Place detail: ask visitors to add a missing map pin (TGI-59). */
+.help-pin-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px dashed var(--sand);
+  border-radius: var(--radius);
+  background: #fbf6e6;
+  color: var(--text);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.help-pin-row > svg:first-child {
+  flex: none;
+  color: var(--star);
+}
+
+.help-pin-row span {
+  flex: 1;
+}
+
+.help-pin-row strong {
+  color: var(--primary);
+}
+
+.help-pin-row > svg:last-child {
+  flex: none;
+  color: var(--faint);
+}
+
+.help-pin-row:active {
+  opacity: 0.6;
+}
+
+/* The sticky header must not cover the Location section when jumped to. */
+.form-section {
+  scroll-margin-top: calc(env(safe-area-inset-top) + 72px);
+}

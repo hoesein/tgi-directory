@@ -1,6 +1,18 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Building2, Map as MapIcon, MapPin, PencilLine, Phone, Share2, Star, Tag, X } from 'lucide-react';
+import {
+  Building2,
+  ChevronRight,
+  Map as MapIcon,
+  MapPin,
+  MapPinPlus,
+  PencilLine,
+  Phone,
+  Share2,
+  Star,
+  Tag,
+  X,
+} from 'lucide-react';
 import { canSuggest } from '../services/suggestions';
 import BackButton from '../components/BackButton';
 import { DetailSkeleton } from '../components/Skeleton';
@@ -82,7 +94,8 @@ export default function CategoryDetailPage() {
 
   const rateable = canRate(place.entity);
   const suggestable = canSuggest() && !parseStaticListingId(place.id);
-  const hasMapTarget = (place.latitude !== null && place.longitude !== null) || !!place.address;
+  const hasCoordinates = place.latitude !== null && place.longitude !== null;
+  const hasMapTarget = hasCoordinates || !!place.address;
   const description = place.description?.trim() ?? '';
   const longDescription = description.length > DESCRIPTION_PREVIEW;
   const shownDescription =
@@ -193,6 +206,17 @@ export default function CategoryDetailPage() {
             </InfoCard>
           )}
         </dl>
+
+        {/* Most places have no coordinates yet (TGI-59): ask visitors to add them. */}
+        {suggestable && !hasCoordinates && (
+          <Link className="help-pin-row" to={`${placePath(place)}/suggest#location`}>
+            <MapPinPlus size={18} aria-hidden="true" />
+            <span>
+              No map pin yet · <strong>Help pin this place</strong>
+            </span>
+            <ChevronRight size={18} aria-hidden="true" />
+          </Link>
+        )}
 
         {description && (
           <section className="place-section detail-about">

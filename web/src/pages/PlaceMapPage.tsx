@@ -55,7 +55,7 @@ export default function PlaceMapPage() {
                 </a>
               )}
               {suggestable && (
-                <Link className="chip-btn" to={`${placePath(place)}/suggest`}>
+                <Link className="chip-btn" to={`${placePath(place)}/suggest#location`}>
                   <PencilLine size={16} />
                   <span>Add the location</span>
                 </Link>

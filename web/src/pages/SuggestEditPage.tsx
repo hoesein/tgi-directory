@@ -88,6 +88,16 @@ export default function SuggestEditPage() {
     if (place) reset(valuesFromPlace(place));
   }, [place, reset]);
 
+  // "Help pin this place" links here with #location: jump to the map once the form is shown.
+  const jumpToLocation = location.hash === '#location';
+  useEffect(() => {
+    if (!place || !jumpToLocation) return;
+    const frame = requestAnimationFrame(() =>
+      document.getElementById('location')?.scrollIntoView({ block: 'start', behavior: 'smooth' }),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [place, jumpToLocation]);
+
   const values = watch();
   const changes = changedFields(initial, values);
   const hasChanges = Object.keys(changes).length > 0;
@@ -98,7 +108,7 @@ export default function SuggestEditPage() {
 
   if (!canSuggest()) return <Navigate to={`/place/${entity}/${listingId}`} replace />;
   if (ready && !user) {
-    return <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname)}`} replace />;
+    return <Navigate to={`/sign-in?next=${encodeURIComponent(location.pathname + location.hash)}`} replace />;
   }
   if (!place) {
     return <div className="centered">{isLoading ? <p>Loading…</p> : <p>Place not found</p>}</div>;
