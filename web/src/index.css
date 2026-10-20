@@ -3846,3 +3846,8 @@ button.hero-fab {
   margin-top: auto;
   min-width: 0;
 }
+
+/* No double-tap zoom (iOS); panning still works. */
+html {
+  touch-action: manipulation;
+}

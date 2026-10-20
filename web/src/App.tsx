@@ -27,6 +27,7 @@ import AboutPage from './pages/AboutPage';
 import Toast from './components/Toast';
 import UpdatePrompt from './components/UpdatePrompt';
 import { useNativeNavigation } from './lib/useNativeNavigation';
+import { useIosGestureGuards } from './lib/useIosGestureGuards';
 
 // The floating tab bar only shows on the four tab pages — every other
 // route is a dedicated page with its own back navigation.
@@ -36,6 +37,7 @@ export default function App() {
   const location = useLocation();
   const showNav = (SHOW_NAV_PATHS as readonly string[]).includes(location.pathname);
   const pageAnimation = useNativeNavigation(SHOW_NAV_PATHS);
+  useIosGestureGuards(showNav);
 
   useEffect(() => {
     const guideShown = 'add-to-home-screen-guide-shown';

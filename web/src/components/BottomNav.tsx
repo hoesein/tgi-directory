@@ -15,6 +15,8 @@ export default function BottomNav() {
         <NavLink
           key={to}
           to={to}
+          // Tabs replace each other, so swiping back never walks through old tabs.
+          replace
           className={({ isActive }) => (isActive ? 'active' : '')}
         >
           <Icon size={22} />
