@@ -117,6 +117,16 @@ export interface ApiMyRating {
 }
 
 /** One row of GET /v1/ratings/mine. `place` is null when the record no longer exists. */
+/** GET /v1/home-slides (TGI-60): an admin-picked place photo for the Home slider. */
+export interface ApiHomeSlide {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  image_url: string;
+  entity: string;
+  record_id: string;
+}
+
 export interface ApiMyRatingItem {
   entity: string;
   record_id: string;

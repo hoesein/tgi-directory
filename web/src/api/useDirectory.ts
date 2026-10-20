@@ -7,6 +7,7 @@ import {
   fetchEventDays,
   fetchEventParticipant,
   fetchEventRanges,
+  fetchHomeSlides,
   fetchTazaungdaingEvents,
   type PlaceFilters,
 } from '../services/directory';
@@ -73,6 +74,16 @@ export function useEventRanges() {
     queryKey: ['event-ranges', DATA_SOURCE],
     queryFn: fetchEventRanges,
     staleTime: STALE_TIME,
+  });
+}
+
+/** Home slider photos picked in the admin portal (TGI-60). */
+export function useHomeSlides() {
+  return useQuery({
+    queryKey: ['home-slides', DATA_SOURCE],
+    queryFn: fetchHomeSlides,
+    staleTime: STALE_TIME,
+    retry: 1,
   });
 }
 

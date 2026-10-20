@@ -6,6 +6,7 @@ import {
   type ApiEvent,
   type ApiEventDay,
   type ApiEventParticipant,
+  type ApiHomeSlide,
   type ApiResponse,
   type DirectoryCategoryMeta,
   type DirectoryCategoryView,
@@ -398,6 +399,13 @@ function staticEventRanges(events: TazaungdaingEvent[]): EventRangeView[] {
 }
 
 /** Every active event with its date range, sorted by start date. */
+/** Admin-picked Home slider photos; static mode has none, so the slider uses its defaults. */
+export async function fetchHomeSlides(): Promise<ApiHomeSlide[]> {
+  if (DATA_SOURCE !== 'api') return [];
+  const response = await api.get<ApiResponse<ApiHomeSlide[]>>('/v1/home-slides');
+  return response.data ?? [];
+}
+
 export async function fetchEventRanges(): Promise<EventRangeView[]> {
   if (DATA_SOURCE === 'api') {
     const response = await api.get<ApiResponse<ApiEvent[]>>('/v1/events', { page_size: '100' });
