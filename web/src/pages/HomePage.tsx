@@ -23,8 +23,8 @@ export default function HomePage() {
     navigate(placePath(place));
   };
 
-  const handleFoodPlacesViewAll = () => {
-    navigate('/category/food_places');
+  const handleTopRatedViewAll = () => {
+    navigate('/categories');
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -56,7 +56,7 @@ export default function HomePage() {
         onViewAll={handleViewAllCategories}
         onCategoryPress={handleCategoryPress}
       />
-      <NearestListings onViewAll={handleFoodPlacesViewAll} onListingPress={handleListingPress} />
+      <NearestListings onViewAll={handleTopRatedViewAll} onListingPress={handleListingPress} />
     </div>
   );
 }

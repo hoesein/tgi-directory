@@ -3787,3 +3787,29 @@ button.hero-fab {
   z-index: 15;
   box-shadow: 0 calc(-1 * env(safe-area-inset-top)) 0 var(--card), 0 1px 0 var(--border);
 }
+
+/* Home "Top picks" row (TGI-48). */
+.nearest-meta {
+  align-items: center;
+  gap: 8px;
+}
+
+.nearest-meta > span:first-child {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.nearest-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  color: var(--star);
+  font-weight: 600;
+}
+
+.nearest-rating-count {
+  color: var(--faint);
+  font-weight: 400;
+}
