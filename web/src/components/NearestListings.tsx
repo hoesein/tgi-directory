@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useDirectoryPlaces } from '../api/useDirectory';
 import type { DirectoryPlace } from '../types';
 import NearestCard from './NearestCard';
+import { CardRowSkeleton } from './Skeleton';
 
 const FOOD_PLACES = 'food_places';
 
@@ -42,7 +43,7 @@ export default function NearestListings({ onViewAll, onListingPress }: NearestLi
         </button>
       </div>
       <div className="h-scroll">
-        {isLoading && <p className="centered">Loading recommendations…</p>}
+        {isLoading && <CardRowSkeleton />}
         {isError && (
           <div className="data-error" role="alert">
             <span>Couldn’t load food recommendations.</span>
@@ -55,7 +56,7 @@ export default function NearestListings({ onViewAll, onListingPress }: NearestLi
           <p className="empty">No food listings found.</p>
         )}
         {places && places.length > 0 && selected === null && (
-          <p className="centered">Loading recommendations…</p>
+          <CardRowSkeleton />
         )}
         {selected?.map((place) => (
           <NearestCard key={place.id} place={place} onPress={() => onListingPress(place)} />

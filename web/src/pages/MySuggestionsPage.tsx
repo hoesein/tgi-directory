@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import BackButton from '../components/BackButton';
+import { ListSkeleton } from '../components/Skeleton';
 import { useDirectoryCategories } from '../api/useDirectory';
 import { useMySuggestions, useWithdrawSuggestion } from '../api/useSuggestions';
 import {
@@ -52,7 +53,7 @@ export default function MySuggestionsPage() {
       </div>
 
       <div className="suggestion-list">
-        {isLoading && <p className="centered">Loading…</p>}
+        {isLoading && <ListSkeleton rows={4} />}
         {isError && (
           <div className="centered">
             <p role="alert">Couldn&apos;t load your suggestions.</p>

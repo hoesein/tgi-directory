@@ -1,6 +1,7 @@
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import BackButton from '../components/BackButton';
+import { ListSkeleton } from '../components/Skeleton';
 import PlaceImage from '../components/PlaceImage';
 import { useMyRatings } from '../api/useRatings';
 import { canSuggest } from '../services/suggestions';
@@ -69,7 +70,7 @@ export default function MyRatingsPage() {
       </div>
 
       <div className="my-rating-list">
-        {isLoading && <p className="centered">Loading…</p>}
+        {isLoading && <ListSkeleton rows={4} />}
         {isError && (
           <div className="centered">
             <p role="alert">Couldn&apos;t load your ratings.</p>

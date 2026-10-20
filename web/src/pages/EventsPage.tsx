@@ -1,9 +1,11 @@
 import { useRef, useState, type TouchEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Share2 } from 'lucide-react';
+import { shareLink } from '../lib/share';
 import { useEventDays, useEventRanges } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
 import { useDebouncedValue } from '../lib/useDebouncedValue';
+import { EventCardSkeleton } from '../components/Skeleton';
 import { eventDayLabel, formatMyanmarDate } from '../lib/myanmar';
 import { isPagodaFestival } from '../services/directory';
 import type { EventRangeView } from '../types';
@@ -178,6 +180,22 @@ export default function EventsPage() {
   return (
     <div>
       <div className="page-head events-page-head">
+        {/* Shares the selected day: its date and any festivals on it. */}
+        <button
+          className="icon-btn events-share-button"
+          type="button"
+          aria-label="Share this day"
+          title="Share this day"
+          onClick={() =>
+            void shareLink({
+              title: `Events · ${formatMyanmarDate(selectedDate)}`,
+              text: [formatMyanmarDate(selectedDate), ...eventsOn(selectedDate).map((event) => event.name)].join(' · '),
+              path: `/events?date=${selectedDate}`,
+            })
+          }
+        >
+          <Share2 size={19} />
+        </button>
         <h1>Events</h1>
         <button
           className="calendar-today-button"
@@ -405,7 +423,7 @@ export default function EventsPage() {
             aria-live="polite"
             aria-busy={scheduleIsStale}
           >
-            {isLoadingEventDays && <p>ပွဲအချက်အလက်များ ရယူနေသည်…</p>}
+            {isLoadingEventDays && <EventCardSkeleton />}
             {isEventDaysError && (
               <div className="data-error" role="alert">
                 <span>အချက်အလက်များကို ရယူ၍ မရပါ။</span>

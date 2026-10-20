@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQueries } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import BackButton from '../components/BackButton';
+import { ListSkeleton } from '../components/Skeleton';
 import CategoryListItem from '../components/CategoryListItem';
 import { useDirectoryCategories } from '../api/useDirectory';
 import { DATA_SOURCE, fetchDirectoryPlaces } from '../services/directory';
@@ -77,7 +78,7 @@ export default function SearchPage() {
 
       <div className="list">
         {!ready && <p className="empty">Type at least {MIN_LENGTH} letters to search every category.</p>}
-        {ready && loading && <p className="centered">Searching…</p>}
+        {ready && loading && <ListSkeleton rows={3} />}
         {ready && failed && (
           <div className="data-error" role="alert">
             <span>Some categories couldn’t be searched.</span>

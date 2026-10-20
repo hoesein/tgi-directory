@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { markBackNavigation } from '../lib/useNativeNavigation';
 
 interface BackButtonProps {
   variant?: 'header' | 'fab';
@@ -13,7 +14,11 @@ export default function BackButton({ variant = 'header', label = 'Back', onBack 
   return (
     <button
       className={variant === 'fab' ? 'back-fab' : 'icon-btn'}
-      onClick={onBack ?? (() => navigate(-1))}
+      onClick={() => {
+        // Custom back actions use navigate(path, { replace }); mark them so the page slides back.
+        markBackNavigation();
+        (onBack ?? (() => navigate(-1)))();
+      }}
       aria-label={label}
       type="button"
     >

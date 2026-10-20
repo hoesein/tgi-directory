@@ -4,6 +4,7 @@ import { PlusCircle, Search } from 'lucide-react';
 import { canSuggest } from '../services/suggestions';
 import CategoryListItem from '../components/CategoryListItem';
 import BackButton from '../components/BackButton';
+import { ListSkeleton } from '../components/Skeleton';
 import { useDirectoryCategories, useDirectoryPlaces } from '../api/useDirectory';
 import { useTownships } from '../api/useSuggestions';
 import { DATA_SOURCE, toEntityCode, type PlaceSort } from '../services/directory';
@@ -195,7 +196,7 @@ export default function CategoryPage() {
             onPress={() => navigate(placePath(place))}
           />
         ))}
-        {isLoading && <p className="centered">Loading…</p>}
+        {isLoading && <ListSkeleton />}
         {!isLoading && !placesError && places.length === 0 && (
           <div className="empty">
             <p>No places found.</p>

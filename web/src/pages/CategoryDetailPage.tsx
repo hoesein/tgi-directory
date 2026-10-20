@@ -1,8 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Building2, Map as MapIcon, MapPin, PencilLine, Phone, Star, Tag, X } from 'lucide-react';
+import { Building2, Map as MapIcon, MapPin, PencilLine, Phone, Share2, Star, Tag, X } from 'lucide-react';
 import { canSuggest } from '../services/suggestions';
 import BackButton from '../components/BackButton';
+import { DetailSkeleton } from '../components/Skeleton';
+import { shareLink } from '../lib/share';
 import { useDirectoryPlace } from '../api/useDirectory';
 import RatingControl from '../components/RatingControl';
 import RatingSummary from '../components/RatingSummary';
@@ -59,12 +61,12 @@ export default function CategoryDetailPage() {
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [isPhonePickerOpen]);
 
+  if (!place && isLoading) return <DetailSkeleton />;
+
   if (!place) {
     return (
       <div className="centered">
-        {isLoading ? (
-          <p>Loading…</p>
-        ) : dataError ? (
+        {dataError ? (
           <>
             <p role="alert">Couldn’t load this listing’s directory data.</p>
             <button className="link-btn" onClick={() => void retryData()} type="button">
@@ -91,6 +93,21 @@ export default function CategoryDetailPage() {
       <div className="detail-hero">
         <PhotoGallery images={place.imageUrls} alt={place.name} entity={place.entity} />
         <BackButton variant="fab" />
+        <button
+          className={`hero-fab ${suggestable ? 'hero-fab-right-2' : 'hero-fab-right'}`}
+          type="button"
+          aria-label="Share"
+          title="Share"
+          onClick={() =>
+            void shareLink({
+              title: place.name,
+              text: [place.name, place.type.name, place.address].filter(Boolean).join(' · '),
+              path: placePath(place),
+            })
+          }
+        >
+          <Share2 size={18} />
+        </button>
         {suggestable && (
           <Link
             className="hero-fab hero-fab-right"

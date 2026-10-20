@@ -1,4 +1,5 @@
 import CategoryCard from './CategoryCard';
+import { IconGridSkeleton } from './Skeleton';
 import { useDirectoryCategories } from '../api/useDirectory';
 
 interface CategoriesListProps {
@@ -26,7 +27,7 @@ export default function CategoriesList({ onViewAll, onCategoryPress }: Categorie
         </div>
       )}
       {isLoading ? (
-        <div className="spinner">Loading…</div>
+        <IconGridSkeleton />
       ) : (
         <div className="cat-grid">
           {categories?.map((category) => (

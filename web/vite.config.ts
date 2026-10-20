@@ -40,7 +40,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // The new version waits for the user's Refresh tap (components/UpdatePrompt.tsx).
+      registerType: 'prompt',
       includeAssets: ['apple-touch-icon.png', 'icon.svg', 'maskable-icon.svg'],
       manifest: {
         id: base,

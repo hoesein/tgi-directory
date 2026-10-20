@@ -3412,3 +3412,369 @@ textarea {
   color: var(--primary);
   font-weight: 600;
 }
+
+/* ─── Native feel (TGI-57) ─── */
+
+/* Page transitions. Only the entry animates; with no fill-mode "forwards" the
+   transform is gone afterwards, so fixed overlays inside the page stay put. */
+.page.page-forward {
+  animation: page-forward 260ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.page.page-back {
+  animation: page-back 260ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.page.page-fade {
+  animation: page-fade 180ms ease-out backwards;
+}
+
+@keyframes page-forward {
+  from {
+    opacity: 0.4;
+    transform: translateX(28%);
+  }
+}
+
+@keyframes page-back {
+  from {
+    opacity: 0.4;
+    transform: translateX(-22%);
+  }
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The horizontal slide must not cause a sideways page scroll. */
+.app-main {
+  overflow-x: clip;
+}
+
+/* No rubber-band bounce or pull-to-refresh on the app frame. */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Controls behave like app buttons: no text selection or long-press callout. */
+button,
+.bottom-nav a,
+.hero-fab,
+.back-fab,
+.category-detail-action,
+.event-status-chip,
+.calendar-strip-day {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+img {
+  -webkit-touch-callout: none;
+}
+
+/* Press feedback. */
+button:not(:disabled),
+.bottom-nav a,
+.hero-fab,
+.category-detail-action,
+.settings-row,
+.my-rating-row,
+.event-row {
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+button:not(:disabled):active,
+.bottom-nav a:active,
+.hero-fab:active,
+.category-detail-action:active {
+  transform: scale(0.95);
+}
+
+.settings-row:active,
+.my-rating-row:active,
+a.event-row:active {
+  opacity: 0.6;
+}
+
+.bottom-nav a:active {
+  transform: scale(0.94);
+}
+
+/* Share on the place hero sits left of "Suggest an edit" when both show. */
+button.hero-fab {
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.hero-fab-right-2 {
+  right: 64px;
+}
+
+.events-page-head .events-share-button {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  color: var(--primary);
+}
+
+.events-page-head h1 {
+  grid-row: 1;
+}
+
+/* Skeletons. */
+.sk {
+  background: linear-gradient(90deg, #e6ece6 0%, #f3f6f2 40%, #e6ece6 80%);
+  background-size: 300% 100%;
+  animation: sk-shimmer 1.3s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes sk-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+.sk-bar {
+  height: 12px;
+}
+
+.sk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.sk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.sk-thumb {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 10px;
+}
+
+.sk-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sk-card-row {
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+  padding: 4px 0 8px;
+}
+
+.sk-card {
+  width: 200px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sk-card-image {
+  height: 130px;
+  border-radius: var(--radius);
+}
+
+.sk-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px 8px;
+  padding: 8px 16px;
+}
+
+.sk-icon-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+}
+
+.sk-photo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sk-photo {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+}
+
+.sk-hero {
+  height: min(66vw, 320px);
+  border-radius: 0;
+}
+
+.sk-detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 16px;
+}
+
+.sk-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sk-info {
+  height: 58px;
+  border-radius: var(--radius);
+}
+
+.sk-info.wide {
+  grid-column: 1 / -1;
+}
+
+.sk-block {
+  height: 90px;
+  border-radius: var(--radius);
+}
+
+.sk-event {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.sk-event-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 6px;
+}
+
+.sk-event-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Toast and update prompt float above the bottom nav. */
+.app-toast,
+.update-prompt {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(max(12px, env(safe-area-inset-bottom)) + 84px);
+  z-index: 60;
+  max-width: calc(100% - 32px);
+  animation: toast-in 200ms ease-out backwards;
+}
+
+.app-toast {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(30, 40, 33, 0.92);
+  color: #fff;
+  font-size: 14px;
+  white-space: nowrap;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.update-prompt {
+  width: 448px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 14px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+}
+
+.update-prompt > svg {
+  color: var(--primary);
+  flex: none;
+}
+
+.update-prompt-text {
+  flex: 1;
+  font-weight: 600;
+}
+
+.update-prompt button {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.update-prompt-later {
+  background: transparent;
+  color: var(--muted);
+}
+
+.update-prompt-refresh {
+  background: var(--primary);
+  color: #fff;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page.page-forward,
+  .page.page-back,
+  .page.page-fade,
+  .app-toast,
+  .update-prompt {
+    animation: none;
+  }
+
+  .sk {
+    animation: none;
+  }
+
+  button:not(:disabled):active,
+  .bottom-nav a:active,
+  .hero-fab:active,
+  .category-detail-action:active {
+    transform: none;
+  }
+}

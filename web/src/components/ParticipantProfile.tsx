@@ -1,4 +1,5 @@
 import BackButton from './BackButton';
+import { EventCardSkeleton } from './Skeleton';
 import { formatMyanmarDate, toMyanmarDigits } from '../lib/myanmar';
 import type { ParticipantAppearanceView, ParticipantProfileView } from '../types';
 
@@ -125,7 +126,7 @@ export function ParticipantState({
   isError: boolean;
   onRetry: () => void;
 }) {
-  if (isLoading) return <p className="centered">ပွဲအချက်အလက်များ ရယူနေသည်…</p>;
+  if (isLoading) return <EventCardSkeleton rows={4} />;
   if (isError) {
     return (
       <div className="centered">

@@ -24,14 +24,18 @@ import SearchPage from './pages/SearchPage';
 import PlaceMapPage from './pages/PlaceMapPage';
 import MyRatingsPage from './pages/MyRatingsPage';
 import AboutPage from './pages/AboutPage';
+import Toast from './components/Toast';
+import UpdatePrompt from './components/UpdatePrompt';
+import { useNativeNavigation } from './lib/useNativeNavigation';
 
-// The floating tab bar only lives on the home page — every other
+// The floating tab bar only shows on the four tab pages — every other
 // route is a dedicated page with its own back navigation.
-const SHOW_NAV_PATHS = ['/', '/events', '/place-to-visit', '/profile'];
+const SHOW_NAV_PATHS = ['/', '/events', '/place-to-visit', '/profile'] as const;
 
 export default function App() {
   const location = useLocation();
-  const showNav = SHOW_NAV_PATHS.includes(location.pathname);
+  const showNav = (SHOW_NAV_PATHS as readonly string[]).includes(location.pathname);
+  const pageAnimation = useNativeNavigation(SHOW_NAV_PATHS);
 
   useEffect(() => {
     const guideShown = 'add-to-home-screen-guide-shown';
@@ -54,7 +58,9 @@ export default function App() {
   return (
     <div className="app-shell">
       <main className={showNav ? 'app-main' : 'app-main no-nav'}>
-        <Routes>
+        {/* Keyed by path so each new screen mounts fresh and plays its slide/fade in. */}
+        <div key={location.pathname} className={`page ${pageAnimation}`}>
+        <Routes location={location}>
           <Route path="/" element={<HomePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/search" element={<SearchPage />} />
@@ -86,8 +92,11 @@ export default function App() {
           <Route path="/place-to-visit" element={<PlaceToVisitPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </div>
       </main>
       {showNav && <BottomNav />}
+      <UpdatePrompt />
+      <Toast />
     </div>
   );
 }

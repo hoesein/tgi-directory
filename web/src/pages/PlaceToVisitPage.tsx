@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlusCircle } from 'lucide-react';
 import PlaceImage from '../components/PlaceImage';
+import { PhotoGridSkeleton } from '../components/Skeleton';
 import { useDirectoryCategories, useDirectoryPlaces } from '../api/useDirectory';
 import { DATA_SOURCE } from '../services/directory';
 import { canSuggest } from '../services/suggestions';
@@ -89,7 +90,7 @@ export default function PlaceToVisitPage() {
         </div>
       )}
 
-      {apiMode && isLoading && <p className="centered">Loading…</p>}
+      {apiMode && isLoading && <PhotoGridSkeleton />}
 
       {hasRecords ? (
         <div className="places-grid">
