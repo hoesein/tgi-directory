@@ -3778,3 +3778,12 @@ button.hero-fab {
     transform: none;
   }
 }
+
+/* Sticky header bar: page titles stay put while the list scrolls under them.
+   It sticks below the notch; the upward shadow fills the strip above it. */
+.page-head {
+  position: sticky;
+  top: env(safe-area-inset-top);
+  z-index: 15;
+  box-shadow: 0 calc(-1 * env(safe-area-inset-top)) 0 var(--card), 0 1px 0 var(--border);
+}
