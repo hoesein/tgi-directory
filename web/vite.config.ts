@@ -120,6 +120,19 @@ export default defineConfig({
             },
           },
           {
+            // Place photos and Home slides uploaded in the admin portal. A path
+            // never changes content (new uploads get new names), so the saved copy
+            // is used first. <img> loads are opaque (status 0) cross-origin.
+            urlPattern: ({ url }) =>
+              url.hostname.endsWith('.supabase.co') && url.pathname.startsWith('/storage/v1/object/public/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'place-photos',
+              expiration: { maxEntries: 150, maxAgeSeconds: 30 * 24 * 60 * 60, purgeOnQuotaError: true },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
             urlPattern: /^https:\/\/images\.unsplash\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
