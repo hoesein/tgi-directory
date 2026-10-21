@@ -371,6 +371,7 @@ export async function fetchEventParticipant(
     })),
     about: participant.about,
     social: participant.social,
+    photos: participant.image_urls ?? [],
     appearances: [...participant.appearances]
       .sort((a, b) => b.event_date.localeCompare(a.event_date))
       .map((item) => ({

@@ -1,23 +1,16 @@
+import { useState } from 'react';
 import BackButton from './BackButton';
+import PhotoViewer from './PhotoViewer';
 import { EventCardSkeleton } from './Skeleton';
-import { formatMyanmarDate, toMyanmarDigits } from '../lib/myanmar';
-import type { ParticipantAppearanceView, ParticipantProfileView } from '../types';
+import type { ParticipantProfileView } from '../types';
 
 const BACK_LABEL = 'ပွဲစာရင်းသို့ ပြန်သွားရန်';
-
-/** Appearances (already newest first) grouped by year, newest year first. */
-function groupByYear(appearances: ParticipantAppearanceView[]): [string, ParticipantAppearanceView[]][] {
-  const groups = new Map<string, ParticipantAppearanceView[]>();
-  for (const item of appearances) {
-    const year = item.date.slice(0, 4);
-    groups.set(year, [...(groups.get(year) ?? []), item]);
-  }
-  return [...groups.entries()];
-}
 
 /** Event participant profile; same layout for static and API data. */
 export default function ParticipantProfile({ participant }: { participant: ParticipantProfileView }) {
   const milestones = participant.milestones.filter((milestone) => milestone.achieve);
+  // Index of the photo open in the popup; null when closed.
+  const [viewing, setViewing] = useState<number | null>(null);
 
   return (
     <div>
@@ -44,14 +37,15 @@ export default function ParticipantProfile({ participant }: { participant: Parti
             <dt>စတင်ယှဥ်ပြိုင်သည့်နှစ်</dt>
             <dd>{participant.initialYear}</dd>
           </div>
-          <div>
+          <div className="participant-milestones">
             <dt>မှတ်တမ်းများ</dt>
             <dd>
               {milestones.length > 0 ? (
                 <ul>
                   {milestones.map((milestone) => (
                     <li key={`${milestone.year}-${milestone.achieve}`}>
-                      {milestone.year}: {milestone.achieve}
+                      <span className="milestone-year">{milestone.year}</span>
+                      <span className="milestone-text">{milestone.achieve}</span>
                     </li>
                   ))}
                 </ul>
@@ -72,27 +66,24 @@ export default function ParticipantProfile({ participant }: { participant: Parti
         </article>
       )}
 
-      {participant.appearances.length > 0 && (
+      {participant.photos.length > 0 && (
         <article className="tazaungdaing-participant-page">
           <section style={{ marginTop: '0' }}>
-            <h2>ပွဲဝင်မှတ်တမ်း</h2>
-            {groupByYear(participant.appearances).map(([year, items]) => (
-              <div className="appearance-year" key={year}>
-                <h3>{toMyanmarDigits(year)}</h3>
-                <ul className="appearance-list">
-                  {items.map((item) => (
-                    <li key={item.key}>
-                      <time dateTime={item.date}>{formatMyanmarDate(item.date)}</time>
-                      <span className="appearance-event">
-                        {item.dayTitle ?? item.eventName}
-                        {item.dayTitle && item.eventName ? ` · ${item.eventName}` : ''}
-                      </span>
-                      {item.role && <span className="appearance-role">{item.role}</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <h2>ဓာတ်ပုံများ</h2>
+            <ul className="participant-photos">
+              {participant.photos.map((src, index) => (
+                <li key={src}>
+                  <button
+                    className="participant-photo"
+                    onClick={() => setViewing(index)}
+                    aria-label={`ဓာတ်ပုံ ${index + 1} ကို ကြည့်ရန်`}
+                    type="button"
+                  >
+                    <img src={src} alt="" loading="lazy" decoding="async" />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </section>
         </article>
       )}
@@ -112,6 +103,15 @@ export default function ParticipantProfile({ participant }: { participant: Parti
             </ul>
           </section>
         </article>
+      )}
+
+      {viewing !== null && (
+        <PhotoViewer
+          photos={participant.photos}
+          startIndex={viewing}
+          title={participant.name}
+          onClose={() => setViewing(null)}
+        />
       )}
     </div>
   );

@@ -211,6 +211,8 @@ export interface ApiEventParticipant {
   initial_year: number | null;
   milestones: { year: string | number; achieve: string }[];
   social: { platform: string; url: string }[];
+  /** Photo library (TGI-62); missing before the backend migration. */
+  image_urls?: string[];
   appearances: {
     id: string;
     event_date: string;
@@ -310,6 +312,8 @@ export interface ParticipantProfileView {
   milestones: { year: string; achieve: string }[];
   about: string | null;
   social: { platform: string; url: string }[];
+  /** Photo URLs in display order (API mode; empty for static data). */
+  photos: string[];
   /** Every scheduled appearance, newest first (API mode; empty for static data). */
   appearances: ParticipantAppearanceView[];
 }

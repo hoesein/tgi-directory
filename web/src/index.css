@@ -2542,47 +2542,6 @@ img.nearest-card-image {
   font-size: 12px;
 }
 
-.appearance-year h3 {
-  margin: 12px 0 6px;
-  color: var(--faint);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.tazaungdaing-participant-page .appearance-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.appearance-list li {
-  display: grid;
-  grid-template-columns: 96px 1fr auto;
-  gap: 8px;
-  align-items: baseline;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--primary-light);
-  font-size: 13px;
-}
-
-.appearance-list time {
-  color: var(--muted);
-}
-
-.appearance-event {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.appearance-role {
-  color: var(--primary);
-  font-weight: 600;
-}
-
 /* ─── Mobile polish: iOS + Android (TGI-45/52) ─── */
 html {
   -webkit-text-size-adjust: 100%;
@@ -4024,5 +3983,195 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .load-more-spinner {
     animation-duration: 2.4s;
+  }
+}
+
+/* ─── Participant milestones + photo library (TGI-62) ─── */
+.tazaungdaing-participant-info dl > .participant-milestones {
+  grid-column: 1 / -1;
+}
+
+.participant-milestones ul {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.participant-milestones li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.milestone-year {
+  flex: none;
+  min-width: 48px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.milestone-text {
+  min-width: 0;
+  line-height: 1.5;
+}
+
+.participant-photos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tazaungdaing-participant-page ul.participant-photos {
+  padding: 0;
+}
+
+.participant-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--primary-light);
+  cursor: zoom-in;
+}
+
+.participant-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.participant-photo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Full-screen photo popup (shared). */
+.photo-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(8, 14, 10, 0.97);
+  animation: photo-viewer-in 0.18s ease-out;
+}
+
+@keyframes photo-viewer-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.photo-viewer-bar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 8px) 12px 8px 18px;
+  color: #fff;
+  background: linear-gradient(rgba(0, 0, 0, 0.45), transparent);
+  pointer-events: none;
+}
+
+.photo-viewer-count {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.photo-viewer-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.photo-viewer-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.photo-viewer-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.photo-viewer-track {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.photo-viewer-track::-webkit-scrollbar {
+  display: none;
+}
+
+.photo-viewer-slide {
+  flex: 0 0 100%;
+  display: grid;
+  place-items: center;
+  padding: calc(env(safe-area-inset-top) + 60px) 0 calc(env(safe-area-inset-bottom) + 24px);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.photo-viewer-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.photo-viewer-prev,
+.photo-viewer-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.photo-viewer-prev {
+  left: 10px;
+}
+
+.photo-viewer-next {
+  right: 10px;
+}
+
+/* On touch screens swiping is enough; the arrows would cover the photo. */
+@media (hover: none) {
+  .photo-viewer-prev,
+  .photo-viewer-next {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-viewer {
+    animation: none;
   }
 }
