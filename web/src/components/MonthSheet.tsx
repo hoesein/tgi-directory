@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import FestivalBands from './FestivalBands';
+import FestivalMarks from './FestivalMarks';
 import MoonPhase from './MoonPhase';
-import { getEventsCalendarDay } from '../lib/eventsCalendar';
+import { getEventsCalendarDay, myanmarMonthsOf } from '../lib/eventsCalendar';
 import { DAY_LABELS, MONTH_NAMES, eventsOn, toDateStr } from '../lib/festivals';
 import type { EventRangeView } from '../types';
 
@@ -19,17 +19,6 @@ function monthWeeks(year: number, month: number): (string | null)[][] {
   return weeks;
 }
 
-/** Myanmar months a Gregorian month spans, e.g. "သီတင်းကျွတ် – တန်ဆောင်မုန်း". */
-function myanmarMonths(year: number, month: number): string {
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const names: string[] = [];
-  for (let day = 1; day <= daysInMonth; day++) {
-    const name = getEventsCalendarDay(toDateStr(year, month, day)).myanmarDate.month.my;
-    if (!names.includes(name)) names.push(name);
-  }
-  return names.join(' – ');
-}
-
 interface MonthSheetProps {
   selectedDate: string;
   today: string;
@@ -39,7 +28,7 @@ interface MonthSheetProps {
 }
 
 /**
- * Month calendar in a bottom sheet (TGI-64): moons, festival bands per week,
+ * Month calendar in a bottom sheet (TGI-64): moons, festival marks per day,
  * tap a day to jump the Events strip there.
  */
 export default function MonthSheet({ selectedDate, today, events, onSelect, onClose }: MonthSheetProps) {
@@ -87,7 +76,7 @@ export default function MonthSheet({ selectedDate, today, events, onSelect, onCl
           </button>
           <div className="month-sheet-title">
             <strong>{title}</strong>
-            <span>{myanmarMonths(view.year, view.month)}</span>
+            <span>{myanmarMonthsOf(view.year, view.month)}</span>
           </div>
           <button className="month-sheet-step" onClick={() => step(1)} aria-label="Next month" type="button">
             <ChevronRight size={20} />
@@ -122,11 +111,11 @@ export default function MonthSheet({ selectedDate, today, events, onSelect, onCl
                   >
                     <span className="month-day-number">{Number(date.slice(8))}</span>
                     <MoonPhase phase={phase} day={Number(myanmarDate.day.fd.en)} size={12} />
+                    <FestivalMarks events={festivals} />
                   </button>
                 );
               })}
             </div>
-            <FestivalBands dates={week} events={events} />
           </div>
         ))}
       </div>

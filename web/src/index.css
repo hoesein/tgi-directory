@@ -3046,27 +3046,6 @@ textarea {
   touch-action: pan-y;
 }
 
-@keyframes strip-slide-next {
-  from {
-    transform: translateX(24px);
-    opacity: 0.4;
-  }
-}
-
-@keyframes strip-slide-prev {
-  from {
-    transform: translateX(-24px);
-    opacity: 0.4;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .calendar-strip.slide-next,
-  .calendar-strip.slide-prev {
-    animation: none;
-  }
-}
-
 /* Market day: one slim row (TGI-56) */
 .market-day {
   margin-bottom: 12px;
@@ -4064,18 +4043,6 @@ html {
   outline-offset: 1px;
 }
 
-.calendar-strip.slide-next {
-  animation: strip-slide-next 0.22s ease-out;
-}
-
-.calendar-strip.slide-prev {
-  animation: strip-slide-prev 0.22s ease-out;
-}
-
-.calendar-strip {
-  touch-action: pan-y;
-}
-
 .calendar-strip-day {
   min-height: 0;
   gap: 4px;
@@ -4123,38 +4090,6 @@ html {
 
 .calendar-strip-day.today.full-moon .calendar-strip-myanmar {
   color: #f6dd8c;
-}
-
-/* Festival bands: one line per festival under a row of days. */
-.festival-bands {
-  display: grid;
-  gap: 4px 6px;
-  margin-top: 6px;
-}
-
-.festival-band {
-  min-width: 0;
-  height: 26px;
-  padding: 0 8px;
-  overflow: hidden;
-  background: var(--tone-soft);
-  color: var(--tone);
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 26px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.festival-band.starts {
-  border-top-left-radius: 999px;
-  border-bottom-left-radius: 999px;
-  box-shadow: inset 3px 0 0 var(--tone);
-}
-
-.festival-band.ends {
-  border-top-right-radius: 999px;
-  border-bottom-right-radius: 999px;
 }
 
 /* Event chips: tap to jump to the festival. */
@@ -4437,18 +4372,6 @@ html {
   border-top: 1px solid var(--border);
 }
 
-.month-week .festival-bands {
-  gap: 3px 6px;
-  margin-top: 4px;
-}
-
-.month-week .festival-band {
-  height: 20px;
-  padding: 0 6px;
-  font-size: 10px;
-  line-height: 20px;
-}
-
 .month-day {
   display: flex;
   min-height: 46px;
@@ -4495,4 +4418,112 @@ html {
   .month-sheet-backdrop {
     animation: none;
   }
+}
+
+/* ─── Events row v2 (TGI-63): scrolls freely, tap a day to load it ─── */
+.calendar-day-strip {
+  display: flex;
+  gap: 6px;
+  margin: 0 -4px;
+  padding: 4px 4px 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px;
+  scrollbar-width: none;
+  touch-action: pan-x pan-y;
+}
+
+.calendar-day-strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* Five days fit the card; the rest of the month scrolls. */
+.calendar-day-strip .calendar-strip-day {
+  flex: 0 0 calc((100% - 24px) / 5);
+  scroll-snap-align: start;
+  padding-bottom: 14px;
+}
+
+/* Festival marks: thin lines on the cell's bottom edge, one per festival. */
+.festival-marks {
+  position: absolute;
+  inset: auto 10px 5px;
+  display: flex;
+  gap: 2px;
+}
+
+.festival-mark {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--tone);
+}
+
+.calendar-strip-day.today .festival-mark,
+.month-day[aria-pressed='true'] .festival-mark {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.75);
+}
+
+.month-day {
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.month-day .festival-marks {
+  inset: auto 8px 3px;
+}
+
+/* Event card: the title row opens and closes the schedule. */
+.event-card-title {
+  margin: 0;
+  font-size: inherit;
+}
+
+.event-card-head {
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.event-card-head[aria-expanded='true'] {
+  border-bottom: 1px solid var(--border);
+}
+
+.event-card-head[aria-expanded='false'] {
+  border-bottom: none;
+  padding-bottom: 12px;
+}
+
+.event-card-head:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  border-radius: var(--radius);
+}
+
+.event-card-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.event-card-head .event-progress {
+  margin-left: 0;
+}
+
+.event-card-head .market-day-toggle {
+  margin-left: 2px;
+}
+
+.event-card-empty {
+  margin: 0;
+  padding: 12px 14px 14px;
+  color: var(--faint);
+  font-size: 13px;
 }
