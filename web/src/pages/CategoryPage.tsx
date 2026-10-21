@@ -4,6 +4,7 @@ import { PlusCircle, Search } from 'lucide-react';
 import { canSuggest } from '../services/suggestions';
 import CategoryListItem from '../components/CategoryListItem';
 import BackButton from '../components/BackButton';
+import LoadMore from '../components/LoadMore';
 import { ListSkeleton } from '../components/Skeleton';
 import { useDirectoryCategories, useDirectoryPlaces } from '../api/useDirectory';
 import { useTownships } from '../api/useSuggestions';
@@ -70,6 +71,7 @@ export default function CategoryPage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
   } = useDirectoryPlaces(entity, { search: urlSearch, typeCode: activeTypeId, townshipId, sort });
 
   const category = useMemo(() => categories?.find((item) => item.id === entity), [categories, entity]);
@@ -214,17 +216,8 @@ export default function CategoryPage() {
             )}
           </div>
         )}
-        {hasNextPage && (
-          <button
-            className="link-btn"
-            style={{ display: 'block', margin: '12px auto' }}
-            onClick={() => void fetchNextPage()}
-            disabled={isFetchingNextPage}
-            type="button"
-          >
-            {isFetchingNextPage ? 'Loading…' : 'Load more'}
-          </button>
-        )}
+        {/* Loads the next 100 as the end of the list scrolls near (TGI-61). */}
+        <LoadMore query={{ hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage }} />
         {canSuggest() && !isLoading && (
           <Link className="suggest-entry" to={`/category/${categoryId}/add`}>
             <PlusCircle size={18} />

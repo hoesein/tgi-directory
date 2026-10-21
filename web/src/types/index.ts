@@ -140,6 +140,13 @@ export interface ApiMyRatingItem {
   } | null;
 }
 
+/** Active places per township for one category (TGI-61); id null = no township. */
+export interface ApiTownshipCount {
+  id: string | null;
+  name: string | null;
+  count: number;
+}
+
 export interface ApiTownship {
   id: string;
   code: string;

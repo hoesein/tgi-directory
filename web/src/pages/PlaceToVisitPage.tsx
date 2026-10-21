@@ -1,12 +1,13 @@
-import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PlusCircle } from 'lucide-react';
-import PlaceImage from '../components/PlaceImage';
-import { PhotoGridSkeleton } from '../components/Skeleton';
-import { useDirectoryCategories, useDirectoryPlaces } from '../api/useDirectory';
+import { ChevronRight, PlusCircle } from 'lucide-react';
+import LoadMore from '../components/LoadMore';
+import PlaceCard from '../components/PlaceCard';
+import { CardRowSkeleton } from '../components/Skeleton';
+import { useDirectoryCategories, useDirectoryPlaces, useDirectoryTownships } from '../api/useDirectory';
 import { DATA_SOURCE } from '../services/directory';
 import { canSuggest } from '../services/suggestions';
-import { PLACES_TO_VISIT, placePath } from '../lib/routes';
+import { PLACES_TO_VISIT, townshipLabel, townshipPlacesPath } from '../lib/routes';
+import type { ApiTownshipCount } from '../types';
 
 /** Shown until the directory has its own Places to Visit records (and always in static mode). */
 const HIGHLIGHTS = [
@@ -36,21 +37,21 @@ const HIGHLIGHTS = [
   },
 ];
 
+/** Places per row request; the row loads the next batch as it nears its end. */
+const ROW_PAGE_SIZE = 10;
+
 /**
  * The Places tab, which is also the "Places to Visit" category (TGI-47).
- * API mode lists the directory's places_to_visit records with type chips.
+ * API mode shows one swipeable row per township (TGI-61); tapping the
+ * township name opens all of its places.
  */
 export default function PlaceToVisitPage() {
   const apiMode = DATA_SOURCE === 'api';
-  const [typeCode, setTypeCode] = useState<string | null>(null);
   const { data: categories } = useDirectoryCategories();
-  const { data, isLoading, isError, refetch } = useDirectoryPlaces(apiMode ? PLACES_TO_VISIT : undefined, {
-    typeCode,
-  });
-
+  const townships = useDirectoryTownships(apiMode ? PLACES_TO_VISIT : undefined);
   const category = categories?.find((item) => item.id === PLACES_TO_VISIT);
-  const places = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
-  const hasRecords = apiMode && (category?.count ?? places.length) > 0;
+  const rows = townships.data ?? [];
+  const loading = apiMode && townships.isLoading;
 
   return (
     <div>
@@ -59,74 +60,85 @@ export default function PlaceToVisitPage() {
         <span style={{ width: 24 }} />
       </div>
 
-      {hasRecords && (category?.types.length ?? 0) > 1 && (
-        <div className="chip-row">
-          <button
-            className={`chip${typeCode === null ? ' selected' : ''}`}
-            onClick={() => setTypeCode(null)}
-            type="button"
-          >
-            All
-          </button>
-          {category!.types.map((type) => (
-            <button
-              key={type.code}
-              className={`chip${typeCode === type.code ? ' selected' : ''}`}
-              onClick={() => setTypeCode(type.code)}
-              type="button"
-            >
-              {type.name}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {apiMode && isError && (
+      {apiMode && townships.isError && (
         <div className="data-error" role="alert">
           <span>Couldn’t load places.</span>
-          <button className="link-btn" onClick={() => void refetch()} type="button">
+          <button className="link-btn" onClick={() => void townships.refetch()} type="button">
             Retry
           </button>
         </div>
       )}
 
-      {apiMode && isLoading && <PhotoGridSkeleton />}
-
-      {hasRecords ? (
-        <div className="places-grid">
-          {places.map((place) => (
-            <Link key={place.id} className="place-card place-card-link" to={placePath(place)}>
-              <PlaceImage className="place-card-image" src={place.imageUrl} alt={place.name} entity={place.entity} />
-              <div className="place-info">
-                <div className="place-name">{place.name}</div>
-                <div className="place-location">{place.type.name || place.township?.name}</div>
-              </div>
-            </Link>
-          ))}
-          {!isLoading && places.length === 0 && <p className="empty places-grid-empty">No places of this type yet.</p>}
+      {loading && (
+        <div className="township-section">
+          <CardRowSkeleton />
         </div>
-      ) : (
-        !isLoading && (
-          <div className="places-grid">
-            {HIGHLIGHTS.map((place) => (
-              <div key={place.id} className="place-card">
-                <img src={place.image} alt={place.name} />
-                <div className="place-info">
-                  <div className="place-name">{place.name}</div>
-                  <div className="place-location">{place.location}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )
       )}
 
-      {apiMode && canSuggest() && !isLoading && (
+      {rows.length > 0
+        ? rows.map((township) => <TownshipRow key={township.id ?? 'none'} township={township} />)
+        : !loading &&
+          !townships.isError && (
+            <div className="places-grid">
+              {HIGHLIGHTS.map((place) => (
+                <div key={place.id} className="place-card">
+                  <img src={place.image} alt={place.name} />
+                  <div className="place-info">
+                    <div className="place-name">{place.name}</div>
+                    <div className="place-location">{place.location}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+      {apiMode && canSuggest() && !loading && (
         <Link className="suggest-entry" to={`/category/${PLACES_TO_VISIT}/add`}>
           <PlusCircle size={18} />
           <span>Know a place worth visiting? Add it</span>
         </Link>
       )}
     </div>
+  );
+}
+
+function TownshipRow({ township }: { township: ApiTownshipCount }) {
+  const query = useDirectoryPlaces(PLACES_TO_VISIT, {
+    townshipId: township.id ?? 'none',
+    pageSize: ROW_PAGE_SIZE,
+  });
+  const places = query.data?.pages.flatMap((page) => page.items) ?? [];
+  const label = townshipLabel(township.name);
+  const path = townshipPlacesPath(township.id);
+
+  return (
+    <section className="township-section" aria-label={label}>
+      <div className="section-head">
+        <Link className="township-title" to={path}>
+          <h2>{label}</h2>
+          <ChevronRight size={20} aria-hidden="true" />
+        </Link>
+        <Link className="link-btn" to={path} aria-label={`See all ${township.count} places in ${label}`}>
+          See all {township.count}
+        </Link>
+      </div>
+      {query.isLoading ? (
+        <CardRowSkeleton />
+      ) : query.isError ? (
+        <div className="data-error" role="alert">
+          <span>Couldn’t load {label}.</span>
+          <button className="link-btn" onClick={() => void query.refetch()} type="button">
+            Retry
+          </button>
+        </div>
+      ) : (
+        <div className="h-scroll township-row">
+          {places.map((place) => (
+            <PlaceCard key={place.id} place={place} />
+          ))}
+          <LoadMore query={query} axis="x" />
+        </div>
+      )}
+    </section>
   );
 }

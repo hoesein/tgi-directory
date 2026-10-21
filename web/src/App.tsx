@@ -17,6 +17,7 @@ import EventsPage from './pages/EventsPage';
 import TazaungdaingParticipantPage from './pages/TazaungdaingParticipantPage';
 import EventParticipantPage from './pages/EventParticipantPage';
 import PlaceToVisitPage from './pages/PlaceToVisitPage';
+import TownshipPlacesPage from './pages/TownshipPlacesPage';
 import SuggestEditPage from './pages/SuggestEditPage';
 import AddPlacePage from './pages/AddPlacePage';
 import MySuggestionsPage from './pages/MySuggestionsPage';
@@ -92,6 +93,7 @@ export default function App() {
             element={<TazaungdaingParticipantPage />}
           />
           <Route path="/place-to-visit" element={<PlaceToVisitPage />} />
+          <Route path="/place-to-visit/township/:townshipId" element={<TownshipPlacesPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         </div>

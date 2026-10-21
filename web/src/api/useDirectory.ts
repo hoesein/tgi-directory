@@ -4,6 +4,7 @@ import {
   fetchDirectoryCategories,
   fetchDirectoryPlace,
   fetchDirectoryPlaces,
+  fetchDirectoryTownships,
   fetchEventDays,
   fetchEventParticipant,
   fetchEventRanges,
@@ -25,7 +26,7 @@ export function useDirectoryCategories() {
   });
 }
 
-/** Places in one category, filtered; API mode pages 100 at a time. */
+/** Places in one category, filtered; API mode pages 100 at a time unless `pageSize` says otherwise. */
 export function useDirectoryPlaces(entity: string | undefined, filters: PlaceFilters = {}) {
   return useInfiniteQuery({
     queryKey: [
@@ -41,6 +42,16 @@ export function useDirectoryPlaces(entity: string | undefined, filters: PlaceFil
     queryFn: ({ pageParam }) => fetchDirectoryPlaces(entity as string, filters, pageParam),
     initialPageParam: 1,
     getNextPageParam: (last) => (last.hasMore ? last.page + 1 : undefined),
+    enabled: !!entity,
+    staleTime: STALE_TIME,
+  });
+}
+
+/** Townships with places in one category and their counts (TGI-61). */
+export function useDirectoryTownships(entity: string | undefined) {
+  return useQuery({
+    queryKey: ['directory-townships', DATA_SOURCE, entity],
+    queryFn: () => fetchDirectoryTownships(entity as string),
     enabled: !!entity,
     staleTime: STALE_TIME,
   });

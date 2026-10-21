@@ -8,6 +8,7 @@ import {
   type ApiEventParticipant,
   type ApiHomeSlide,
   type ApiResponse,
+  type ApiTownshipCount,
   type DirectoryCategoryMeta,
   type DirectoryCategoryView,
   type DirectoryItem,
@@ -242,7 +243,7 @@ export type PlaceSort = 'name' | 'newest';
 export interface PlaceFilters {
   search?: string;
   typeCode?: string | null;
-  /** API mode only: static data has no township ids. */
+  /** API mode only: static data has no township ids. `none` = places without a township. */
   townshipId?: string | null;
   /** API mode only; static data keeps file order. */
   sort?: PlaceSort;
@@ -253,6 +254,15 @@ const SORT_PARAMS: Record<PlaceSort, { sort: string; direction: string }> = {
   name: { sort: 'name', direction: 'asc' },
   newest: { sort: 'created_at', direction: 'desc' },
 };
+
+/** Townships with active places in one category, most places first (API mode; static has none). */
+export async function fetchDirectoryTownships(entity: string): Promise<ApiTownshipCount[]> {
+  if (DATA_SOURCE !== 'api') return [];
+  const response = await api.get<ApiResponse<ApiTownshipCount[]>>(
+    `/v1/directory/${encodeURIComponent(entity)}/townships`,
+  );
+  return response.data ?? [];
+}
 
 export interface PlacePage {
   items: DirectoryPlace[];
@@ -398,7 +408,6 @@ function staticEventRanges(events: TazaungdaingEvent[]): EventRangeView[] {
   return ranges;
 }
 
-/** Every active event with its date range, sorted by start date. */
 /** Admin-picked Home slider photos; static mode has none, so the slider uses its defaults. */
 export async function fetchHomeSlides(): Promise<ApiHomeSlide[]> {
   if (DATA_SOURCE !== 'api') return [];
@@ -406,6 +415,7 @@ export async function fetchHomeSlides(): Promise<ApiHomeSlide[]> {
   return response.data ?? [];
 }
 
+/** Every active event with its date range, sorted by start date. */
 export async function fetchEventRanges(): Promise<EventRangeView[]> {
   if (DATA_SOURCE === 'api') {
     const response = await api.get<ApiResponse<ApiEvent[]>>('/v1/events', { page_size: '100' });
