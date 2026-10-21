@@ -1538,7 +1538,7 @@ a.profile-user-card {
   margin: 16px;
   padding: 18px;
   border-radius: var(--radius);
-  background: var(--card);
+  background: var(--primary-light);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -1759,12 +1759,6 @@ a.profile-user-card {
   font-size: 15px;
 }
 
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-
 .calendar-day-strip {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1818,95 +1812,8 @@ a.profile-user-card {
   color: inherit;
 }
 
-.calendar-strip-day strong.full-moon,
-.calendar-strip-day strong.new-moon,
-.calendar-day-number.full-moon,
-.calendar-day-number.new-moon {
-  border: 1px solid currentColor;
-  border-radius: 50%;
-}
-
-.calendar-strip-day strong.full-moon,
-.calendar-day-number.full-moon {
-  border-color: var(--sand);
-  background: var(--butter);
-  color: #544316;
-}
-
-.calendar-strip-day strong.new-moon,
-.calendar-day-number.new-moon {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-}
-
-.calendar-day.selected .calendar-day-number.full-moon {
-  border-color: var(--butter);
-  background: var(--butter);
-  color: #544316;
-}
-
-.calendar-day.selected .calendar-day-number.new-moon {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-}
-
-.calendar-strip-market {
-  overflow: hidden;
-  max-width: 100%;
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .calendar-strip-myanmar {
   text-align: center;
-}
-
-.calendar-dow {
-  margin-bottom: 2px;
-}
-
-.calendar-dow-label {
-  text-align: center;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--faint);
-  padding: 4px 0;
-}
-
-.calendar-day {
-  position: relative;
-  border: none;
-  border-radius: 50%;
-  width: 100%;
-  aspect-ratio: 1;
-  cursor: pointer;
-  font-size: 13px;
-  background: transparent;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 0;
-}
-
-.calendar-day.today {
-  outline: 2px solid var(--primary);
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.calendar-day.selected {
-  background: var(--primary);
-  color: #fff;
-  font-weight: 600;
-}
-
-.calendar-day.selected.today {
-  outline-color: var(--primary);
 }
 
 /* ─── Places to Visit ─── */
@@ -3135,40 +3042,8 @@ textarea {
   box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--primary);
 }
 
-.calendar-strip-day.today strong.new-moon {
-  border-color: #fff;
-}
-
-/* Event dot along the bottom edge of a day. */
-.calendar-strip-dot {
-  position: absolute;
-  bottom: 6px;
-  left: 50%;
-  width: 6px;
-  height: 6px;
-  margin-left: -3px;
-  border-radius: 50%;
-  background: var(--primary);
-}
-
-.calendar-strip-dot.pagoda {
-  background: var(--sand);
-}
-
-.calendar-strip-day.today .calendar-strip-dot {
-  background: #fff;
-}
-
 .calendar-day-strip {
   touch-action: pan-y;
-}
-
-.calendar-day-strip.slide-next {
-  animation: strip-slide-next 0.22s ease-out;
-}
-
-.calendar-day-strip.slide-prev {
-  animation: strip-slide-prev 0.22s ease-out;
 }
 
 @keyframes strip-slide-next {
@@ -3186,56 +3061,10 @@ textarea {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .calendar-day-strip.slide-next,
-  .calendar-day-strip.slide-prev {
+  .calendar-strip.slide-next,
+  .calendar-strip.slide-prev {
     animation: none;
   }
-}
-
-/* Previous | current | upcoming event chips: text only, colour shows the state. */
-.event-status-chips {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  margin: 4px 0 12px;
-  padding: 0;
-  list-style: none;
-}
-
-.event-status-chip {
-  padding: 4px 8px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 1.5;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.event-status-chip.previous {
-  border-color: var(--border);
-  background: transparent;
-  color: var(--muted);
-}
-
-.event-status-chip.current {
-  background: var(--primary);
-  color: #fff;
-}
-
-.event-status-chip.upcoming {
-  border-color: #efdca6;
-  background: #fdf7e6;
-  color: #7a5a12;
-}
-
-/* No event in this slot: same place, faded and dashed. */
-.event-status-chip.no-event {
-  border: 1px dashed var(--border);
-  background: transparent;
-  color: var(--faint);
 }
 
 /* Market day: one slim row (TGI-56) */
@@ -3321,10 +3150,6 @@ textarea {
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--primary);
-}
-
-.event-card.pagoda .event-card-dot {
-  background: var(--sand);
 }
 
 .event-card-head h3 {
@@ -4172,6 +3997,502 @@ html {
 
 @media (prefers-reduced-motion: reduce) {
   .photo-viewer {
+    animation: none;
+  }
+}
+
+/* ─── Events calendar: moons, festival bands, chips (TGI-63, TGI-64) ─── */
+:root {
+  /* One colour per festival: pagoda festival gold, Tazaungdaing (fire balloons) ember, others forest. */
+  --tone-pagoda: #a87a14;
+  --tone-pagoda-soft: #f6ebc9;
+  --tone-lights: #a6402a;
+  --tone-lights-soft: #f7e5d3;
+  --tone-other: #2f6b45;
+  --tone-other-soft: #dcebdf;
+  --moon-lit: #e9c75a;
+  --moon-dark: #dfe5df;
+}
+
+.tone-pagoda {
+  --tone: var(--tone-pagoda);
+  --tone-soft: var(--tone-pagoda-soft);
+}
+
+.tone-lights {
+  --tone: var(--tone-lights);
+  --tone-soft: var(--tone-lights-soft);
+}
+
+.tone-other {
+  --tone: var(--tone-other);
+  --tone-soft: var(--tone-other-soft);
+}
+
+/* Header: Myanmar month over the Gregorian one; tap for the month sheet. */
+.calendar-nav button {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+}
+
+.calendar-nav .calendar-month-button {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  column-gap: 4px;
+  min-height: 44px;
+  padding: 2px 12px;
+  border-radius: 12px;
+}
+
+.calendar-month-button .calendar-month-myanmar {
+  grid-column: 1 / -1;
+  color: var(--tone-pagoda);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.calendar-month-button svg {
+  color: var(--faint);
+}
+
+.calendar-nav button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.calendar-strip.slide-next {
+  animation: strip-slide-next 0.22s ease-out;
+}
+
+.calendar-strip.slide-prev {
+  animation: strip-slide-prev 0.22s ease-out;
+}
+
+.calendar-strip {
+  touch-action: pan-y;
+}
+
+.calendar-strip-day {
+  min-height: 0;
+  gap: 4px;
+  padding: 8px 2px 10px;
+}
+
+.calendar-strip-myanmar {
+  line-height: 1.5;
+}
+
+/* Moon drawing. */
+.moon-phase {
+  display: block;
+  flex: none;
+}
+
+.moon-dark {
+  fill: var(--moon-dark);
+}
+
+.moon-lit {
+  fill: var(--moon-lit);
+}
+
+.moon-phase.full .moon-lit {
+  stroke: var(--tone-pagoda);
+  stroke-width: 1.5;
+}
+
+/* Full moon days carry the festivals: ringed in gold. */
+.calendar-strip-day.full-moon:not(.today):not(.focused) {
+  border-color: var(--sand);
+  box-shadow: inset 0 0 0 1px var(--sand);
+}
+
+.calendar-strip-day.full-moon .calendar-strip-myanmar {
+  color: var(--tone-pagoda);
+  font-weight: 600;
+}
+
+.calendar-strip-day.today {
+  --moon-dark: rgba(255, 255, 255, 0.2);
+  --moon-lit: #f6dd8c;
+}
+
+.calendar-strip-day.today.full-moon .calendar-strip-myanmar {
+  color: #f6dd8c;
+}
+
+/* Festival bands: one line per festival under a row of days. */
+.festival-bands {
+  display: grid;
+  gap: 4px 6px;
+  margin-top: 6px;
+}
+
+.festival-band {
+  min-width: 0;
+  height: 26px;
+  padding: 0 8px;
+  overflow: hidden;
+  background: var(--tone-soft);
+  color: var(--tone);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 26px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.festival-band.starts {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+  box-shadow: inset 3px 0 0 var(--tone);
+}
+
+.festival-band.ends {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
+/* Event chips: tap to jump to the festival. */
+.event-status-chips {
+  display: flex;
+  gap: 8px;
+  margin: 2px -16px 12px;
+  padding: 2px 16px;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.event-status-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.event-status-chips li {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 72%;
+}
+
+.event-status-chip {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 6px 12px 7px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--tone);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.event-status-chip.current {
+  border-color: var(--tone);
+  background: var(--tone-soft);
+}
+
+.event-status-chip.previous {
+  opacity: 0.75;
+}
+
+.event-status-name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-status-when {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.event-status-chip.current .event-status-when {
+  color: var(--tone);
+}
+
+.event-status-chip:focus-visible,
+.event-next:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Event cards use the festival colour. */
+.event-card-dot {
+  background: var(--tone, var(--primary));
+}
+
+/* Festival day progress: a thin bar and "N / M". */
+.event-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.event-progress-track {
+  position: relative;
+  width: 56px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--tone-soft, var(--border));
+}
+
+.event-progress-track > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 2px;
+  background: var(--tone, var(--primary));
+}
+
+.event-progress-count {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Empty day: say so and point to the next festival. */
+.event-empty-day {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.event-empty-day h3 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.event-empty-day p {
+  margin: 4px 0 0;
+  color: var(--faint);
+  font-size: 13px;
+}
+
+.event-next {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: none;
+  border-left: 4px solid var(--tone);
+  border-radius: 10px;
+  background: var(--tone-soft);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.event-next-text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.event-next-label {
+  color: var(--tone);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.event-next strong {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.event-next-text > span:last-child {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.event-next svg {
+  flex: none;
+  color: var(--tone);
+}
+
+/* Month sheet (TGI-64). */
+.month-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(16, 32, 22, 0.42);
+  animation: month-sheet-fade 0.18s ease-out;
+}
+
+.month-sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 92dvh;
+  overflow-y: auto;
+  padding: 10px 14px calc(env(safe-area-inset-bottom) + 18px);
+  border-radius: 20px 20px 0 0;
+  background: var(--card);
+  box-shadow: 0 -12px 32px -16px rgba(16, 32, 22, 0.4);
+  animation: month-sheet-up 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes month-sheet-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes month-sheet-up {
+  from {
+    transform: translateY(40px);
+    opacity: 0.6;
+  }
+}
+
+.month-sheet-head {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px 40px;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.month-sheet-title {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+}
+
+.month-sheet-title strong {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.month-sheet-title span {
+  color: var(--tone-pagoda);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.month-sheet-step,
+.month-sheet-close {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.month-sheet-close {
+  background: var(--primary-light);
+}
+
+.month-sheet-dow,
+.month-week-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0 6px;
+}
+
+.month-sheet-dow span {
+  padding: 4px 0;
+  color: var(--faint);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.month-week {
+  padding: 4px 0 6px;
+  border-top: 1px solid var(--border);
+}
+
+.month-week .festival-bands {
+  gap: 3px 6px;
+  margin-top: 4px;
+}
+
+.month-week .festival-band {
+  height: 20px;
+  padding: 0 6px;
+  font-size: 10px;
+  line-height: 20px;
+}
+
+.month-day {
+  display: flex;
+  min-height: 46px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 0;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.month-day-number {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.month-day.today {
+  box-shadow: inset 0 0 0 1.5px var(--primary);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.month-day[aria-pressed='true'] {
+  background: var(--primary);
+  color: #fff;
+  --moon-dark: rgba(255, 255, 255, 0.2);
+  --moon-lit: #f6dd8c;
+}
+
+.month-day:focus-visible,
+.month-sheet-step:focus-visible,
+.month-sheet-close:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .month-sheet,
+  .month-sheet-backdrop {
     animation: none;
   }
 }

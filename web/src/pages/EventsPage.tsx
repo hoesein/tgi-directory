@@ -1,12 +1,16 @@
-import { useRef, useState, type TouchEvent } from 'react';
+import { useCallback, useRef, useState, type TouchEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ChevronDown, ChevronRight, Share2 } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 import { shareLink } from '../lib/share';
 import { useEventDays, useEventRanges } from '../api/useDirectory';
 import { getEventsCalendarDay, getLocalDateString } from '../lib/eventsCalendar';
 import { useDebouncedValue } from '../lib/useDebouncedValue';
 import { EventCardSkeleton } from '../components/Skeleton';
-import { eventDayLabel, formatMyanmarDate } from '../lib/myanmar';
+import FestivalBands from '../components/FestivalBands';
+import MonthSheet from '../components/MonthSheet';
+import MoonPhase from '../components/MoonPhase';
+import { eventDayLabel, formatMyanmarDate, toMyanmarDigits } from '../lib/myanmar';
+import { DAY_LABELS, MONTH_NAMES, daysFrom, eventsOn, festivalTone, shiftDate } from '../lib/festivals';
 import { isPagodaFestival } from '../services/directory';
 import type { EventRangeView } from '../types';
 
@@ -15,13 +19,9 @@ const SWIPE_DISTANCE = 40;
 /** Wait this long after the last day change before loading that day's schedule. */
 const SCHEDULE_DEBOUNCE_MS = 250;
 
-function daysFrom(from: string, to: string): number {
-  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
-}
-
 type EventStatus = 'previous' | 'current' | 'upcoming';
 
-/** Spoken by screen readers; sighted users read the state from the chip colour. */
+/** Spoken by screen readers; sighted users read the state from the chip's date line. */
 const STATUS_LABELS: Record<EventStatus, string> = {
   previous: 'ပြီးခဲ့သောပွဲ',
   current: 'ယခုကျင်းပဆဲပွဲ',
@@ -30,13 +30,12 @@ const STATUS_LABELS: Record<EventStatus, string> = {
 
 /** Previous and upcoming chips only count events within this many days of today. */
 const CHIP_WINDOW_DAYS = 30;
-const NO_EVENT = 'ပွဲမရှိ';
 
 /**
- * Always three slots, left to right: the last event that ended, the one
- * running today, and the next one to start. A slot is null when there is none.
+ * Up to three chips, left to right: the last event that ended, the one running
+ * today, and the next one to start. Slots without an event are left out.
  */
-function eventStatusChips(events: EventRangeView[], today: string): [EventStatus, EventRangeView | null][] {
+function eventStatusChips(events: EventRangeView[], today: string): [EventStatus, EventRangeView][] {
   const previous = events
     .filter((event) => event.endDate < today && daysFrom(event.endDate, today) <= CHIP_WINDOW_DAYS)
     .sort((a, b) => b.endDate.localeCompare(a.endDate))[0];
@@ -44,11 +43,12 @@ function eventStatusChips(events: EventRangeView[], today: string): [EventStatus
   const upcoming = events
     .filter((event) => event.startDate > today && daysFrom(today, event.startDate) <= CHIP_WINDOW_DAYS)
     .sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
-  return [
-    ['previous', previous ?? null],
-    ['current', current ?? null],
-    ['upcoming', upcoming ?? null],
+  const chips: [EventStatus, EventRangeView | undefined][] = [
+    ['previous', previous],
+    ['current', current],
+    ['upcoming', upcoming],
   ];
+  return chips.filter((chip): chip is [EventStatus, EventRangeView] => !!chip[1]);
 }
 
 function dateRangeLabel(event: EventRangeView): string {
@@ -56,53 +56,42 @@ function dateRangeLabel(event: EventRangeView): string {
   return `${formatMyanmarDate(event.startDate)} – ${formatMyanmarDate(event.endDate)}`;
 }
 
-const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-function toDateStr(year: number, month: number, day: number): string {
-  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+/** "in N days" in Myanmar. */
+function inDaysLabel(days: number): string {
+  return days === 1 ? 'မနက်ဖြန်' : `${toMyanmarDigits(days)} ရက်အကြာ`;
 }
 
-function buildCalendarDays(year: number, month: number): (number | null)[] {
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells: (number | null)[] = [];
-  for (let i = 0; i < firstDay; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-  while (cells.length % 7 !== 0) cells.push(null);
-  return cells;
+/** Second line of a chip: today, how soon, or when it ran. */
+function chipDateLine(status: EventStatus, event: EventRangeView, today: string): string {
+  if (status === 'current') {
+    const total = daysFrom(event.startDate, event.endDate) + 1;
+    if (total === 1) return 'ယနေ့';
+    return `ယနေ့ · ${toMyanmarDigits(daysFrom(event.startDate, today) + 1)} / ${toMyanmarDigits(total)}`;
+  }
+  if (status === 'upcoming') return inDaysLabel(daysFrom(today, event.startDate));
+  return dateRangeLabel(event);
 }
 
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
-function getMoonMarker(phase: string): string {
-  if (phase === 'Full Moon') return 'full-moon';
-  if (phase === 'New Moon') return 'new-moon';
-  return '';
-}
-
-function shiftDate(dateStr: string, offset: number): string {
-  const date = new Date(`${dateStr}T12:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + offset);
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+/** Waxing/waning day in Myanmar digits; full and new moon by name. */
+function moonLabel(phase: string, dayMy: string): string {
+  if (phase === 'Full Moon') return 'လပြည့်';
+  if (phase === 'New Moon') return 'လကွယ်';
+  return dayMy;
 }
 
 export default function EventsPage() {
   const today = new Date();
+  const todayStr = getLocalDateString(today);
   // ?date=YYYY-MM-DD opens a given day (shareable links, ticker taps).
   const [searchParams] = useSearchParams();
   const linkedDate = searchParams.get('date');
   const initialDate =
     linkedDate && /^\d{4}-\d{2}-\d{2}$/.test(linkedDate) && !Number.isNaN(Date.parse(linkedDate))
       ? linkedDate
-      : toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
-  const [viewYear, setViewYear] = useState(Number(initialDate.slice(0, 4)));
-  const [viewMonth, setViewMonth] = useState(Number(initialDate.slice(5, 7)) - 1);
-  const [viewMode] = useState<'month' | 'day'>('day');
+      : todayStr;
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [showMarketDayChips, setShowMarketDayChips] = useState(false);
+  const [monthOpen, setMonthOpen] = useState(false);
   // Rapid taps on the strip only load the day the user stops on.
   const scheduleDate = useDebouncedValue(selectedDate, SCHEDULE_DEBOUNCE_MS);
   const {
@@ -114,41 +103,42 @@ export default function EventsPage() {
   } = useEventDays(scheduleDate);
   // The cards still show an earlier day until the chosen day's schedule arrives.
   const scheduleIsStale = isPlaceholderData || scheduleDate !== selectedDate;
-  const selectedPagodaFestivalEvents = selectedEventDays.filter((day) =>
-    isPagodaFestival(day.eventName),
-  );
-  const selectedBalloonFestivalEvents = selectedEventDays.filter(
-    (day) => !isPagodaFestival(day.eventName),
-  );
+  const sortedEventDays = [
+    ...selectedEventDays.filter((day) => isPagodaFestival(day.eventName)),
+    ...selectedEventDays.filter((day) => !isPagodaFestival(day.eventName)),
+  ];
 
   const { data: eventRanges = [] } = useEventRanges();
   const [slide, setSlide] = useState<'next' | 'prev' | null>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
-  const cells = buildCalendarDays(viewYear, viewMonth);
-  const todayStr = getLocalDateString(today);
-  const eventsOn = (dateStr: string) =>
-    eventRanges.filter((event) => event.startDate <= dateStr && dateStr <= event.endDate);
   const statusChips = eventStatusChips(eventRanges, todayStr);
-
+  const stripDates = [-2, -1, 0, 1, 2].map((offset) => shiftDate(selectedDate, offset));
   const [selectedYear, selectedMonth] = selectedDate.split('-').map(Number);
   const selectedCalendarDay = getEventsCalendarDay(selectedDate);
-  const { marketDay: selectedMarketDay } = selectedCalendarDay;
+  const { marketDay: selectedMarketDay, myanmarDate: selectedMyanmarDate } = selectedCalendarDay;
   const selectedMarketTown = selectedMarketDay.markets[0]?.name.my;
 
-  function selectDate(dateStr: string) {
-    setSelectedDate(dateStr);
-    const date = new Date(`${dateStr}T12:00:00Z`);
-    setViewYear(date.getUTCFullYear());
-    setViewMonth(date.getUTCMonth());
-  }
+  // Empty day: what runs today without a schedule, and the next festival after it.
+  const runningWithoutSchedule = eventsOn(eventRanges, selectedDate);
+  const nextFestival = eventRanges
+    .filter((event) => event.startDate > selectedDate)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
+  const showEmptyDay =
+    !isLoadingEventDays && !isEventDaysError && !scheduleIsStale && selectedEventDays.length === 0;
 
-  /** Move the strip by whole days; the slide direction drives a short animation. */
-  function moveDays(offset: number) {
-    if (offset === 0) return;
-    setSlide(offset > 0 ? 'next' : 'prev');
-    selectDate(shiftDate(selectedDate, offset));
-  }
+  /** Move the strip to a date; the slide direction drives a short animation. */
+  const goToDate = useCallback(
+    (dateStr: string) => {
+      const offset = daysFrom(selectedDate, dateStr);
+      if (offset === 0) return;
+      setSlide(offset > 0 ? 'next' : 'prev');
+      setSelectedDate(dateStr);
+    },
+    [selectedDate],
+  );
+
+  const closeMonth = useCallback(() => setMonthOpen(false), []);
 
   function onStripTouchStart(event: TouchEvent) {
     const touch = event.touches[0];
@@ -164,17 +154,7 @@ export default function EventsPage() {
     const dy = touch.clientY - start.y;
     // Mostly-vertical moves are page scrolls, not swipes.
     if (Math.abs(dx) < SWIPE_DISTANCE || Math.abs(dx) < Math.abs(dy)) return;
-    moveDays(dx < 0 ? 1 : -1);
-  }
-
-  function prevMonth() {
-    if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
-    else setViewMonth(m => m - 1);
-  }
-
-  function nextMonth() {
-    if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
-    else setViewMonth(m => m + 1);
+    goToDate(shiftDate(selectedDate, dx < 0 ? 1 : -1));
   }
 
   return (
@@ -189,7 +169,7 @@ export default function EventsPage() {
           onClick={() =>
             void shareLink({
               title: `Events · ${formatMyanmarDate(selectedDate)}`,
-              text: [formatMyanmarDate(selectedDate), ...eventsOn(selectedDate).map((event) => event.name)].join(' · '),
+              text: [formatMyanmarDate(selectedDate), ...eventsOn(eventRanges, selectedDate).map((event) => event.name)].join(' · '),
               path: `/events?date=${selectedDate}`,
             })
           }
@@ -199,7 +179,7 @@ export default function EventsPage() {
         <h1>Events</h1>
         <button
           className="calendar-today-button"
-          onClick={() => moveDays(daysFrom(selectedDate, todayStr))}
+          onClick={() => goToDate(todayStr)}
           aria-current={selectedDate === todayStr ? 'date' : undefined}
           type="button"
         >
@@ -208,212 +188,109 @@ export default function EventsPage() {
       </div>
 
       <div style={{ padding: '12px 16px 0' }}>
-        {/* Day or Month Toggle */}
-        {/* <div className="calendar-view-switch" role="group" aria-label="Calendar view">
-          <button
-            type="button"
-            aria-pressed={viewMode === 'month'}
-            className={viewMode === 'month' ? 'active' : ''}
-            onClick={() => setViewMode('month')}
-          >
-            Month
-          </button>
-          <button
-            type="button"
-            aria-pressed={viewMode === 'day'}
-            className={viewMode === 'day' ? 'active' : ''}
-            onClick={() => setViewMode('day')}
-          >
-            Day
-          </button>
-        </div> */}
-
-        {/* Calendar Card */}
         <div className="calendar-card">
-          {viewMode === 'month' ? (
-            <>
-              <div className="calendar-nav">
-                <button onClick={prevMonth} aria-label="Previous month" type="button">‹</button>
-                <span className="calendar-month">{MONTH_NAMES[viewMonth]} {viewYear}</span>
-                <button onClick={nextMonth} aria-label="Next month" type="button">›</button>
-              </div>
+          <div className="calendar-nav">
+            <button onClick={() => goToDate(shiftDate(selectedDate, -1))} aria-label="Previous day" type="button">
+              <ChevronLeft size={20} />
+            </button>
+            {/* Opens the month calendar (TGI-64). */}
+            <button
+              className="calendar-month-button"
+              onClick={() => setMonthOpen(true)}
+              aria-haspopup="dialog"
+              aria-label={`${MONTH_NAMES[selectedMonth - 1]} ${selectedYear}, open month calendar`}
+              type="button"
+            >
+              <span className="calendar-month-myanmar">{selectedMyanmarDate.month.my}</span>
+              <span className="calendar-month">
+                {MONTH_NAMES[selectedMonth - 1]} {selectedYear}
+              </span>
+              <ChevronDown size={14} aria-hidden="true" />
+            </button>
+            <button onClick={() => goToDate(shiftDate(selectedDate, 1))} aria-label="Next day" type="button">
+              <ChevronRight size={20} />
+            </button>
+          </div>
 
-              <div className="calendar-grid calendar-dow">
-                {DAY_LABELS.map((label) => (
-                  <div key={label} className="calendar-dow-label">{label}</div>
-                ))}
-              </div>
-
-              <div className="calendar-grid">
-                {cells.map((day, idx) => {
-                  if (day === null) return <div key={`empty-${idx}`} />;
-                  const dateStr = toDateStr(viewYear, viewMonth, day);
-                  const isSelected = dateStr === selectedDate;
-                  const isToday = dateStr === todayStr;
-                  const { myanmarDate, marketDay } = getEventsCalendarDay(dateStr);
-                  const moonMarker = getMoonMarker(myanmarDate.day.mp.en);
-
-                  return (
-                    <button
-                      key={dateStr}
-                      onClick={() => selectDate(dateStr)}
-                      className={`calendar-day${isSelected ? ' selected' : ''}${isToday ? ' today' : ''}`}
-                      aria-label={`${dateStr}: ${marketDay.markets[0]?.town.my} ဈေးနေ့၊ ${myanmarDate.month.my} ${myanmarDate.day.mp.my} ${myanmarDate.day.fd.my} ရက်${moonMarker ? `၊ ${moonMarker === 'full-moon' ? 'လပြည့်နေ့' : 'လကွယ်နေ့'}` : ''}`}
-                      type="button"
-                    >
-                      <span className={`calendar-day-number ${moonMarker}`}>{day}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="calendar-nav">
-                <button
-                  onClick={() => moveDays(-1)}
-                  aria-label="Previous day"
-                  disabled={selectedDate === '0001-01-01'}
-                  type="button"
-                >
-                  ‹
-                </button>
-                <div className="calendar-nav-center">
-                  <span className="calendar-month">
-                    {MONTH_NAMES[selectedMonth - 1]} {selectedYear}
-                  </span>
-                  {/* <button
-                    className="calendar-today-button"
-                    onClick={() => selectDate(todayStr)}
-                    aria-current={selectedDate === todayStr ? 'date' : undefined}
+          <div
+            key={selectedDate}
+            className={`calendar-strip${slide ? ` slide-${slide}` : ''}`}
+            onTouchStart={onStripTouchStart}
+            onTouchEnd={onStripTouchEnd}
+          >
+            <div className="calendar-day-strip">
+              {stripDates.map((dateStr, index) => {
+                const date = new Date(`${dateStr}T12:00:00Z`);
+                const { myanmarDate, marketDay } = getEventsCalendarDay(dateStr);
+                const isToday = dateStr === todayStr;
+                const phase = myanmarDate.day.mp.en;
+                const dayEvents = eventsOn(eventRanges, dateStr);
+                return (
+                  <button
+                    key={dateStr}
                     type="button"
+                    aria-pressed={index === 2}
+                    aria-label={`${isToday ? 'Today, ' : ''}${dateStr}: ${marketDay.markets[0]?.town.my} ဈေးနေ့၊ ${myanmarDate.month.my} ${myanmarDate.day.mp.my} ${myanmarDate.day.fd.my} ရက်${dayEvents.length ? `၊ ${dayEvents.map((event) => event.name).join('၊ ')}` : ''}`}
+                    className={`calendar-strip-day${index === 2 ? ' focused' : ''}${isToday ? ' today' : ''}${phase === 'Full Moon' ? ' full-moon' : ''}`}
+                    onClick={() => goToDate(dateStr)}
                   >
-                    Today
-                  </button> */}
-                </div>
-                <button
-                  onClick={() => moveDays(1)}
-                  aria-label="Next day"
-                  disabled={selectedDate === '9999-12-31'}
-                  type="button"
-                >
-                  ›
-                </button>
-              </div>
-              <div
-                key={selectedDate}
-                className={`calendar-day-strip${slide ? ` slide-${slide}` : ''}`}
-                onTouchStart={onStripTouchStart}
-                onTouchEnd={onStripTouchEnd}
-              >
-                {[-2, -1, 0, 1, 2].map((offset) => {
-                  const dateStr = shiftDate(selectedDate, offset);
-                  const date = new Date(`${dateStr}T12:00:00Z`);
-                  const { myanmarDate, marketDay } = getEventsCalendarDay(dateStr);
-                  const isToday = dateStr === todayStr;
-                  const moonMarker = getMoonMarker(myanmarDate.day.mp.en);
-                  const dayEvents = eventsOn(dateStr);
-                  const hasPagodaFestival = dayEvents.some((event) => isPagodaFestival(event.name));
-
-                  return (
-                    <button
-                      key={dateStr}
-                      type="button"
-                      aria-pressed={offset === 0}
-                      aria-label={`${isToday ? 'Today, ' : ''}${dateStr}: ${marketDay.markets[0]?.town.my} ဈေးနေ့၊ ${myanmarDate.month.my} ${myanmarDate.day.mp.my} ${myanmarDate.day.fd.my} ရက်${moonMarker ? `၊ ${moonMarker === 'full-moon' ? 'လပြည့်နေ့' : 'လကွယ်နေ့'}` : ''}${dayEvents.length ? `၊ ${dayEvents.map((event) => event.name).join('၊ ')}` : ''}`}
-                      className={`calendar-strip-day${offset === 0 ? ' focused' : ''}${isToday ? ' today' : ''}`}
-                      onClick={() => moveDays(offset)}
-                    >
-                      {dayEvents.length > 0 && (
-                        <span
-                          className={`calendar-strip-dot${hasPagodaFestival ? ' pagoda' : ''}`}
-                          aria-hidden="true"
-                        />
-                      )}
-                      <span className="calendar-strip-weekday">
-                        {DAY_LABELS[date.getUTCDay()]}
-                      </span>
-                      <strong className={`calendar-strip-date ${moonMarker}`}>
-                        {date.getUTCDate()}
-                      </strong>
-                      {/* <span className="calendar-strip-market">{marketDay.markets[0]?.town.my}</span> */}
-                      <span className="calendar-strip-myanmar">{myanmarDate.day.mp.my} <b>{myanmarDate.day.fd.my}</b></span>
-                      <span className="calendar-strip-myanmar">{myanmarDate.month.my}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
+                    <span className="calendar-strip-weekday">{DAY_LABELS[date.getUTCDay()]}</span>
+                    <strong className="calendar-strip-date">{date.getUTCDate()}</strong>
+                    <MoonPhase phase={phase} day={Number(myanmarDate.day.fd.en)} size={18} />
+                    <span className="calendar-strip-myanmar">{moonLabel(phase, myanmarDate.day.fd.my)}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <FestivalBands dates={stripDates} events={eventRanges} />
+          </div>
         </div>
 
-        {/* Previous | current | upcoming event: names only, colour shows which is which. */}
-        <ul className="event-status-chips" aria-label="ပွဲများ">
-          {statusChips.map(([status, event]) => (
-            <li
-              key={status}
-              className={`event-status-chip ${status}${event ? '' : ' no-event'}`}
-              title={event ? `${STATUS_LABELS[status]} · ${dateRangeLabel(event)}` : STATUS_LABELS[status]}
-            >
-              <span className="visually-hidden">{STATUS_LABELS[status]}: </span>
-              {event?.name ?? NO_EVENT}
-            </li>
-          ))}
-        </ul>
+        {/* Previous | current | upcoming event: tap to jump the strip there. */}
+        {statusChips.length > 0 && (
+          <ul className="event-status-chips" aria-label="ပွဲများ">
+            {statusChips.map(([status, event]) => (
+              <li key={status}>
+                <button
+                  className={`event-status-chip ${status} tone-${festivalTone(event.name)}`}
+                  onClick={() => goToDate(status === 'current' ? todayStr : event.startDate)}
+                  type="button"
+                >
+                  <span className="visually-hidden">{STATUS_LABELS[status]}: </span>
+                  <span className="event-status-name">{event.name}</span>
+                  <span className="event-status-when">{chipDateLine(status, event, todayStr)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
         {/* Market Day Info Card */}
         <section className="market-day" aria-live="polite">
-          {/* <div>
-            <div className="calendar-info-label">မြန်မာပြက္ခဒိန်</div>
-            <strong>
-              {selectedMyanmarDate.month.my} {selectedMyanmarDate.day.mp.my}{' '}
-              {selectedMyanmarDate.day.fd.my} ရက်
-            </strong>
-          </div> */}
-          <div>
-            {/* One slim row: label, today's market, and a chevron for the full list. */}
-            <button
-              className="market-day-row"
-              type="button"
-              aria-expanded={showMarketDayChips}
-              onClick={() => setShowMarketDayChips((isVisible) => !isVisible)}
-            >
-              <span className="market-day-label">ဈေးနေ့</span>
-              <strong>{selectedMarketTown}</strong>
-              <ChevronDown
-                size={16}
-                className={`market-day-toggle${showMarketDayChips ? ' open' : ''}`}
-                aria-hidden="true"
-              />
-            </button>
-            {showMarketDayChips && (
-              <div className="market-day-chips" aria-label="ဈေးနေ့များ">
-                {selectedMarketDay.markets.map((market) => (
-                  <span className="market-day-chip" key={market.id}>
-                    {market.name.my}
-                  </span>
-                ))}
-              </div>
-            )}
-            {/* <div className="calendar-holidays">
-              <div className="calendar-info-label">အစိုးရရုံးပိတ်ရက်</div>
-              {selectedHolidays.length > 0 ? (
-                <ul>
-                  {selectedHolidays.map((holiday) => (
-                    <li key={holiday.id}>
-                      <a href={holiday.source.url} target="_blank" rel="noreferrer">
-                        {holiday.name.my}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <span className="calendar-holiday-empty">
-                  ဤရက်အတွက် မှတ်တမ်းတင်ထားသော ရုံးပိတ်ရက် မရှိပါ။
+          {/* One slim row: label, today's market, and a chevron for the full list. */}
+          <button
+            className="market-day-row"
+            type="button"
+            aria-expanded={showMarketDayChips}
+            onClick={() => setShowMarketDayChips((isVisible) => !isVisible)}
+          >
+            <span className="market-day-label">ဈေးနေ့</span>
+            <strong>{selectedMarketTown}</strong>
+            <ChevronDown
+              size={16}
+              className={`market-day-toggle${showMarketDayChips ? ' open' : ''}`}
+              aria-hidden="true"
+            />
+          </button>
+          {showMarketDayChips && (
+            <div className="market-day-chips" aria-label="ဈေးနေ့များ">
+              {selectedMarketDay.markets.map((market) => (
+                <span className="market-day-chip" key={market.id}>
+                  {market.name.my}
                 </span>
-              )}
-            </div> */}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Festival days on the selected date */}
@@ -427,22 +304,25 @@ export default function EventsPage() {
             {isEventDaysError && (
               <div className="data-error" role="alert">
                 <span>အချက်အလက်များကို ရယူ၍ မရပါ။</span>
-                <button
-                  className="link-btn"
-                  onClick={() => void refetchEventDays()}
-                  type="button"
-                >
+                <button className="link-btn" onClick={() => void refetchEventDays()} type="button">
                   ပြန်ကြိုးစားရန်
                 </button>
               </div>
             )}
-            {[...selectedPagodaFestivalEvents, ...selectedBalloonFestivalEvents].map((day) => (
-              <article className={`event-card${isPagodaFestival(day.eventName) ? ' pagoda' : ''}`} key={day.key}>
+            {sortedEventDays.map((day) => (
+              <article className={`event-card tone-${festivalTone(day.eventName)}`} key={day.key}>
                 <header className="event-card-head">
                   <span className="event-card-dot" aria-hidden="true" />
                   <h3>{day.title}</h3>
                   {day.dayNumber && day.dayCount && (
-                    <span className="event-day-count">{eventDayLabel(day.dayNumber, day.dayCount)}</span>
+                    <span className="event-progress" role="img" aria-label={eventDayLabel(day.dayNumber, day.dayCount)}>
+                      <span className="event-progress-track" aria-hidden="true">
+                        <span style={{ width: `${(day.dayNumber / day.dayCount) * 100}%` }} />
+                      </span>
+                      <span className="event-progress-count" aria-hidden="true">
+                        {toMyanmarDigits(day.dayNumber)} / {toMyanmarDigits(day.dayCount)}
+                      </span>
+                    </span>
                   )}
                 </header>
                 <ul className="event-card-list">
@@ -476,7 +356,50 @@ export default function EventsPage() {
             ))}
           </section>
         )}
+
+        {/* No schedule on this day: say so, and point to the next festival. */}
+        {showEmptyDay && (
+          <section className="event-empty-day" aria-live="polite">
+            {runningWithoutSchedule.length > 0 ? (
+              <>
+                <h3>{runningWithoutSchedule.map((event) => event.name).join('၊ ')}</h3>
+                <p>ဤနေ့အတွက် အစီအစဉ် မထည့်ရသေးပါ။</p>
+              </>
+            ) : (
+              <h3>ဤနေ့ ပွဲမရှိပါ</h3>
+            )}
+            {nextFestival && (
+              <button
+                className={`event-next tone-${festivalTone(nextFestival.name)}`}
+                onClick={() => goToDate(nextFestival.startDate)}
+                type="button"
+              >
+                <span className="event-next-text">
+                  <span className="event-next-label">နောက်ပွဲ</span>
+                  <strong>{nextFestival.name}</strong>
+                  <span>
+                    {formatMyanmarDate(nextFestival.startDate)} · {inDaysLabel(daysFrom(selectedDate, nextFestival.startDate))}
+                  </span>
+                </span>
+                <ChevronRight size={18} aria-hidden="true" />
+              </button>
+            )}
+          </section>
+        )}
       </div>
+
+      {monthOpen && (
+        <MonthSheet
+          selectedDate={selectedDate}
+          today={todayStr}
+          events={eventRanges}
+          onSelect={(date) => {
+            goToDate(date);
+            setMonthOpen(false);
+          }}
+          onClose={closeMonth}
+        />
+      )}
     </div>
   );
 }
