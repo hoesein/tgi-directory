@@ -3070,11 +3070,6 @@ textarea {
   cursor: pointer;
 }
 
-.market-day-label {
-  color: var(--faint);
-  font-size: 12px;
-}
-
 .market-day-row strong {
   flex: 1;
   min-width: 0;
@@ -3121,14 +3116,6 @@ textarea {
   gap: 8px;
   padding: 12px 14px 10px;
   border-bottom: 1px solid var(--border);
-}
-
-.event-card-dot {
-  width: 8px;
-  height: 8px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--primary);
 }
 
 .event-card-head h3 {
@@ -4167,10 +4154,6 @@ html {
 }
 
 /* Event cards use the festival colour. */
-.event-card-dot {
-  background: var(--tone, var(--primary));
-}
-
 /* Festival day progress: a thin bar and "N / M". */
 .event-progress {
   display: flex;

@@ -274,7 +274,6 @@ export default function EventsPage() {
             aria-expanded={showMarketDayChips}
             onClick={() => setShowMarketDayChips((isVisible) => !isVisible)}
           >
-            <span className="market-day-label">ဈေးနေ့</span>
             <strong>{selectedMarketTown}</strong>
             <ChevronDown
               size={16}
@@ -375,7 +374,6 @@ function EventCard({ day, open, onToggle }: { day: EventDayView; open: boolean; 
           aria-controls={listId}
           onClick={onToggle}
         >
-          <span className="event-card-dot" aria-hidden="true" />
           <span className="event-card-name">{day.title}</span>
           {day.dayNumber && day.dayCount && (
             <span className="event-progress">
