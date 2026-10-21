@@ -118,8 +118,8 @@ function TownshipRow({ township }: { township: ApiTownshipCount }) {
           <h2>{label}</h2>
           <ChevronRight size={20} aria-hidden="true" />
         </Link>
-        <Link className="link-btn" to={path} aria-label={`See all ${township.count} places in ${label}`}>
-          See all {township.count}
+        <Link className="link-btn" to={path} aria-label={`View All ${township.count} places in ${label}`}>
+          View All
         </Link>
       </div>
       {query.isLoading ? (

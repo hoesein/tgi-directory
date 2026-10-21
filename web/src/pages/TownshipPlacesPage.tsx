@@ -7,7 +7,7 @@ import { PhotoGridSkeleton } from '../components/Skeleton';
 import { useDirectoryPlaces, useDirectoryTownships } from '../api/useDirectory';
 import { PLACES_TO_VISIT, townshipLabel } from '../lib/routes';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 /** Every place to visit in one township, loaded as the user scrolls (TGI-61). */
 export default function TownshipPlacesPage() {

@@ -216,7 +216,7 @@ export default function CategoryPage() {
             )}
           </div>
         )}
-        {/* Loads the next 100 as the end of the list scrolls near (TGI-61). */}
+        {/* Loads the next page as the end of the list scrolls near (TGI-61). */}
         <LoadMore query={{ hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage }} />
         {canSuggest() && !isLoading && (
           <Link className="suggest-entry" to={`/category/${categoryId}/add`}>

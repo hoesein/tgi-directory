@@ -220,71 +220,10 @@ textarea {
   background: rgba(255, 255, 255, 0.18);
 }
 
-/* Story-style progress: one segment per slide, the active one fills. */
-.home-slider-progress {
-  display: flex;
-  gap: 6px;
-  padding: 4px 16px 0;
-}
-
-.home-slider-segment {
-  position: relative;
-  flex: 1;
-  height: 16px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-/* The visible bar is thin; the button stays tall enough to tap. */
-.home-slider-segment::before,
-.home-slider-fill {
-  position: absolute;
-  left: 0;
-  top: 6px;
-  height: 3px;
-  border-radius: 2px;
-}
-
-.home-slider-segment::before {
-  content: "";
-  right: 0;
-  background: var(--border);
-}
-
-.home-slider-segment.seen::before {
-  background: var(--sand);
-}
-
-.home-slider-fill {
-  width: 100%;
-  background: var(--primary);
-  transform-origin: left center;
-  animation: home-slider-fill var(--slide-ms, 5000ms) linear forwards;
-}
-
-.home-slider.paused .home-slider-fill {
-  animation-play-state: paused;
-}
-
-@keyframes home-slider-fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .home-slide,
   .home-slide img {
     transform: none;
-  }
-
-  .home-slider-fill {
-    animation: none;
   }
 }
 

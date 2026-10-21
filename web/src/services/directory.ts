@@ -25,7 +25,7 @@ import {
 
 export type DataSource = 'static' | 'api';
 export const DATA_SOURCE: DataSource = import.meta.env.VITE_DATA_SOURCE === 'api' ? 'api' : 'static';
-export const API_PAGE_SIZE = 100;
+export const API_PAGE_SIZE = 10;
 
 const PAGODA_FESTIVAL_PREFIX = 'ဖောင်တော်ဦးဘုရားပွဲ';
 const PAGODA_FESTIVAL_TYPE_ORDER = ['ကြွချီ', 'နေ့ဆွမ်း', 'ညကျိန်း'];

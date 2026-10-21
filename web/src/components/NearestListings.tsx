@@ -46,7 +46,7 @@ interface NearestListingsProps {
 }
 
 export default function NearestListings({ onViewAll, onListingPress }: NearestListingsProps) {
-  // First page of each: up to 100 places in API mode, the whole file in static mode.
+  // First page of each: up to 10 places in API mode, the whole file in static mode.
   const hotels = useDirectoryPlaces(HOTELS);
   const food = useDirectoryPlaces(FOOD_PLACES);
   const isLoading = hotels.isLoading || food.isLoading;

@@ -26,7 +26,7 @@ export function useDirectoryCategories() {
   });
 }
 
-/** Places in one category, filtered; API mode pages 100 at a time unless `pageSize` says otherwise. */
+/** Places in one category, filtered; API mode pages `API_PAGE_SIZE` (10) at a time unless `pageSize` says otherwise. */
 export function useDirectoryPlaces(entity: string | undefined, filters: PlaceFilters = {}) {
   return useInfiniteQuery({
     queryKey: [
