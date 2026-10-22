@@ -397,14 +397,14 @@ function EventCard({ day, open, onToggle }: { day: EventDayView; open: boolean; 
       {open && day.entries.length > 0 && (
         <ul className="event-card-list" id={listId}>
           {day.entries.map((entry) => {
-            // With a ward: "role · ward" under the name. Without: the role sits on the right.
+            // Ward (if any) under the name; role always on the right.
             const body = (
               <>
                 <span className="event-row-text">
                   <strong>{entry.name}</strong>
-                  {entry.ward && <span>{[entry.role, entry.ward].filter(Boolean).join(' · ')}</span>}
+                  {entry.ward && <span>{entry.ward}</span>}
                 </span>
-                {!entry.ward && entry.role && <span className="event-row-role">{entry.role}</span>}
+                {entry.role && <span className="event-row-role">{entry.role}</span>}
                 {entry.href && <ChevronRight size={16} className="event-row-arrow" aria-hidden="true" />}
               </>
             );
