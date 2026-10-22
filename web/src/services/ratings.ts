@@ -1,4 +1,4 @@
-import type { ApiMyRating, ApiMyRatingItem, ApiResponse } from '../types';
+import type { ApiMyRating, ApiMyRatingItem, ApiResponse, Paged } from '../types';
 import { api } from './api';
 import { DATA_SOURCE } from './directory';
 
@@ -30,6 +30,10 @@ export async function removeRating(entity: string, id: string): Promise<void> {
 
 /** The signed-in user's ratings, newest first. */
 export async function fetchMyRatings(): Promise<{ items: ApiMyRatingItem[]; count: number }> {
-  const response = await api.getMine<ApiResponse<ApiMyRatingItem[]>>('/v1/ratings/mine', { page_size: '100' });
-  return { items: response.data, count: response.count ?? response.data.length };
+  const response = await api.getMine<ApiResponse<Paged<ApiMyRatingItem> | ApiMyRatingItem[]>>('/v1/ratings/mine', {
+    page_size: '100',
+  });
+  // Paged since TGI-67; a bare array is the older backend.
+  const items = Array.isArray(response.data) ? response.data : response.data.items;
+  return { items, count: response.count ?? items.length };
 }
