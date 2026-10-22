@@ -47,7 +47,14 @@ export default function SignInPage() {
     }
   };
 
-  const leave = () => navigate(next, { replace: true });
+  // Go back to where the user came from. `next` is often a page that needs
+  // sign-in (add place, my ratings), so going there would loop straight back.
+  // After a failed OAuth round trip the previous entry is the provider, so go home.
+  const leave = () => {
+    const historyIndex = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (historyIndex > 0 && !params.get('error')) navigate(-1);
+    else navigate('/', { replace: true });
+  };
 
   return (
     <div className="sign-in-page">
