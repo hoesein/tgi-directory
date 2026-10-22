@@ -18,7 +18,7 @@ export async function submitSuggestion(input: SuggestionInput): Promise<ApiSugge
 }
 
 export async function fetchMySuggestions(): Promise<ApiSuggestion[]> {
-  const response = await api.get<ApiResponse<ApiSuggestion[]>>('/v1/suggestions', {
+  const response = await api.getMine<ApiResponse<ApiSuggestion[]>>('/v1/suggestions', {
     page: '1',
     page_size: '100',
   });

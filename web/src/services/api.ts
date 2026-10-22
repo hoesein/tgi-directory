@@ -18,6 +18,8 @@ export class ApiError extends Error {
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string>;
+  /** Send the signed-in user's token. Public reads leave it off. */
+  auth?: boolean;
 }
 
 class ApiService {
@@ -27,12 +29,15 @@ class ApiService {
     this.baseUrl = baseUrl;
   }
 
-  private getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
+  /**
+   * Public reads send no custom headers, so the browser skips the CORS
+   * preflight and Vercel's edge cache can answer them (TGI-66).
+   */
+  private getHeaders(auth: boolean, hasBody: boolean): Record<string, string> {
+    const headers: Record<string, string> = {};
+    if (hasBody) headers['Content-Type'] = 'application/json';
 
-    const token = useAuthStore.getState().userToken;
+    const token = auth ? useAuthStore.getState().userToken : null;
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -41,7 +46,7 @@ class ApiService {
   }
 
   private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const { params, ...fetchOptions } = options;
+    const { params, auth = true, ...fetchOptions } = options;
 
     let url = `${this.baseUrl}${endpoint}`;
     if (params) {
@@ -52,7 +57,7 @@ class ApiService {
     const response = await fetch(url, {
       ...fetchOptions,
       headers: {
-        ...this.getHeaders(),
+        ...this.getHeaders(auth, fetchOptions.body !== undefined),
         ...fetchOptions.headers,
       },
     });
@@ -70,7 +75,12 @@ class ApiService {
 
   /** `signal` lets callers (e.g. TanStack Query) cancel a request that is no longer needed. */
   async get<T>(endpoint: string, params?: Record<string, string>, signal?: AbortSignal): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET', params, signal });
+    return this.request<T>(endpoint, { method: 'GET', params, signal, auth: false });
+  }
+
+  /** A read that needs the signed-in user (my rating, my suggestions). */
+  async getMine<T>(endpoint: string, params?: Record<string, string>, signal?: AbortSignal): Promise<T> {
+    return this.request<T>(endpoint, { method: 'GET', params, signal, auth: true });
   }
 
   async post<T>(endpoint: string, body?: unknown): Promise<T> {

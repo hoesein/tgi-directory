@@ -15,7 +15,7 @@ function ratingPath(entity: string, id: string): string {
 }
 
 export async function fetchMyRating(entity: string, id: string): Promise<ApiMyRating> {
-  const response = await api.get<ApiResponse<ApiMyRating>>(ratingPath(entity, id));
+  const response = await api.getMine<ApiResponse<ApiMyRating>>(ratingPath(entity, id));
   return response.data;
 }
 
@@ -30,6 +30,6 @@ export async function removeRating(entity: string, id: string): Promise<void> {
 
 /** The signed-in user's ratings, newest first. */
 export async function fetchMyRatings(): Promise<{ items: ApiMyRatingItem[]; count: number }> {
-  const response = await api.get<ApiResponse<ApiMyRatingItem[]>>('/v1/ratings/mine', { page_size: '100' });
+  const response = await api.getMine<ApiResponse<ApiMyRatingItem[]>>('/v1/ratings/mine', { page_size: '100' });
   return { items: response.data, count: response.count ?? response.data.length };
 }
