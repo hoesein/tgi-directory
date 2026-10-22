@@ -1,4 +1,4 @@
-import type { ApiResponse, ApiSuggestion, ApiTownship, SuggestionInput } from '../types';
+import type { ApiResponse, ApiSuggestion, ApiTownship, Paged, SuggestionInput } from '../types';
 import { api, ApiError } from './api';
 import { DATA_SOURCE } from './directory';
 
@@ -18,11 +18,12 @@ export async function submitSuggestion(input: SuggestionInput): Promise<ApiSugge
 }
 
 export async function fetchMySuggestions(): Promise<ApiSuggestion[]> {
-  const response = await api.getMine<ApiResponse<ApiSuggestion[]>>('/v1/suggestions', {
+  const response = await api.getMine<ApiResponse<Paged<ApiSuggestion> | ApiSuggestion[]>>('/v1/suggestions', {
     page: '1',
     page_size: '100',
   });
-  return response.data;
+  // Paged since TGI-67; a bare array is the older backend.
+  return Array.isArray(response.data) ? response.data : response.data.items;
 }
 
 export async function withdrawSuggestion(id: string): Promise<ApiSuggestion> {
