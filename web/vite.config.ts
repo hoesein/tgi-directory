@@ -11,11 +11,12 @@ const appVersion = (
 
 const repositoryName = env.GITHUB_REPOSITORY?.split('/')[1];
 const base =
-  env.GITHUB_ACTIONS === 'true' &&
-  repositoryName &&
-  !repositoryName.endsWith('.github.io')
+  env.VITE_BASE_PATH ??
+  (env.GITHUB_ACTIONS === 'true' &&
+    repositoryName &&
+    !repositoryName.endsWith('.github.io')
     ? `/${repositoryName}/`
-    : '/';
+    : '/');
 
 const marketDaySource = decodeURIComponent(
   new URL('./vendor/shan-market-day/src/index.ts', import.meta.url).pathname.replace(

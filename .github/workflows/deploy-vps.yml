@@ -1,0 +1,78 @@
+name: Deploy VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vps-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+          token: ${{ secrets.CITY_DATA_TOKEN || github.token }}
+
+      - name: Initialize pinned submodules
+        env:
+          CITY_DATA_TOKEN: ${{ secrets.CITY_DATA_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -n "$CITY_DATA_TOKEN" ]; then
+            git config --global url."https://x-access-token:${CITY_DATA_TOKEN}@github.com/".insteadOf "https://github.com/"
+          fi
+          git submodule sync --recursive
+          git submodule update --init --recursive
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        working-directory: web
+        run: bun install --frozen-lockfile
+
+      - name: Build site
+        working-directory: web
+        env:
+          VITE_BASE_PATH: /
+          VITE_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_WEB_ANALYTICS_TOKEN }}
+          VITE_DATA_SOURCE: ${{ vars.DATA_SOURCE }}
+          VITE_API_URL: ${{ vars.API_URL }}
+          VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          VITE_AUTH_PROVIDERS: ${{ vars.AUTH_PROVIDERS }}
+        run: bun run build
+
+      - name: Configure SSH
+        env:
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > "$HOME/.ssh/vps_deploy_key"
+          printf '%s\n' "$VPS_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/vps_deploy_key" "$HOME/.ssh/known_hosts"
+
+      - name: Deploy to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+          ssh -i "$HOME/.ssh/vps_deploy_key" -o IdentitiesOnly=yes "$VPS_USER@$VPS_HOST" "mkdir -p '$VPS_DEPLOY_PATH'"
+          rsync -az --delete \
+            -e "ssh -i $HOME/.ssh/vps_deploy_key -o IdentitiesOnly=yes" \
+            web/dist/ "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/"
